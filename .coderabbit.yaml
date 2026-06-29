@@ -1,0 +1,15 @@
+language: "ko-KR"
+
+reviews:
+  auto_review:
+    enabled: true
+    drafts: false
+    labels:
+      - "ai-review"
+    auto_incremental_review: true
+    auto_pause_after_reviewed_commits: 2
+    ignore_usernames:
+      - "dependabot[bot]"
+      - "renovate[bot]"
+      - "github-actions[bot]"
+    description_keyword: ""

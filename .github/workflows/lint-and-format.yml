@@ -1,10 +1,11 @@
-name: Lint and Format Check
+name: Pull Request Checks
 
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review]
 
 permissions:
   contents: read
@@ -29,5 +30,5 @@ jobs:
       - name: Make Gradle wrapper executable
         run: chmod +x gradlew
 
-      - name: Apply Spotless formatting
-        run: ./gradlew spotlessApply
+      - name: Check formatting
+        run: ./gradlew spotlessCheck
