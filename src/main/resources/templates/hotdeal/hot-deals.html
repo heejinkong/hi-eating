@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+  <section th:fragment="content" class="hot-deal-section container-xl">
+    <h1 class="hot-deal-title">원데이 <strong>핫딜</strong></h1>
+
+    <p class="hot-deal-empty" th:if="${#lists.isEmpty(hotDealProducts)}">
+      진행 중인 핫딜 상품이 없습니다.
+    </p>
+
+    <section class="hot-deal-carousel"
+             th:if="${!#lists.isEmpty(hotDealProducts)}"
+             data-hotdeal-carousel
+             aria-label="핫딜 상품">
+      <button class="hot-deal-nav hot-deal-nav--prev"
+              type="button"
+              data-hotdeal-prev
+              aria-label="이전 핫딜">
+        <i class="bi bi-chevron-left" aria-hidden="true"></i>
+      </button>
+
+      <div class="hot-deal-viewport">
+        <div class="hot-deal-track" data-hotdeal-track>
+          <article class="hot-deal-card" th:each="hotDealProduct : ${hotDealProducts}">
+            <p class="hot-deal-card__eyebrow" th:text="${hotDealProduct.hotDealTitle}">
+              올 여름 가장 시원한 혜택
+            </p>
+
+            <div class="hot-deal-card__body">
+              <div class="hot-deal-card__image">
+                <span>상품 이미지</span>
+                <span class="hot-deal-card__stock"
+                      th:text="|남은수량 ${hotDealProduct.stock}개|">남은수량 4개</span>
+              </div>
+
+              <div>
+                <p class="hot-deal-card__name" th:text="${hotDealProduct.productName}">
+                  트롬 18KG 건조기
+                </p>
+                <p class="hot-deal-card__discount"
+                   th:text="|${hotDealProduct.discountRate}% 할인|">20% 할인</p>
+                <p class="hot-deal-card__price"
+                   th:text="${#numbers.formatInteger(hotDealProduct.hotDealPrice, 0, 'COMMA')} + '원'">
+                  923,300원
+                </p>
+                <div class="hot-deal-card__meta">
+                  <span>종료까지 남은 시간</span>
+                  <span class="hot-deal-card__timer"
+                        th:attr="data-remaining-seconds=${hotDealProduct.remainingSeconds}">
+                    00:00:00
+                  </span>
+                </div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+
+      <button class="hot-deal-nav hot-deal-nav--next"
+              type="button"
+              data-hotdeal-next
+              aria-label="다음 핫딜">
+        <i class="bi bi-chevron-right" aria-hidden="true"></i>
+      </button>
+    </section>
+  </section>
+</body>
+</html>

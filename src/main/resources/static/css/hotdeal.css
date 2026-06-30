@@ -1,0 +1,172 @@
+.hot-deal-section {
+  margin-top: 48px;
+  margin-bottom: 48px;
+}
+
+.hot-deal-title {
+  margin: 0 0 24px;
+  color: var(--color-ink);
+  font-size: 28px;
+  font-weight: 800;
+}
+
+.hot-deal-title strong {
+  color: #f33221;
+}
+
+.hot-deal-carousel {
+  position: relative;
+}
+
+.hot-deal-viewport {
+  overflow: hidden;
+}
+
+.hot-deal-track {
+  display: flex;
+  gap: 28px;
+  transition: transform 320ms ease;
+  will-change: transform;
+}
+
+.hot-deal-card {
+  flex: 0 0 calc((100% - 28px) / 2);
+  min-width: 0;
+  border-radius: 8px;
+  background: #fa321f;
+  padding: 22px;
+  box-shadow: 0 10px 24px rgba(34, 34, 34, 0.12);
+}
+
+.hot-deal-card__eyebrow {
+  margin: 0 0 18px;
+  color: #fff5ee;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.hot-deal-card__body {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 26px;
+  align-items: center;
+  min-height: 190px;
+  border-radius: 18px;
+  background: #fff2ed;
+  padding: 18px 26px 18px 18px;
+}
+
+.hot-deal-card__image {
+  position: relative;
+  display: grid;
+  min-height: 150px;
+  place-items: center;
+  border-radius: 14px;
+  background: linear-gradient(145deg, #ffffff, #e9ecef);
+  color: #888;
+  font-size: 15px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.hot-deal-card__stock {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  border-radius: 6px;
+  background: rgba(32, 32, 32, 0.72);
+  color: #fff;
+  padding: 6px 10px;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.hot-deal-card__name {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 900;
+  line-height: 1.35;
+}
+
+.hot-deal-card__discount {
+  margin: 4px 0 0;
+  font-size: 24px;
+  font-weight: 900;
+}
+
+.hot-deal-card__price {
+  margin: 18px 0;
+  color: #f21e13;
+  font-size: 30px;
+  font-weight: 900;
+}
+
+.hot-deal-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  align-items: center;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.hot-deal-card__timer {
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+.hot-deal-nav {
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+  display: grid;
+  width: 46px;
+  height: 46px;
+  place-items: center;
+  border: 0;
+  background: #63c4a8;
+  color: #15231f;
+  cursor: pointer;
+  font-size: 24px;
+  transform: translateY(-50%);
+}
+
+.hot-deal-nav:hover {
+  background: #4ab294;
+}
+
+.hot-deal-nav--prev {
+  left: -54px;
+}
+
+.hot-deal-nav--next {
+  right: -54px;
+}
+
+.hot-deal-empty {
+  padding: 40px;
+  border: 1px solid var(--color-line);
+  border-radius: 8px;
+  background: #fff;
+  text-align: center;
+  font-weight: 700;
+}
+
+@media (max-width: 900px) {
+  .hot-deal-card {
+    flex-basis: 100%;
+  }
+
+  .hot-deal-card__body {
+    grid-template-columns: 1fr;
+  }
+
+  .hot-deal-nav--prev {
+    left: 0;
+  }
+
+  .hot-deal-nav--next {
+    right: 0;
+  }
+}
