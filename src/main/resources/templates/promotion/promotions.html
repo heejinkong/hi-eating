@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Promotions</title>
+</head>
+<body>
+<main>
+  <h1>Promotions</h1>
+
+  <p th:if="${#lists.isEmpty(promotions)}">노출 중인 프로모션이 없습니다.</p>
+
+  <ul th:if="${!#lists.isEmpty(promotions)}">
+    <li th:each="promotion : ${promotions}">
+      <a th:href="${promotion.link}">
+        <img th:src="${promotion.imgSrc}" th:alt="${promotion.title}" width="240">
+        <span th:text="${promotion.title}">프로모션 제목</span>
+      </a>
+    </li>
+  </ul>
+</main>
+</body>
+</html>
