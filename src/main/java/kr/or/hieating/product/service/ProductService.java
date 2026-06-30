@@ -12,7 +12,7 @@ public class ProductService {
 
   private final ProductMapper productMapper;
 
-  public List<MostPurchasedProductResponseDto> findMostPurchasedProducts(){
+  public List<MostPurchasedProductResponseDto> findMostPurchasedProducts() {
     return productMapper.findMostPurchasedProducts();
   }
 }
