@@ -1,0 +1,66 @@
+.site-footer {
+  margin-top: 72px;
+  padding: 34px 0;
+  color: #66615d;
+}
+
+.footer-company h2,
+.footer-customer h2 {
+  color: #24211f;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.footer-company p,
+.footer-customer p {
+  font-size: 15px;
+  line-height: 1.8;
+}
+
+.footer-divider {
+  color: #b7b0aa;
+}
+
+.footer-notice {
+  max-width: 760px;
+}
+
+.footer-customer {
+  min-width: 220px;
+}
+
+.footer-customer strong {
+  color: #8a8600;
+  font-size: 34px;
+  line-height: 1.1;
+  font-weight: 800;
+}
+
+@media (max-width: 420px) {
+  .site-footer {
+    margin-top: 48px;
+    padding: 28px 0;
+  }
+
+  .footer-company h2,
+  .footer-customer h2 {
+    font-size: 20px;
+  }
+
+  .footer-company p,
+  .footer-customer p {
+    font-size: 14px;
+  }
+
+  .footer-divider {
+    display: block;
+    width: 0;
+    height: 0;
+    margin: 0 !important;
+    overflow: hidden;
+  }
+
+  .footer-customer strong {
+    font-size: 30px;
+  }
+}

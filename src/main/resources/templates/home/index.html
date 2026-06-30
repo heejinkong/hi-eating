@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+  <section th:fragment="content">
+    <section class="home-hero container-xl py-5">
+      <p class="section-eyebrow mb-3 fw-bold">오늘의 식탁을 가볍게 고르는 곳</p>
+      <h1 class="mb-0">Hi Eating에서 맛있는 선택을 시작하세요.</h1>
+      <p class="home-hero-copy mt-3 mb-0">카테고리, 핫딜, 즐겨찾기를 한 흐름에서 둘러볼 수 있도록 공통 레이아웃을 준비했습니다.</p>
+    </section>
+
+    <section class="content-preview-grid container-xl" aria-label="추천 섹션">
+      <div class="row g-3">
+        <article class="col-md-4">
+          <div class="content-preview h-100 p-4 border rounded bg-white">
+            <span class="d-block mb-3 fw-bold">Category</span>
+            <strong class="d-block">먹고 싶은 종류부터 빠르게</strong>
+          </div>
+        </article>
+        <article class="col-md-4">
+          <div class="content-preview h-100 p-4 border rounded bg-white">
+            <span class="d-block mb-3 fw-bold">Hot Deal</span>
+            <strong class="d-block">놓치기 아까운 혜택 모아보기</strong>
+          </div>
+        </article>
+        <article class="col-md-4">
+          <div class="content-preview h-100 p-4 border rounded bg-white">
+            <span class="d-block mb-3 fw-bold">Favorites</span>
+            <strong class="d-block">자주 찾는 메뉴는 즐겨찾기로</strong>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="demo-scroll-space container-xl py-5" aria-label="오늘의 큐레이션">
+      <h2 class="mb-2">오늘의 큐레이션</h2>
+      <p class="mb-0">든든한 한 끼부터 가볍게 즐기는 간식까지, 지금 둘러보기 좋은 선택지를 준비하고 있습니다.</p>
+    </section>
+  </section>
+</body>
+</html>

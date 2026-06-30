@@ -1,0 +1,61 @@
+.section-eyebrow {
+  color: var(--color-brand-strong);
+  font-size: 14px;
+}
+
+.home-hero h1 {
+  max-width: 680px;
+  color: var(--color-ink);
+  font-size: 44px;
+  line-height: 1.18;
+}
+
+.home-hero-copy {
+  max-width: 600px;
+  color: var(--color-muted);
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+.content-preview {
+  min-height: 148px;
+  border-color: var(--color-line) !important;
+}
+
+.content-preview span {
+  color: var(--color-brand);
+  font-size: 13px;
+}
+
+.content-preview strong {
+  color: var(--color-ink);
+  font-size: 22px;
+  line-height: 1.35;
+}
+
+.demo-scroll-space {
+  min-height: 720px;
+  color: var(--color-muted);
+}
+
+.demo-scroll-space h2 {
+  color: var(--color-ink);
+  font-size: 28px;
+}
+
+.demo-scroll-space p {
+  max-width: 520px;
+  line-height: 1.7;
+}
+
+@media (max-width: 767.98px) {
+  .home-hero h1 {
+    font-size: 32px;
+  }
+}
+
+@media (max-width: 420px) {
+  .home-hero h1 {
+    font-size: 28px;
+  }
+}
