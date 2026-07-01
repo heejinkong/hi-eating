@@ -4,15 +4,15 @@
 <section class="mypage-shell min-vh-100 py-4 py-md-5" id="top" th:fragment="content">
   <div class="container-xxl mypage-container">
     <nav class="mypage-breadcrumb d-inline-flex align-items-center gap-1 mb-4 fw-bold" aria-label="현재 위치">
-      <a class="mypage-member-link" th:href="@{/mypage}" th:text="|${memberName}님|">이재우님</a>
+      <a class="mypage-member-link" th:href="@{/mypage}" th:text="|${member.name}님|"></a>
       <i class="bi bi-chevron-right" aria-hidden="true"></i>
     </nav>
 
     <section class="mypage-summary row g-2 g-lg-3 mb-5" aria-label="마이페이지 요약">
       <article class="col-4 col-lg-2" th:each="card : ${summaryCards}">
         <div class="summary-card h-100 d-flex flex-column align-items-center justify-content-center gap-2 border rounded-3 shadow-sm bg-white">
-          <span th:text="${card.label}">주문 상품</span>
-          <strong th:text="${card.count}">0</strong>
+          <span th:text="${card.label}"></span>
+          <strong th:text="${card.count}"></strong>
         </div>
       </article>
 
@@ -36,18 +36,18 @@
       <article class="order-card ps-md-5">
         <div class="order-status d-inline-flex align-items-center gap-2 mb-4">
           <span class="rounded-pill"></span>
-          <strong th:text="${recentOrder.status}">구매 확정</strong>
+          <strong th:text="${recentPurchase.formattedCreatedAt()}"></strong>
         </div>
 
         <div class="order-product row g-3 g-md-4 align-items-center mb-4">
           <div class="col-auto">
-            <img class="rounded" th:src="${recentOrder.imageUrl}" th:alt="${recentOrder.name}">
+            <img class="rounded" th:src="${productImageUrls[recentOrderProduct.id]}" th:alt="${recentOrderProduct.name}">
           </div>
           <div class="order-product-info col">
-            <span class="d-block mb-1" th:text="${recentOrder.brand}">오트밀</span>
-            <h2 class="mb-2" th:text="${recentOrder.name}">아침 그래놀라 오트밀 세트</h2>
-            <p class="mb-2" th:text="${recentOrder.option}">1팩 / HIEATING</p>
-            <strong class="d-block" th:text="${recentOrder.price}">119,640원</strong>
+            <span class="d-block mb-1" th:text="${recentOrderProduct.statusLabel()}"></span>
+            <h2 class="mb-2" th:text="${recentOrderProduct.name}"></h2>
+            <p class="mb-2" th:text="${recentPurchase.formattedQuantity()}"></p>
+            <strong class="d-block" th:text="${recentPurchase.formattedTotalPrice()}"></strong>
           </div>
         </div>
 
@@ -63,16 +63,14 @@
 
       <div class="recommend-row row g-2 g-md-3">
         <article class="product-card col-6 col-md-4 col-lg pb-2" th:each="product : ${recommendedProducts}">
-          <a class="product-image-link d-block overflow-hidden mb-2 rounded" th:href="@{/products}">
-            <img class="d-block w-100" th:src="${product.imageUrl}" th:alt="${product.name}">
+          <a class="product-image-link d-block overflow-hidden mb-2 rounded" th:href="@{/product/{id}(id=${product.id})}">
+            <img class="d-block w-100" th:src="${productImageUrls[product.id]}" th:alt="${product.name}">
           </a>
-          <p class="product-subtitle mb-0" th:text="${product.subtitle}">하루를 채워주는 산뜻한 선택</p>
-          <h3 class="mb-2" th:text="${product.name}">청정 목장 무항생제 우유 900ml</h3>
+          <p class="product-subtitle mb-0" th:text="${product.description}"></p>
+          <h3 class="mb-2" th:text="${product.name}"></h3>
           <div class="product-price d-flex align-items-baseline gap-2 mb-2">
-            <span th:if="${product.discountRate != null}" th:text="${product.discountRate}">20%</span>
-            <strong th:text="${product.price}">3,900원</strong>
+            <strong th:text="${product.formattedPrice()}"></strong>
           </div>
-          <p class="delivery-message mb-0" th:text="${product.deliveryMessage}">4만원 이상 무료배송</p>
           <div class="product-actions d-flex gap-2 mt-3">
             <button class="d-inline-flex align-items-center justify-content-center border rounded-circle bg-white" type="button" aria-label="장바구니 담기">
               <i class="bi bi-cart-plus" aria-hidden="true"></i>

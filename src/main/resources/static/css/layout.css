@@ -1,4 +1,36 @@
+@font-face {
+  font-family: "Happiness Sans";
+  src: url("/fonts/Happiness-Sans-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Happiness Sans";
+  src: url("/fonts/Happiness-Sans-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Happiness Sans";
+  src: url("/fonts/Happiness-Sans-Title.ttf") format("truetype");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
+  --font-family-base:
+      "Happiness Sans",
+      Pretendard,
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      sans-serif;
+  --bs-body-font-family: var(--font-family-base);
   --color-brand: #ff4d1f;
   --color-brand-strong: #e83d12;
   --color-ink: #191716;
@@ -13,16 +45,12 @@
 html {
   background: var(--color-page);
   color: var(--color-ink);
-  font-family:
-      Pretendard,
-      -apple-system,
-      BlinkMacSystemFont,
-      "Segoe UI",
-      sans-serif;
+  font-family: var(--font-family-base);
   letter-spacing: 0;
 }
 
 body {
   min-width: 320px;
   background: var(--color-page);
+  font-family: var(--font-family-base);
 }

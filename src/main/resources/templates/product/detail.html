@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+<section class="product-detail-shell py-4 py-lg-5" th:fragment="content">
+  <div class="container-xl product-detail-container">
+    <section class="product-hero row g-4 g-xl-5 align-items-start">
+      <div class="col-lg-6">
+        <div class="product-gallery">
+          <div class="product-main-image overflow-hidden bg-white position-relative">
+            <img id="mainProductImage" th:alt="${product.name}" th:src="${product.mainImageUrl()}">
+            <button class="carousel-control-prev" onclick="showPrevImage()" type="button">
+              <span aria-hidden="true" class="carousel-control-prev-icon"></span>
+              <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" onclick="showNextImage()" type="button">
+              <span aria-hidden="true" class="carousel-control-next-icon"></span>
+              <span class="visually-hidden">Next</span>
+            </button>
+          </div>
+
+          <div class="product-thumbnails d-grid mt-3">
+            <button class="product-thumbnail"
+                    th:classappend="${stat.index == 0} ? 'active'"
+                    th:data-image-url="${imageUrl}"
+                    th:each="imageUrl, stat : ${product.thumbnailImageUrls()}"
+                    type="button">
+              <img th:alt="|${product.name} ${stat.count}|" th:src="${imageUrl}">
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <article class="product-purchase-panel">
+          <h1 class="mb-3" th:text="${product.name}"></h1>
+          <strong class="product-price d-block mb-4" th:text="${product.formattedPrice()}"></strong>
+
+          <div class="purchase-controls d-flex flex-column flex-sm-row gap-3">
+            <div class="quantity-control d-inline-flex align-items-center">
+              <button class="quantity-button" data-quantity-action="decrease" type="button">
+                <i class="bi bi-dash" aria-hidden="true"></i>
+              </button>
+              <input class="quantity-input" id="productQuantity" min="1" type="number" value="1">
+              <button class="quantity-button" data-quantity-action="increase" type="button">
+                <i class="bi bi-plus" aria-hidden="true"></i>
+              </button>
+            </div>
+            <button class="buy-button btn" type="button">구매하기</button>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="product-content mt-5">
+      <ul class="product-tabs nav" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button aria-controls="product-description"
+                  aria-selected="true"
+                  class="nav-link active"
+                  data-bs-target="#product-description"
+                  data-bs-toggle="tab"
+                  id="product-description-tab"
+                  role="tab"
+                  type="button">상품 상세 내역</button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button aria-controls="product-reviews"
+                  aria-selected="false"
+                  class="nav-link"
+                  data-bs-target="#product-reviews"
+                  data-bs-toggle="tab"
+                  id="product-reviews-tab"
+                  role="tab"
+                  type="button">리뷰</button>
+        </li>
+      </ul>
+
+      <div class="tab-content product-tab-content bg-white">
+        <section aria-labelledby="product-description-tab"
+                 class="tab-pane fade show active product-description-html"
+                 id="product-description"
+                 role="tabpanel"
+                 tabindex="0"
+                 th:utext="${product.safeDescriptionHtml()}"></section>
+
+        <section aria-labelledby="product-reviews-tab"
+                 class="tab-pane fade review-list"
+                 id="product-reviews"
+                 role="tabpanel"
+                 tabindex="0">
+          <div class="review-tab-header d-flex align-items-center justify-content-between gap-3">
+            <h2 class="mb-0">
+              리뷰
+              <span th:text="${product.reviewSummary.formattedReviewCount()}"></span>
+            </h2>
+            <a class="review-write-link d-inline-flex align-items-center gap-2" th:href="@{/reviews/new}">
+              <i class="bi bi-plus-circle-fill" aria-hidden="true"></i>
+              리뷰 작성하기
+              <i class="bi bi-chevron-right" aria-hidden="true"></i>
+            </a>
+          </div>
+          <article class="review-item" th:each="review : ${reviews}">
+            <div class="review-meta d-flex flex-wrap align-items-center justify-content-between gap-2">
+              <time th:datetime="${review.createdAt}" th:text="${review.formattedCreatedAt()}"></time>
+              <span class="review-stars" th:text="${review.starText()}"></span>
+            </div>
+            <p class="review-content mb-0 mt-3" th:text="${review.content}"></p>
+            <img class="review-image mt-3" th:if="${review.imgSrc != null}" th:src="${review.imgSrc}" th:alt="${review.content}">
+          </article>
+        </section>
+      </div>
+    </section>
+  </div>
+  <script th:src="@{/js/product-detail.js}"></script>
+</section>
+</body>
+</html>
