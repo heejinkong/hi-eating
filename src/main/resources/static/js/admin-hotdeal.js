@@ -8,6 +8,65 @@ let currentPage = 1;
 
 document.addEventListener('DOMContentLoaded', () => {
     searchProducts();
+
+    // 핫딜 등록 폼 submit 이벤트 핸들러 등록
+    const hotDealForm = document.getElementById('hotDealForm');
+    if (hotDealForm) {
+        hotDealForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            if (selectedProducts.length === 0) {
+                alert('핫딜에 등록할 상품을 최소 하나 이상 선택해야 합니다.');
+                return;
+            }
+            
+            const title = document.getElementById('dealTitle').value;
+            const description = document.getElementById('dealDescription').value;
+            const startsAt = document.getElementById('startsAt').value;
+            const endsAt = document.getElementById('endsAt').value;
+            const discountRate = parseInt(document.getElementById('discountRate').value, 10);
+            
+            // 날짜 구분자 변환 (yyyy-MM-dd -> yyyy.MM.dd)
+            const formattedStartsAt = startsAt.replace(/-/g, '.');
+            const formattedEndsAt = endsAt.replace(/-/g, '.');
+            
+            // 상품 목록 DTO 매핑
+            const products = selectedProducts.map(p => ({
+                productOptionId: p.optionId,
+                originalPrice: p.price
+            }));
+            
+            const requestData = {
+                title,
+                description,
+                startsAt: formattedStartsAt,
+                endsAt: formattedEndsAt,
+                discountRate,
+                products
+            };
+            
+            fetch('/admin/hotdeals', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestData)
+            })
+            .then(res => res.json())
+            .then(response => {
+                if (response.isSuccess) {
+                    alert('핫딜이 성공적으로 등록되었습니다.');
+                    location.reload();
+                } else {
+                    alert('핫딜 등록에 실패했습니다: ' + (response.message || '알 수 없는 오류'));
+                }
+            })
+            .catch(err => {
+                console.error('Error creating hotdeal:', err);
+                alert('서버와 통신하는 중 오류가 발생했습니다.');
+            });
+        });
+    }
 });
 
 function changeSort(sortType) {
@@ -293,19 +352,183 @@ function updateCharCount() {
     }
 }
 
-// 추천가 버튼 클릭 시 30% 할인가(원가의 70%)를 강제로 세팅하는 함수
-function applyRecommendedPrice() {
-    if (selectedProducts.length === 0) {
-        alert('선택된 상품이 없습니다. 먼저 상품을 선택해 주세요.');
-        return;
-    }
-    let totalOriginalPrice = 0;
-    selectedProducts.forEach(item => {
-        totalOriginalPrice += item.price;
-    });
-    const recommendedPrice = Math.floor(totalOriginalPrice * 0.7);
-    const priceInput = document.getElementById('hotDealPrice');
-    if (priceInput) {
-        priceInput.value = recommendedPrice;
+// 추천 할인율 버튼 클릭 시 30%를 강제로 세팅하는 함수
+function applyRecommendedDiscount() {
+    const discountInput = document.getElementById('discountRate');
+    if (discountInput) {
+        discountInput.value = 30;
     }
 }
+
+// 취소 버튼 클릭 시 전체 입력 및 선택 값 초기화
+function resetHotDealForm() {
+    const form = document.getElementById('hotDealForm');
+    if (form) {
+        form.reset();
+    }
+    const counter = document.getElementById('charCount');
+    if (counter) {
+        counter.innerText = '0';
+    }
+    selectedProducts = [];
+    updateSelectedBox();
+    const checkboxes = document.querySelectorAll('#productSearchResult .checkbox-custom');
+    checkboxes.forEach(cb => cb.checked = false);
+}
+
+// === 등록된 핫딜 페이징 및 정렬 기능 ===
+let registeredDeals = [];
+let currentDealPage = 1;
+let currentDealSort = 'ASC'; // 기본값: 오래된순 (ASC)
+const dealPageSize = 3;
+
+// 정렬 상태 변경 및 active 클래스 토글
+function changeDealSort(sortOrder) {
+    currentDealSort = sortOrder;
+    
+    const btnDesc = document.getElementById('btnDealSortDesc');
+    const btnAsc = document.getElementById('btnDealSortAsc');
+    if (btnDesc && btnAsc) {
+        if (sortOrder === 'DESC') {
+            btnDesc.classList.add('active');
+            btnAsc.classList.remove('active');
+        } else {
+            btnDesc.classList.remove('active');
+            btnAsc.classList.add('active');
+        }
+    }
+    
+    currentDealPage = 1; // 정렬 변경 시 1페이지로 리셋
+    renderRegisteredDeals();
+}
+
+// 초기화 진입점
+function initRegisteredDeals(dataList) {
+    registeredDeals = dataList || [];
+    renderRegisteredDeals();
+}
+
+// 날짜 형식 변환기 (yyyy.MM.dd)
+function formatDate(dateStr) {
+    if (!dateStr) return 'N/A';
+    if (Array.isArray(dateStr)) {
+        const y = dateStr[0];
+        const m = String(dateStr[1]).padStart(2, '0');
+        const d = String(dateStr[2]).padStart(2, '0');
+        return `${y}.${m}.${d}`;
+    }
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) {
+        return dateStr.substring(0, 10).replace(/-/g, '.');
+    }
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}.${m}.${d}`;
+}
+
+// 핫딜 목록 렌더링 (3개씩 정렬)
+function renderRegisteredDeals() {
+    const tbody = document.getElementById('registeredDealsBody');
+    const totalCountLbl = document.getElementById('dealTotalCount');
+    const paginationContainer = document.getElementById('registeredDealsPagination');
+    if (!tbody) return;
+
+    totalCountLbl.innerText = `${registeredDeals.length}개`;
+
+    if (registeredDeals.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="6" class="text-center py-5 text-muted">
+                    등록된 핫딜 기획전이 없습니다.
+                </td>
+            </tr>
+        `;
+        paginationContainer.innerHTML = '';
+        return;
+    }
+
+    // 1. 기간 정렬
+    const sortedList = [...registeredDeals].sort((a, b) => {
+        const dateA = new Date(a.startsAt);
+        const dateB = new Date(b.startsAt);
+        return currentDealSort === 'ASC' ? dateA - dateB : dateB - dateA;
+    });
+
+    // 2. 페이징 인덱스 계산
+    const totalPages = Math.ceil(sortedList.length / dealPageSize);
+    if (currentDealPage > totalPages) currentDealPage = totalPages;
+    if (currentDealPage < 1) currentDealPage = 1;
+
+    const startIndex = (currentDealPage - 1) * dealPageSize;
+    const pagedList = sortedList.slice(startIndex, startIndex + dealPageSize);
+
+    // 3. 테이블 그리기
+    let html = '';
+    pagedList.forEach(deal => {
+        const startStr = formatDate(deal.startsAt);
+        const endStr = formatDate(deal.endsAt);
+        
+        let statusBadge = '';
+        if (deal.status === 'ACTIVE') {
+            statusBadge = '<span class="status-pill status-active">진행중</span>';
+        } else if (deal.status === 'SCHEDULED') {
+            statusBadge = '<span class="status-pill status-waiting">대기중</span>';
+        } else if (deal.status === 'ENDED') {
+            statusBadge = '<span class="status-pill status-closed">종료됨</span>';
+        } else {
+            statusBadge = `<span class="status-pill status-closed">${deal.status}</span>`;
+        }
+
+        html += `
+            <tr>
+                <td><strong>${deal.title}</strong></td>
+                <td>${startStr} ~ ${endStr}</td>
+                <td>${deal.productCount}개</td>
+                <td class="fw-bold">${deal.discountPrice.toLocaleString()}원</td>
+                <td>${statusBadge}</td>
+                <td class="text-center">
+                    <button type="button" class="btn btn-sm btn-outline-custom py-1 px-3" style="font-size: 0.8rem; font-weight: 700; border-radius: 6px;">수정</button>
+                </td>
+            </tr>
+        `;
+    });
+    tbody.innerHTML = html;
+
+    // 4. 페이지네이션 렌더링
+    renderDealPagination(totalPages);
+}
+
+// 핫딜 목록 페이지네이션 그리기
+function renderDealPagination(totalPages) {
+    const container = document.getElementById('registeredDealsPagination');
+    if (!container) return;
+    if (totalPages <= 1) {
+        container.innerHTML = '';
+        return;
+    }
+
+    let html = '';
+    html += `
+        <button type="button" class="page-btn" ${currentDealPage === 1 ? 'disabled' : ''} onclick="changeDealPage(${currentDealPage - 1})">
+            <i class="bi bi-chevron-left"></i>
+        </button>
+    `;
+    for (let i = 1; i <= totalPages; i++) {
+        html += `
+            <button type="button" class="page-btn ${currentDealPage === i ? 'active' : ''}" onclick="changeDealPage(${i})">${i}</button>
+        `;
+    }
+    html += `
+        <button type="button" class="page-btn" ${currentDealPage === totalPages ? 'disabled' : ''} onclick="changeDealPage(${currentDealPage + 1})">
+            <i class="bi bi-chevron-right"></i>
+        </button>
+    `;
+    container.innerHTML = html;
+}
+
+function changeDealPage(page) {
+    currentDealPage = page;
+    renderRegisteredDeals();
+}
+

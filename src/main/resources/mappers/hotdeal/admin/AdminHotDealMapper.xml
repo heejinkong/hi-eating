@@ -19,4 +19,14 @@
         GROUP BY h.id, h.title, h.starts_at, h.ends_at, h.status
         ORDER BY h.starts_at DESC
     </select>
+
+    <insert id="insertHotDeal" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO hot_deals (created_by, title, description, starts_at, ends_at, status)
+        VALUES (#{createdBy}, #{title}, #{description}, #{startsAt}, #{endsAt}, #{status})
+    </insert>
+
+    <insert id="insertHotDealProduct">
+        INSERT INTO hot_deal_products (hot_deal_id, product_option_id, original_price, hot_deal_price)
+        VALUES (#{hotDealId}, #{productOptionId}, #{originalPrice}, #{hotDealPrice})
+    </insert>
 </mapper>

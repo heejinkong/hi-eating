@@ -93,7 +93,20 @@
                 <div class="dashboard-card">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <div class="card-title m-0">등록된 핫딜</div>
-                        <div class="total-count-lbl m-0" th:text="${hotDeals != null ? hotDeals.size() + '개' : '0개'}">2개</div>
+                        
+                        <!-- 우측 정렬 필즈 + 전체 갯수 세트 -->
+                        <div class="d-flex align-items-center gap-3">
+                            <!-- 시작일 정렬 필터 필즈 -->
+                            <div class="filter-pills m-0">
+                                <button type="button" class="btn-pill active" id="btnDealSortAsc" onclick="changeDealSort('ASC')">
+                                    <i class="bi bi-calendar-event"></i> 오래된순
+                                </button>
+                                <button type="button" class="btn-pill" id="btnDealSortDesc" onclick="changeDealSort('DESC')">
+                                    <i class="bi bi-calendar-event"></i> 최신순
+                                </button>
+                            </div>
+                            <div class="total-count-lbl m-0" id="dealTotalCount">0개</div>
+                        </div>
                     </div>
                     <p style="font-size: 0.82rem; color: var(--text-muted); margin-top: -0.5rem; margin-bottom: 1.25rem;">수정 버튼을 누르면 우측 패널에서 내용을 바로 편집합니다.</p>
 
@@ -109,29 +122,14 @@
                                 <th class="text-center" style="width: 8%;">관리</th>
                             </tr>
                             </thead>
-                            <tbody>
-                            <tr th:if="${#lists.isEmpty(hotDeals)}">
-                                <td colspan="6" class="text-center py-5 text-muted">
-                                    등록된 핫딜 기획전이 없습니다.
-                                </td>
-                            </tr>
-                            <tr th:each="deal : ${hotDeals}">
-                                <td><strong th:text="${deal.title}">여름맞이 특별 핫딜</strong></td>
-                                <td th:text="${#temporals.format(deal.startsAt, 'yyyy.MM.dd')} + ' ~ ' + ${#temporals.format(deal.endsAt, 'yyyy.MM.dd')}">2026.06.26 ~ 2026.06.30</td>
-                                <td th:text="${deal.productCount} + '개'">2개</td>
-                                <td class="fw-bold" th:text="${#numbers.formatInteger(deal.discountPrice, 0, 'COMMA')} + '원'">73,000원</td>
-                                <td>
-                                    <span th:if="${deal.status == 'ACTIVE'}" class="status-pill status-active">진행중</span>
-                                    <span th:if="${deal.status == 'SCHEDULED'}" class="status-pill status-waiting">대기중</span>
-                                    <span th:if="${deal.status == 'ENDED'}" class="status-pill status-closed">종료됨</span>
-                                </td>
-                                <td class="text-center">
-                                    <button class="btn btn-sm btn-outline-custom py-1 px-3" style="font-size: 0.8rem; font-weight: 700; border-radius: 6px;">수정</button>
-                                </td>
-                            </tr>
+                            <tbody id="registeredDealsBody">
+                                <!-- JS 동적 렌더링 -->
                             </tbody>
                         </table>
                     </div>
+                    
+                    <!-- 등록된 핫딜용 페이지네이션 -->
+                    <div class="pagination-custom justify-content-center mt-3" id="registeredDealsPagination"></div>
                 </div>
             </div>
 
@@ -180,27 +178,19 @@
                         </div>
 
                         <div class="mb-4">
-                            <label class="control-label">핫딜 특가</label>
+                            <label class="control-label" for="discountRate">핫딜 할인율</label>
                             <div class="d-flex gap-2">
                                 <div class="position-relative flex-grow-1">
-                                    <input type="number" class="form-control form-control-custom w-100 pe-4" id="hotDealPrice" placeholder="73000" required>
-                                    <span class="position-absolute" style="right: 12px; top: 8px; font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">원</span>
+                                    <input type="number" class="form-control form-control-custom w-100 pe-4" id="discountRate" placeholder="30" min="1" max="99" required>
+                                    <span class="position-absolute" style="right: 12px; top: 8px; font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">%</span>
                                 </div>
-                                <button type="button" onclick="applyRecommendedPrice()" class="btn btn-outline-custom" style="font-weight: 700; border-radius: 8px; font-size: 0.85rem; padding: 0 1rem; color: var(--orange-brand); border-color: #ffc9c9; background: #fff8f5;">추천가</button>
+                                <button type="button" onclick="applyRecommendedDiscount()" class="btn btn-outline-custom" style="font-weight: 700; border-radius: 8px; font-size: 0.85rem; padding: 0 1rem; color: var(--orange-brand); border-color: #ffc9c9; background: #fff8f5;">추천 할인율</button>
                             </div>
-                        </div>
-
-                        <div class="form-switch-custom mb-4">
-                            <div>
-                                <strong style="font-size: 0.85rem; display: block;">노출 상태</strong>
-                                <span class="text-muted" style="font-size: 0.75rem;">등록 즉시 노출</span>
-                            </div>
-                            <input type="checkbox" class="switch-input" id="exposureSwitch" checked>
                         </div>
 
                         <div class="d-flex gap-2 mb-2">
-                            <button type="button" class="action-btn btn-outline-custom" style="width: 40%;">취소</button>
-                            <button type="submit" class="action-btn btn-orange" style="width: 60%;"><i class="bi bi-check-circle-fill me-1"></i> 타임 핫딜 발행하기</button>
+                            <button type="button" onclick="resetHotDealForm()" class="action-btn btn-outline-custom" style="width: 40%;">취소</button>
+                            <button type="submit" class="action-btn btn-orange" style="width: 60%;">핫딜 등록</button>
                         </div>
 
                         <button type="button" class="action-btn btn-close-hotdeal mt-2">
@@ -212,6 +202,16 @@
         </div>
     </main>
 
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        document.addEventListener('DOMContentLoaded', () => {
+            const rawDeals = /*[[${hotDeals}]]*/ [];
+            if (typeof initRegisteredDeals === 'function') {
+                initRegisteredDeals(rawDeals);
+            }
+        });
+        /*]]>*/
+    </script>
 </div>
 </body>
 </html>
