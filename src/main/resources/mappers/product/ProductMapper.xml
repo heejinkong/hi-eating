@@ -4,6 +4,54 @@
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="kr.or.hieating.product.mapper.ProductMapper">
+  <select id="findProductDetailRow" resultType="ProductDetailRowDto">
+    SELECT
+      p.id,
+      p.category_id AS categoryId,
+      c.name AS categoryName,
+      p.name,
+      p.description,
+      p.price,
+      p.view_count AS viewCount,
+      p.status,
+      p.created_at AS createdAt,
+      NVL((
+        SELECT ROUND(AVG(r.rating), 1)
+        FROM reviews r
+        WHERE r.product_id = p.id
+          AND r.deleted_at IS NULL
+      ), 0) AS averageRating,
+      (
+        SELECT COUNT(*)
+        FROM reviews r
+        WHERE r.product_id = p.id
+          AND r.deleted_at IS NULL
+      ) AS reviewCount
+    FROM products p
+    JOIN categories c
+      ON c.id = p.category_id
+    WHERE p.id = #{productId}
+  </select>
+
+  <select id="findProductImageUrls" resultType="string">
+    SELECT
+      picture_saved_location
+    FROM product_pictures
+    WHERE product_id = #{productId}
+    ORDER BY display_order ASC, id ASC
+  </select>
+
+  <select id="findProductOptions" resultType="ProductOption">
+    SELECT
+      id,
+      product_id AS productId,
+      stock,
+      expire_date AS expireDate
+    FROM product_options
+    WHERE product_id = #{productId}
+    ORDER BY expire_date ASC, id ASC
+  </select>
+
   <select id="findMostPurchasedProducts" resultType="MostPurchasedProductResponseDto">
     SELECT
       p.id AS product_id,

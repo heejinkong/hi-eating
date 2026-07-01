@@ -1,95 +1,111 @@
 <!doctype html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang = "ko" xmlns:th = "http://www.thymeleaf.org">
 <body>
-<section class="mypage-shell min-vh-100 py-4 py-md-5" id="top" th:fragment="content">
-  <div class="container-xxl mypage-container">
-    <nav class="mypage-breadcrumb d-inline-flex align-items-center gap-1 mb-4 fw-bold" aria-label="현재 위치">
-      <a class="mypage-member-link" th:href="@{/mypage}" th:text="|${member.name}님|"></a>
-      <i class="bi bi-chevron-right" aria-hidden="true"></i>
+<section class = "mypage-shell min-vh-100 py-4 py-md-5" id = "top" th:fragment = "content">
+  <div class = "container-xxl mypage-container">
+    <nav aria-label = "현재 위치"
+         class = "mypage-breadcrumb d-inline-flex align-items-center gap-1 mb-4 fw-bold">
+      <a class = "mypage-member-link" th:href = "@{/mypage}" th:text = "|${member.name}님|"></a>
+      <i aria-hidden = "true" class = "bi bi-chevron-right"></i>
     </nav>
 
-    <section class="mypage-summary row g-2 g-lg-3 mb-5" aria-label="마이페이지 요약">
-      <article class="col-4 col-lg-2" th:each="card : ${summaryCards}">
-        <div class="summary-card h-100 d-flex flex-column align-items-center justify-content-center gap-2 border rounded-3 shadow-sm bg-white">
-          <span th:text="${card.label}"></span>
-          <strong th:text="${card.count}"></strong>
+    <section aria-label = "마이페이지 요약" class = "mypage-summary row g-2 g-lg-3 mb-5">
+      <article class = "col-4 col-lg-2" th:each = "card : ${summaryCards}">
+        <div
+          class = "summary-card h-100 d-flex flex-column align-items-center justify-content-center gap-2 border rounded-3 shadow-sm bg-white">
+          <span th:text = "${card.label}"></span>
+          <strong th:text = "${card.count}"></strong>
         </div>
       </article>
 
-      <article class="col-12 col-lg-6">
-        <div class="deal-card h-100 d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between gap-3 gap-lg-4 border rounded-3 shadow-sm bg-white px-4 px-lg-5 py-4 py-lg-0">
+      <article class = "col-12 col-lg-6">
+        <div
+          class = "deal-card h-100 d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between gap-3 gap-lg-4 border rounded-3 shadow-sm bg-white px-4 px-lg-5 py-4 py-lg-0">
           <div>
-            <h2 class="mb-2">오늘 핫딜 상품 확인하기</h2>
-            <p class="mb-0">지금 가장 알뜰하게 담을 수 있어요</p>
+            <h2 class = "mb-2">오늘 핫딜 상품 확인하기</h2>
+            <p class = "mb-0">지금 가장 알뜰하게 담을 수 있어요</p>
           </div>
-          <a class="deal-button btn d-inline-flex align-items-center justify-content-center" th:href="@{/promotions}">보러가기</a>
+          <a class = "deal-button btn d-inline-flex align-items-center justify-content-center"
+             th:href = "@{/promotions}">보러가기</a>
         </div>
       </article>
     </section>
 
-    <section class="order-section mb-5" aria-labelledby="order-section-title">
-      <div class="section-heading d-flex align-items-center justify-content-between gap-3 mb-3">
-        <h1 class="mb-0" id="order-section-title">주문 내역</h1>
-        <a th:href="@{/orders}">주문전체보기 <i class="bi bi-chevron-right" aria-hidden="true"></i></a>
+    <section aria-labelledby = "order-section-title" class = "order-section mb-5">
+      <div class = "section-heading d-flex align-items-center justify-content-between gap-3 mb-3">
+        <h1 class = "mb-0" id = "order-section-title">주문 내역</h1>
+        <a th:href = "@{/orders}">주문전체보기 <i aria-hidden = "true" class = "bi bi-chevron-right"></i></a>
       </div>
 
-      <article class="order-card ps-md-5">
-        <div class="order-status d-inline-flex align-items-center gap-2 mb-4">
-          <span class="rounded-pill"></span>
-          <strong th:text="${recentPurchase.formattedCreatedAt()}"></strong>
+      <article class = "order-card ps-md-5">
+        <div class = "order-status d-inline-flex align-items-center gap-2 mb-4">
+          <span class = "rounded-pill"></span>
+          <strong th:text = "${recentPurchase.formattedCreatedAt()}"></strong>
         </div>
 
-        <div class="order-product row g-3 g-md-4 align-items-center mb-4">
-          <div class="col-auto">
-            <img class="rounded" th:src="${productImageUrls[recentOrderProduct.id]}" th:alt="${recentOrderProduct.name}">
+        <div class = "order-product row g-3 g-md-4 align-items-center mb-4">
+          <div class = "col-auto">
+            <img class = "rounded" th:alt = "${recentOrderProduct.name}"
+                 th:src = "${productImageUrls[recentOrderProduct.id]}">
           </div>
-          <div class="order-product-info col">
-            <span class="d-block mb-1" th:text="${recentOrderProduct.statusLabel()}"></span>
-            <h2 class="mb-2" th:text="${recentOrderProduct.name}"></h2>
-            <p class="mb-2" th:text="${recentPurchase.formattedQuantity()}"></p>
-            <strong class="d-block" th:text="${recentPurchase.formattedTotalPrice()}"></strong>
+          <div class = "order-product-info col">
+            <span class = "d-block mb-1" th:text = "${recentOrderProduct.statusLabel()}"></span>
+            <h2 class = "mb-2" th:text = "${recentOrderProduct.name}"></h2>
+            <p class = "mb-2" th:text = "${recentPurchase.formattedQuantity()}"></p>
+            <strong class = "d-block" th:text = "${recentPurchase.formattedTotalPrice()}"></strong>
           </div>
         </div>
 
-        <a class="review-button btn d-flex align-items-center justify-content-center w-100" th:href="@{/reviews/new}">후기 작성</a>
+        <a class = "review-button btn d-flex align-items-center justify-content-center w-100"
+           th:href = "@{/review/new}">후기 작성</a>
       </article>
     </section>
 
-    <section class="recommend-section position-relative" aria-labelledby="recommend-section-title">
-      <div class="section-heading d-flex align-items-end justify-content-between gap-3 mb-3">
-        <h2 class="mb-0" id="recommend-section-title">맞춤형 상품 추천</h2>
+    <section aria-labelledby = "recommend-section-title"
+             class = "recommend-section position-relative">
+      <div class = "section-heading d-flex align-items-end justify-content-between gap-3 mb-3">
+        <h2 class = "mb-0" id = "recommend-section-title">맞춤형 상품 추천</h2>
         <span>광고</span>
       </div>
 
-      <div class="recommend-row row g-2 g-md-3">
-        <article class="product-card col-6 col-md-4 col-lg pb-2" th:each="product : ${recommendedProducts}">
-          <a class="product-image-link d-block overflow-hidden mb-2 rounded" th:href="@{/product/{id}(id=${product.id})}">
-            <img class="d-block w-100" th:src="${productImageUrls[product.id]}" th:alt="${product.name}">
-          </a>
-          <p class="product-subtitle mb-0" th:text="${product.description}"></p>
-          <h3 class="mb-2" th:text="${product.name}"></h3>
-          <div class="product-price d-flex align-items-baseline gap-2 mb-2">
-            <strong th:text="${product.formattedPrice()}"></strong>
+      <div class = "recommend-row row g-2 g-md-3">
+        <article class = "product-card col-6 col-md-4 col-lg pb-2"
+                 th:each = "product : ${recommendedProducts}">
+          <div class = "product-image-frame position-relative overflow-hidden mb-2 rounded">
+            <a class = "product-image-link d-block"
+               th:href = "@{/product/{id}(id=${product.id})}">
+              <img class = "d-block w-100" th:alt = "${product.name}"
+                   th:src = "${productImageUrls[product.id]}">
+            </a>
+            <button
+              aria-label = "관심 상품 즐겨찾기"
+              class = "product-favorite-button position-absolute d-inline-flex align-items-center justify-content-center rounded-circle"
+              type = "button">
+              <i aria-hidden = "true" class = "bi bi-star"></i>
+            </button>
           </div>
-          <div class="product-actions d-flex gap-2 mt-3">
-            <button class="d-inline-flex align-items-center justify-content-center border rounded-circle bg-white" type="button" aria-label="장바구니 담기">
-              <i class="bi bi-cart-plus" aria-hidden="true"></i>
-            </button>
-            <button class="d-inline-flex align-items-center justify-content-center border rounded-circle bg-white" type="button" aria-label="관심 상품 담기">
-              <i class="bi bi-heart" aria-hidden="true"></i>
-            </button>
+          <p class = "product-subtitle mb-0" th:text = "${product.description}"></p>
+          <h3 class = "mb-2" th:text = "${product.name}"></h3>
+          <div class = "product-price d-flex align-items-baseline gap-2 mb-2">
+            <strong th:text = "${product.formattedPrice()}"></strong>
           </div>
         </article>
       </div>
 
-      <button class="recommend-next position-absolute d-inline-flex align-items-center justify-content-center border rounded-circle bg-white" type="button" aria-label="다음 추천 상품 보기">
-        <i class="bi bi-chevron-right" aria-hidden="true"></i>
+      <button
+        aria-label = "다음 추천 상품 보기"
+        class = "recommend-next position-absolute d-inline-flex align-items-center justify-content-center border rounded-circle bg-white"
+        type = "button">
+        <i aria-hidden = "true" class = "bi bi-chevron-right"></i>
       </button>
     </section>
   </div>
 
-  <a class="scroll-top position-fixed d-inline-flex align-items-center justify-content-center border rounded-circle bg-white" href="#top" aria-label="맨 위로 이동">
-    <i class="bi bi-arrow-up" aria-hidden="true"></i>
+  <a
+    aria-label = "맨 위로 이동"
+    class = "scroll-top position-fixed d-inline-flex align-items-center justify-content-center border rounded-circle bg-white"
+    href = "#top">
+    <i aria-hidden = "true" class = "bi bi-arrow-up"></i>
   </a>
 </section>
 </body>

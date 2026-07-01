@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class ReviewController {
 
-  @GetMapping("/reviews/new")
+  @GetMapping("/review/new")
   public String newReview(Model model) {
     ReviewFormResponseDto reviewForm = createSampleReviewForm();
 

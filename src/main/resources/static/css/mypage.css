@@ -142,19 +142,13 @@
   background: var(--color-brand, #ff4d1f);
 }
 
-.product-image-link {
+.product-image-frame {
   background: var(--color-soft, #fff3ed);
 }
 
 .product-image-link img {
   aspect-ratio: 1;
   object-fit: cover;
-  transition: transform 180ms ease;
-}
-
-.product-image-link:hover img,
-.product-image-link:focus img {
-  transform: scale(1.04);
 }
 
 .product-subtitle,
@@ -189,17 +183,22 @@
   line-height: 1;
 }
 
-.product-actions button,
+.product-favorite-button,
 .recommend-next,
 .scroll-top {
   border-color: var(--color-line, #eee5df) !important;
   color: var(--color-brand, #ff4d1f);
 }
 
-.product-actions button {
-  width: 42px;
-  height: 42px;
-  font-size: 20px;
+.product-favorite-button {
+  right: 12px;
+  bottom: 12px;
+  width: 38px;
+  height: 38px;
+  border: 0;
+  background: rgba(99, 92, 70, 0.62);
+  color: #ffffff;
+  font-size: 18px;
 }
 
 .recommend-next {

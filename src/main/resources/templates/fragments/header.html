@@ -1,57 +1,75 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang = "ko" xmlns:th = "http://www.thymeleaf.org">
 <body>
-<header class="site-header sticky-top bg-white" th:fragment="siteHeader">
-  <div class="header-brand-row bg-white border-bottom">
-    <div class="container-xxl brand-layout d-flex flex-wrap flex-lg-nowrap align-items-center gap-3 gap-lg-4 py-3 py-lg-0">
-      <a class="brand-link flex-shrink-0 order-1" th:href="@{/}" aria-label="Hi Eating 홈">
-        <img class="brand-logo" th:src="@{/images/logo-hi-eating.png}" alt="Hi Eating">
+<header class = "site-header sticky-top bg-white" th:fragment = "siteHeader">
+  <div class = "header-brand-row bg-white border-bottom">
+    <div
+      class = "container-xxl brand-layout d-flex flex-wrap flex-lg-nowrap align-items-center gap-3 gap-lg-4 py-3 py-lg-0">
+      <a aria-label = "Hi Eating 홈" class = "brand-link flex-shrink-0 order-1" th:href = "@{/}">
+        <img alt = "Hi Eating" class = "brand-logo" th:src = "@{/images/logo-hi-eating.png}">
       </a>
 
-      <form class="header-search input-group order-3 order-lg-2 w-100 mx-lg-auto" th:action="@{/search}" method="get" role="search">
-        <label class="visually-hidden" for="global-search">검색어</label>
-        <input class="form-control" id="global-search" name="keyword" type="search" placeholder="먹고 싶은 메뉴나 식당을 검색해 보세요">
-        <button class="btn btn-hi-search" type="submit" aria-label="검색">
-          <i class="bi bi-search" aria-hidden="true"></i>
+      <form class = "header-search input-group order-3 order-lg-2 w-100 mx-lg-auto"
+            method = "get" role = "search" th:action = "@{/search}">
+        <label class = "visually-hidden" for = "global-search">검색어</label>
+        <input class = "form-control" id = "global-search" name = "keyword"
+               placeholder = "먹고 싶은 메뉴나 식당을 검색해 보세요"
+               type = "search">
+        <button aria-label = "검색" class = "btn btn-hi-search" type = "submit">
+          <i aria-hidden = "true" class = "bi bi-search"></i>
         </button>
       </form>
 
-      <nav class="auth-links small order-2 order-lg-3 ms-auto d-flex align-items-center justify-content-end gap-2 gap-lg-3 text-nowrap" aria-label="회원 메뉴">
-        <a th:href="@{/login}">로그인</a>
-        <a th:href="@{/signup}">회원가입</a>
-        <a th:href="@{/logout}">로그아웃</a>
+      <nav
+        aria-label = "회원 메뉴"
+        class = "auth-links small order-2 order-lg-3 ms-auto d-flex align-items-center justify-content-end gap-2 gap-lg-3 text-nowrap">
+        <a th:href = "@{/login}">로그인</a>
+        <a th:href = "@{/signup}">회원가입</a>
+        <a th:href = "@{/logout}">로그아웃</a>
       </nav>
     </div>
   </div>
 
-  <div class="header-nav-row bg-white border-bottom">
-    <div class="container-xxl nav-layout d-flex align-items-center justify-content-between gap-2">
-      <div class="dropdown">
-        <button class="btn nav-category-trigger d-inline-flex align-items-center gap-2 px-2 px-sm-3" type="button" data-bs-toggle="dropdown" data-bs-display="static" aria-expanded="false">
-          <span class="category-icon-stack" aria-hidden="true">
-            <i class="bi bi-list category-icon category-icon-menu"></i>
-            <i class="bi bi-x-lg category-icon category-icon-close"></i>
+  <div class = "header-nav-row bg-white border-bottom">
+    <div class = "container-xxl nav-layout d-flex align-items-center justify-content-between gap-2">
+      <div class = "dropdown">
+        <button
+          aria-expanded = "false"
+          class = "btn nav-category-trigger d-inline-flex align-items-center gap-2 px-2 px-sm-3"
+          data-bs-display = "static" data-bs-toggle = "dropdown"
+          type = "button">
+          <span aria-hidden = "true" class = "category-icon-stack">
+            <i class = "bi bi-list category-icon category-icon-menu"></i>
+            <i class = "bi bi-x-lg category-icon category-icon-close"></i>
           </span>
           <span>카테고리</span>
         </button>
-        <ul class="dropdown-menu category-menu">
-          <li><a class="dropdown-item" th:href="@{/categories/main-dish}">메인요리/반찬</a></li>
-          <li><a class="dropdown-item" th:href="@{/categories/soup-stew}">국/탕/찌개</a></li>
-          <li><a class="dropdown-item" th:href="@{/categories/rice-noodle-porridge}">밥/면/죽</a></li>
-          <li><a class="dropdown-item" th:href="@{/categories/salad-dessert-snack}">샐러드/디저트/분식</a></li>
-          <li><a class="dropdown-item" th:href="@{/categories/ingredients}">식재료</a></li>
-          <li><a class="dropdown-item" th:href="@{/categories/health-food}">건강식품</a></li>
+        <ul class = "dropdown-menu category-menu">
+          <li><a class = "dropdown-item" th:href = "@{/categories/main-dish}">메인요리/반찬</a></li>
+          <li><a class = "dropdown-item" th:href = "@{/categories/soup-stew}">국/탕/찌개</a></li>
+          <li><a class = "dropdown-item" th:href = "@{/categories/rice-noodle-porridge}">밥/면/죽</a>
+          </li>
+          <li><a class = "dropdown-item"
+                 th:href = "@{/categories/salad-dessert-snack}">샐러드/디저트/분식</a></li>
+          <li><a class = "dropdown-item" th:href = "@{/categories/ingredients}">식재료</a></li>
+          <li><a class = "dropdown-item" th:href = "@{/categories/health-food}">건강식품</a></li>
         </ul>
       </div>
 
-      <a class="nav-hotdeal d-inline-flex align-items-center justify-content-center px-2 px-sm-3" th:href="@{/deals}">핫딜</a>
+      <a class = "nav-hotdeal d-inline-flex align-items-center justify-content-center px-2 px-sm-3"
+         th:href = "@{/deals}">핫딜</a>
 
-      <nav class="d-inline-flex align-items-center justify-content-end gap-2" aria-label="개인 메뉴">
-        <a class="nav-icon-link d-inline-flex align-items-center justify-content-center" th:href="@{/favorites}" aria-label="즐겨찾기">
-          <i class="bi bi-heart" aria-hidden="true"></i>
+      <nav aria-label = "개인 메뉴"
+           class = "d-inline-flex align-items-center justify-content-end gap-2">
+        <a aria-label = "즐겨찾기"
+           class = "nav-icon-link d-inline-flex align-items-center justify-content-center"
+           th:href = "@{/favorites}">
+          <i aria-hidden = "true" class = "bi bi-star"></i>
         </a>
-        <a class="nav-icon-link d-inline-flex align-items-center justify-content-center" th:href="@{/mypage}" aria-label="마이페이지">
-          <i class="bi bi-person" aria-hidden="true"></i>
+        <a aria-label = "마이페이지"
+           class = "nav-icon-link d-inline-flex align-items-center justify-content-center"
+           th:href = "@{/mypage}">
+          <i aria-hidden = "true" class = "bi bi-person"></i>
         </a>
       </nav>
     </div>
