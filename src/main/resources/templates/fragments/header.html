@@ -44,15 +44,12 @@
           </span>
           <span>카테고리</span>
         </button>
-        <ul class = "dropdown-menu category-menu">
-          <li><a class = "dropdown-item" th:href = "@{/categories/main-dish}">메인요리/반찬</a></li>
-          <li><a class = "dropdown-item" th:href = "@{/categories/soup-stew}">국/탕/찌개</a></li>
-          <li><a class = "dropdown-item" th:href = "@{/categories/rice-noodle-porridge}">밥/면/죽</a>
+        <ul class="dropdown-menu category-menu">
+          <li th:each="category : ${headerCategories}">
+            <a class="dropdown-item"
+               th:href="@{/categories/{categoryId}(categoryId=${category.id})}"
+               th:text="${category.name}">카테고리</a>
           </li>
-          <li><a class = "dropdown-item"
-                 th:href = "@{/categories/salad-dessert-snack}">샐러드/디저트/분식</a></li>
-          <li><a class = "dropdown-item" th:href = "@{/categories/ingredients}">식재료</a></li>
-          <li><a class = "dropdown-item" th:href = "@{/categories/health-food}">건강식품</a></li>
         </ul>
       </div>
 

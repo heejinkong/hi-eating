@@ -4,6 +4,48 @@
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="kr.or.hieating.product.mapper.ProductMapper">
+  <sql id="productListBase">
+    FROM products p
+    JOIN categories c ON c.id = p.category_id
+    LEFT JOIN (
+      SELECT
+        po.product_id,
+        SUM(pc.quantity) AS total_quantity
+      FROM purchases pc
+      JOIN product_options po ON po.id = pc.product_option_id
+      GROUP BY po.product_id
+    ) purchase_stat ON purchase_stat.product_id = p.id
+    LEFT JOIN product_pictures pp
+      ON pp.id = (
+        SELECT MIN(pp2.id)
+        FROM product_pictures pp2
+        WHERE pp2.product_id = p.id
+      )
+    LEFT JOIN (
+      SELECT
+        po.product_id,
+        MIN(hp.hot_deal_price) AS sale_price,
+        MAX(FLOOR((hp.original_price - hp.hot_deal_price) / hp.original_price * 100)) AS discount_rate
+      FROM hot_deals h
+      JOIN hot_deal_products hp ON hp.hot_deal_id = h.id
+      JOIN product_options po ON po.id = hp.product_option_id
+      WHERE h.status = 'ACTIVE'
+        AND h.deleted_at IS NULL
+        AND SYSTIMESTAMP BETWEEN h.starts_at AND h.ends_at
+      GROUP BY po.product_id
+    ) deal_stat ON deal_stat.product_id = p.id
+    WHERE p.category_id = #{categoryId}
+    <if test="minPrice != null">
+      AND p.price &gt;= #{minPrice}
+    </if>
+    <if test="maxPrice != null">
+      AND p.price &lt;= #{maxPrice}
+    </if>
+    <if test="minDiscountRate != null">
+      AND NVL(deal_stat.discount_rate, 0) &gt;= #{minDiscountRate}
+    </if>
+  </sql>
+
   <select id="findProductDetailRow" resultType="ProductDetailRowDto">
     SELECT
       p.id,
@@ -79,5 +121,38 @@
     total_quantity DESC,
     p.id ASC
     FETCH FIRST 4 ROWS ONLY
+  </select>
+
+  <select id="findProductsByCategory" resultType="ProductListItemResponseDto">
+    SELECT
+      p.id AS productId,
+      p.name AS productName,
+      p.price AS price,
+      deal_stat.sale_price AS salePrice,
+      NVL(deal_stat.discount_rate, 0) AS discountRate,
+      p.view_count AS viewCount,
+      NVL(purchase_stat.total_quantity, 0) AS totalQuantity,
+      pp.picture_saved_location AS pictureLocation
+    <include refid="productListBase" />
+    <choose>
+      <when test="sort == 'latest'">
+        ORDER BY p.created_at DESC, p.id DESC
+      </when>
+      <when test="sort == 'priceAsc'">
+        ORDER BY NVL(deal_stat.sale_price, p.price) ASC, p.id ASC
+      </when>
+      <when test="sort == 'priceDesc'">
+        ORDER BY NVL(deal_stat.sale_price, p.price) DESC, p.id ASC
+      </when>
+      <otherwise>
+        ORDER BY NVL(purchase_stat.total_quantity, 0) DESC, p.view_count DESC, p.id ASC
+      </otherwise>
+    </choose>
+    OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
+  </select>
+
+  <select id="countProductsByCategory" resultType="int">
+    SELECT COUNT(*)
+    <include refid="productListBase" />
   </select>
 </mapper>

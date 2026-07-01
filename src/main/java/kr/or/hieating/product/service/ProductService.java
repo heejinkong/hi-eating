@@ -6,6 +6,9 @@ import kr.or.hieating.product.domain.ProductDetail;
 import kr.or.hieating.product.domain.ProductOption;
 import kr.or.hieating.product.dto.MostPurchasedProductResponseDto;
 import kr.or.hieating.product.dto.ProductDetailRowDto;
+import kr.or.hieating.product.dto.ProductListItemResponseDto;
+import kr.or.hieating.product.dto.ProductListPageResponseDto;
+import kr.or.hieating.product.dto.ProductListSearchCondition;
 import kr.or.hieating.product.mapper.ProductMapper;
 import kr.or.hieating.review.domain.ReviewSummary;
 import kr.or.hieating.utils.ImageUrlResolver;
@@ -60,5 +63,17 @@ public class ProductService {
         options,
         new ReviewSummary(product.getAverageRating(), product.getReviewCount()),
         false);
+  }
+
+  public ProductListPageResponseDto findProductsByCategory(ProductListSearchCondition condition) {
+    int totalCount = productMapper.countProductsByCategory(condition);
+    int totalPages = Math.max((int) Math.ceil((double) totalCount / condition.getSize()), 1);
+    List<ProductListItemResponseDto> products = productMapper.findProductsByCategory(condition);
+    products.forEach(
+        product ->
+            product.setPictureLocation(imageUrlResolver.resolve(product.getPictureLocation())));
+
+    return new ProductListPageResponseDto(
+        products, condition.getPage(), condition.getSize(), totalCount, totalPages);
   }
 }

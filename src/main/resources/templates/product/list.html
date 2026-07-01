@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+  <section th:fragment="content" class="product-list-page">
+    <div class="product-list-shell">
+      <aside class="product-filter" aria-label="상품 필터">
+        <section class="filter-panel">
+          <h2>카테고리</h2>
+          <nav class="category-filter" aria-label="카테고리 목록">
+            <a th:each="category : ${categories}"
+               th:href="@{/categories/{categoryId}(categoryId=${category.id})}"
+               th:classappend="${selectedCategory != null && selectedCategory.id == category.id} ? ' is-active'">
+              <span th:text="${category.name}">카테고리</span>
+              <small th:text="${category.productCount}">0</small>
+            </a>
+          </nav>
+        </section>
+
+        <form class="filter-panel" th:action="@{/categories/{categoryId}(categoryId=${categoryId})}" method="get">
+          <h2>필터</h2>
+
+          <label class="filter-label" for="minPrice">가격</label>
+          <div class="price-filter">
+            <input id="minPrice" name="minPrice" type="number" min="0" step="1000"
+                   placeholder="최소" th:value="${condition.minPrice}">
+            <span>~</span>
+            <input name="maxPrice" type="number" min="0" step="1000"
+                   placeholder="최대" th:value="${condition.maxPrice}">
+          </div>
+
+          <label class="filter-label" for="minDiscountRate">할인율</label>
+          <select id="minDiscountRate" name="minDiscountRate">
+            <option value="" th:selected="${condition.minDiscountRate == null}">전체</option>
+            <option value="10" th:selected="${condition.minDiscountRate == 10}">10% 이상</option>
+            <option value="20" th:selected="${condition.minDiscountRate == 20}">20% 이상</option>
+            <option value="30" th:selected="${condition.minDiscountRate == 30}">30% 이상</option>
+          </select>
+
+          <input type="hidden" name="sort" th:value="${condition.sort}">
+
+          <div class="filter-actions">
+            <button type="submit">적용</button>
+            <a th:href="@{/categories/{categoryId}(categoryId=${categoryId})}">초기화</a>
+          </div>
+        </form>
+      </aside>
+
+      <div class="product-list-content">
+        <header class="product-list-header">
+          <div>
+            <p class="product-list-kicker">Category</p>
+            <h1 th:text="${selectedCategory != null ? selectedCategory.name : '상품'}">상품</h1>
+            <p class="product-list-count">
+              총 <strong th:text="${productPage.totalCount}">0</strong>개의 상품
+            </p>
+          </div>
+
+          <form class="sort-form" th:action="@{/categories/{categoryId}(categoryId=${categoryId})}" method="get">
+            <input type="hidden" name="minPrice" th:value="${condition.minPrice}">
+            <input type="hidden" name="maxPrice" th:value="${condition.maxPrice}">
+            <input type="hidden" name="minDiscountRate" th:value="${condition.minDiscountRate}">
+            <label class="visually-hidden" for="sort">정렬</label>
+            <select id="sort" name="sort" onchange="this.form.submit()">
+              <option value="popular" th:selected="${condition.sort == 'popular'}">인기순</option>
+              <option value="latest" th:selected="${condition.sort == 'latest'}">최신순</option>
+              <option value="priceAsc" th:selected="${condition.sort == 'priceAsc'}">낮은가격순</option>
+              <option value="priceDesc" th:selected="${condition.sort == 'priceDesc'}">높은가격순</option>
+            </select>
+          </form>
+        </header>
+
+        <p class="product-empty" th:if="${!productPage.hasProducts()}">
+          조건에 맞는 상품이 없습니다.
+        </p>
+
+        <div class="product-grid" th:if="${productPage.hasProducts()}">
+          <article class="catalog-product-card" th:each="product : ${productPage.products}">
+            <a class="catalog-product-card__image" th:href="@{/product/{id}(id=${product.productId})}">
+              <img th:src="${#strings.isEmpty(product.pictureLocation) ? '/images/logo-hi-eating.png' : product.pictureLocation}"
+                   th:alt="${product.productName}"
+                   data-fallback-src="/images/logo-hi-eating.png">
+              <span class="catalog-product-card__badge"
+                    th:if="${product.discountRate > 0}"
+                    th:text="|${product.discountRate}%|">20%</span>
+            </a>
+
+            <a class="catalog-product-card__name"
+               th:href="@{/product/{id}(id=${product.productId})}"
+               th:text="${product.productName}">상품명</a>
+
+            <div class="catalog-product-card__price">
+              <span class="discount-rate" th:if="${product.discountRate > 0}"
+                    th:text="|${product.discountRate}%|">20%</span>
+              <strong th:text="${#numbers.formatInteger(product.salePrice != null ? product.salePrice : product.price, 0, 'COMMA')} + '원'">
+                9,900원
+              </strong>
+            </div>
+            <del th:if="${product.discountRate > 0}"
+                 th:text="${#numbers.formatInteger(product.price, 0, 'COMMA')} + '원'">12,000원</del>
+            <p class="catalog-product-card__meta">
+              <span th:text="|조회 ${product.viewCount}|">조회 0</span>
+              <span th:text="|구매 ${product.totalQuantity}|">구매 0</span>
+            </p>
+          </article>
+        </div>
+
+        <nav class="product-pagination" th:if="${productPage.totalPages > 1}" aria-label="상품 페이지">
+          <a th:classappend="${!productPage.hasPrevious()} ? ' is-disabled'"
+             th:href="@{/categories/{categoryId}(categoryId=${categoryId}, page=${productPage.page - 1}, sort=${condition.sort}, minPrice=${condition.minPrice}, maxPrice=${condition.maxPrice}, minDiscountRate=${condition.minDiscountRate})}">
+            <i class="bi bi-chevron-left" aria-hidden="true"></i>
+          </a>
+          <a th:each="pageNumber : ${#numbers.sequence(1, productPage.totalPages)}"
+             th:text="${pageNumber}"
+             th:classappend="${pageNumber == productPage.page} ? ' is-active'"
+             th:href="@{/categories/{categoryId}(categoryId=${categoryId}, page=${pageNumber}, sort=${condition.sort}, minPrice=${condition.minPrice}, maxPrice=${condition.maxPrice}, minDiscountRate=${condition.minDiscountRate})}">
+            1
+          </a>
+          <a th:classappend="${!productPage.hasNext()} ? ' is-disabled'"
+             th:href="@{/categories/{categoryId}(categoryId=${categoryId}, page=${productPage.page + 1}, sort=${condition.sort}, minPrice=${condition.minPrice}, maxPrice=${condition.maxPrice}, minDiscountRate=${condition.minDiscountRate})}">
+            <i class="bi bi-chevron-right" aria-hidden="true"></i>
+          </a>
+        </nav>
+      </div>
+    </div>
+  </section>
+</body>
+</html>
