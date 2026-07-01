@@ -10,6 +10,31 @@
   <link rel="stylesheet" th:href="@{/css/header.css}">
   <link rel="stylesheet" th:href="@{/css/footer.css}">
   <link rel="stylesheet" th:if="${pageStylesheet != null}" th:href="@{/css/{stylesheet}.css(stylesheet=${pageStylesheet})}">
+  <script>
+    window.__IMAGE_FALLBACK_SRC__ = '/images/logo-hi-eating.png';
+
+    document.addEventListener(
+        'error',
+        function (event) {
+          const target = event.target;
+
+          if (!(target instanceof HTMLImageElement)) {
+            return;
+          }
+
+          if (target.dataset.fallbackApplied === 'true') {
+            return;
+          }
+
+          const fallbackSrc =
+              target.dataset.fallbackSrc || window.__IMAGE_FALLBACK_SRC__;
+
+          target.dataset.fallbackApplied = 'true';
+          target.src = fallbackSrc;
+        },
+        true
+    );
+  </script>
 </head>
 <body>
   <header th:replace="~{fragments/header :: siteHeader}"></header>

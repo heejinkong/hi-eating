@@ -10,6 +10,7 @@ public class HotDealProductsResponseDto {
   private int productOptionId;
   private String hotDealTitle;
   private String productName;
+  private String pictureLocation;
   private int originalPrice;
   private int hotDealPrice;
   private int discountRate;

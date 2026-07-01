@@ -12,8 +12,12 @@
 
   <ul th:if="${!#lists.isEmpty(promotions)}">
     <li th:each="promotion : ${promotions}">
-      <a th:href="${promotion.link}">
-        <img th:src="${promotion.imgSrc}" th:alt="${promotion.title}" width="240">
+      <a th:href="${promotion.link != null ? promotion.link : '#'}">
+        <img th:src="${#strings.isEmpty(promotion.imgSrc) ? '/images/logo-hi-eating.png' : promotion.imgSrc}"
+             th:alt="${promotion.title}"
+             data-fallback-src="/images/logo-hi-eating.png"
+             width="240"
+             onerror="this.onerror=null; this.src=this.dataset.fallbackSrc;">
         <span th:text="${promotion.title}">프로모션 제목</span>
       </a>
     </li>

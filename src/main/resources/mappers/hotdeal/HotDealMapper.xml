@@ -11,6 +11,7 @@
       hp.product_option_id AS productOptionId,
       h.title AS hotDealTitle,
       p.name AS productName,
+      pp.picture_saved_location AS pictureLocation,
       hp.original_price AS originalPrice,
       hp.hot_deal_price AS hotDealPrice,
       FLOOR((hp.original_price - hp.hot_deal_price) / hp.original_price * 100) AS discountRate,
@@ -21,6 +22,12 @@
       JOIN hot_deal_products hp ON hp.hot_deal_id = h.id
       JOIN product_options po ON po.id = hp.product_option_id
       JOIN products p ON p.id = po.product_id
+      LEFT JOIN product_pictures pp
+        ON pp.id = (
+          SELECT MIN(pp2.id)
+          FROM product_pictures pp2
+          WHERE pp2.product_id = p.id
+        )
     WHERE h.status = 'ACTIVE'
       AND h.deleted_at IS NULL
       AND SYSTIMESTAMP BETWEEN h.starts_at AND h.ends_at

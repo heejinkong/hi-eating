@@ -1,40 +1,118 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <body>
-  <section th:fragment="content">
-    <section class="home-hero container-xl py-5">
-      <p class="section-eyebrow mb-3 fw-bold">오늘의 식탁을 가볍게 고르는 곳</p>
-      <h1 class="mb-0">Hi Eating에서 맛있는 선택을 시작하세요.</h1>
-      <p class="home-hero-copy mt-3 mb-0">카테고리, 핫딜, 즐겨찾기를 한 흐름에서 둘러볼 수 있도록 공통 레이아웃을 준비했습니다.</p>
+  <div th:fragment="content" class="home-page">
+    <section class="promotion-section" aria-label="프로모션">
+      <div class="promotion-carousel"
+           th:if="${!#lists.isEmpty(promotions)}"
+           data-carousel
+           data-carousel-visible="1"
+           data-carousel-autoplay="true">
+        <div class="promotion-viewport" data-carousel-viewport>
+          <div class="promotion-track" data-carousel-track>
+            <a class="promotion-slide"
+              th:each="promotion : ${promotions}"
+               th:href="${promotion.link != null ? promotion.link : '#'}">
+              <img th:src="${#strings.isEmpty(promotion.imgSrc) ? '/images/logo-hi-eating.png' : promotion.imgSrc}"
+                   th:alt="${promotion.title}">
+            </a>
+          </div>
+        </div>
+
+        <div class="promotion-controls">
+          <span class="promotion-count">
+            <span data-carousel-current>1</span>/<span th:text="${#lists.size(promotions)}">1</span>
+          </span>
+          <button class="promotion-pause" type="button" data-carousel-toggle aria-label="프로모션 자동 슬라이드 일시정지">
+            <i class="bi bi-pause-fill" aria-hidden="true"></i>
+          </button>
+        </div>
+
+        <button class="promotion-nav promotion-nav--prev" type="button" data-carousel-prev aria-label="이전 프로모션">
+          <i class="bi bi-chevron-left" aria-hidden="true"></i>
+        </button>
+        <button class="promotion-nav promotion-nav--next" type="button" data-carousel-next aria-label="다음 프로모션">
+          <i class="bi bi-chevron-right" aria-hidden="true"></i>
+        </button>
+      </div>
+
+      <p class="section-empty" th:if="${#lists.isEmpty(promotions)}">노출 중인 프로모션이 없습니다.</p>
     </section>
 
-    <section class="content-preview-grid container-xl" aria-label="추천 섹션">
-      <div class="row g-3">
-        <article class="col-md-4">
-          <div class="content-preview h-100 p-4 border rounded bg-white">
-            <span class="d-block mb-3 fw-bold">Category</span>
-            <strong class="d-block">먹고 싶은 종류부터 빠르게</strong>
+    <section class="hot-deal-section container-xl reveal-section" aria-label="원데이 핫딜">
+      <h2 class="section-title">원데이 <strong>핫딜</strong></h2>
+
+      <p class="section-empty" th:if="${#lists.isEmpty(hotDealProducts)}">진행 중인 핫딜 상품이 없습니다.</p>
+
+      <section class="hot-deal-carousel"
+               th:if="${!#lists.isEmpty(hotDealProducts)}"
+               data-carousel
+               data-carousel-visible="2"
+               data-carousel-autoplay="true">
+        <button class="hot-deal-nav hot-deal-nav--prev" type="button" data-carousel-prev aria-label="이전 핫딜">
+          <i class="bi bi-chevron-left" aria-hidden="true"></i>
+        </button>
+
+        <div class="hot-deal-viewport" data-carousel-viewport>
+          <div class="hot-deal-track" data-carousel-track>
+            <article class="hot-deal-card" th:each="hotDealProduct : ${hotDealProducts}">
+              <p class="hot-deal-card__eyebrow" th:text="${hotDealProduct.hotDealTitle}">올 여름 가장 시원한 혜택</p>
+
+              <div class="hot-deal-card__body">
+                <div class="hot-deal-card__image">
+                  <img th:src="${#strings.isEmpty(hotDealProduct.pictureLocation) ? '/images/logo-hi-eating.png' : hotDealProduct.pictureLocation}"
+                       th:alt="${hotDealProduct.productName}"
+                       data-fallback-src="/images/logo-hi-eating.png">
+                  <span class="hot-deal-card__stock"
+                        th:text="|남은수량 ${hotDealProduct.stock}개|">남은수량 4개</span>
+                </div>
+
+                <div>
+                  <p class="hot-deal-card__name" th:text="${hotDealProduct.productName}">상품명</p>
+                  <p class="hot-deal-card__discount" th:text="|${hotDealProduct.discountRate}% 할인|">20% 할인</p>
+                  <p class="hot-deal-card__price"
+                     th:text="${#numbers.formatInteger(hotDealProduct.hotDealPrice, 0, 'COMMA')} + '원'">9,900원</p>
+                  <div class="hot-deal-card__meta">
+                    <span>종료까지 남은 시간</span>
+                    <span class="hot-deal-card__timer"
+                          th:attr="data-end-at=${hotDealProduct.endsAt}">00:00:00</span>
+                  </div>
+                </div>
+              </div>
+            </article>
           </div>
-        </article>
-        <article class="col-md-4">
-          <div class="content-preview h-100 p-4 border rounded bg-white">
-            <span class="d-block mb-3 fw-bold">Hot Deal</span>
-            <strong class="d-block">놓치기 아까운 혜택 모아보기</strong>
+        </div>
+
+        <button class="hot-deal-nav hot-deal-nav--next" type="button" data-carousel-next aria-label="다음 핫딜">
+          <i class="bi bi-chevron-right" aria-hidden="true"></i>
+        </button>
+      </section>
+    </section>
+
+    <section class="most-purchased-section container-xl reveal-section" aria-label="지금 가장 많이 담는 상품">
+      <h2 class="section-title section-title--center">지금 가장 많이 담는 상품</h2>
+
+      <p class="section-empty" th:if="${#lists.isEmpty(mostPurchasedProducts)}">표시할 상품이 없습니다.</p>
+
+      <div class="most-purchased-grid" th:if="${!#lists.isEmpty(mostPurchasedProducts)}">
+        <article class="product-card" th:each="product, stat : ${mostPurchasedProducts}">
+          <div class="product-card__image">
+            <span class="product-card__rank" th:text="|Top ${stat.index + 1}|">Top 1</span>
+            <img th:src="${#strings.isEmpty(product.pictureLocation) ? '/images/logo-hi-eating.png' : product.pictureLocation}"
+                 th:alt="${product.productName}"
+                 data-fallback-src="/images/logo-hi-eating.png">
+            <button class="product-card__cart" type="button" aria-label="장바구니 담기">
+              <i class="bi bi-bag" aria-hidden="true"></i>
+            </button>
           </div>
-        </article>
-        <article class="col-md-4">
-          <div class="content-preview h-100 p-4 border rounded bg-white">
-            <span class="d-block mb-3 fw-bold">Favorites</span>
-            <strong class="d-block">자주 찾는 메뉴는 즐겨찾기로</strong>
-          </div>
+          <p class="product-card__name" th:text="${product.productName}">상품명</p>
+          <p class="product-card__price">
+            <strong th:text="${#numbers.formatInteger(product.price, 0, 'COMMA')} + '원'">3,280원</strong>
+          </p>
+          <p class="product-card__quantity" th:text="|누적 ${product.totalQuantity}개 담김|">누적 0개 담김</p>
         </article>
       </div>
     </section>
-
-    <section class="demo-scroll-space container-xl py-5" aria-label="오늘의 큐레이션">
-      <h2 class="mb-2">오늘의 큐레이션</h2>
-      <p class="mb-0">든든한 한 끼부터 가볍게 즐기는 간식까지, 지금 둘러보기 좋은 선택지를 준비하고 있습니다.</p>
-    </section>
-  </section>
+  </div>
 </body>
 </html>
