@@ -104,7 +104,7 @@ CREATE TABLE product_options (
     created_at TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
     updated_at TIMESTAMP,
     CONSTRAINT pk_product_options PRIMARY KEY (id),
-    CONSTRAINT fk_options_product FOREIGN KEY (product_id) REFERENCES products (id),
+    CONSTRAINT fk_options_product FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE CASCADE,
     CONSTRAINT chk_options_stock CHECK (stock >= 0)
 );
 
