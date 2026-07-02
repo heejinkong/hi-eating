@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+  <section th:fragment="content"
+           class="hotdeal-page"
+           data-hotdeal-page
+           th:attr="data-hotdeal-id=${selectedHotDealId},data-sort=${condition.sort},data-page=${productPage.page},data-size=${productPage.size},data-has-more=${productPage.hasMore}">
+    <div class="hotdeal-shell">
+      <section class="hotdeal-hero hotdeal-hero--empty"
+               data-hotdeal-all-hero
+               th:hidden="${selectedHotDealId != null}">
+        <div class="hotdeal-hero__copy">
+          <p class="hotdeal-kicker">
+            <i class="bi bi-fire-fill" aria-hidden="true"></i>
+            Hot Deal
+          </p>
+          <h1 th:text="${#lists.isEmpty(activeHotDeals) ? '진행 중인 핫딜이 없습니다' : '전체 핫딜 상품'}">
+            전체 핫딜 상품
+          </h1>
+          <p class="hotdeal-hero__description"
+             th:text="${#lists.isEmpty(activeHotDeals) ? '새로운 특가 상품이 등록되면 이 페이지에서 확인할 수 있습니다.' : '진행 중인 모든 특가 상품을 한 곳에서 확인하고 빠르게 둘러보세요.'}">
+            진행 중인 모든 특가 상품을 한 곳에서 확인하고 빠르게 둘러보세요.
+          </p>
+        </div>
+      </section>
+
+      <section class="hotdeal-hero"
+               data-hotdeal-selected-hero
+               th:hidden="${selectedHotDeal == null}">
+        <div class="hotdeal-hero__copy">
+          <p class="hotdeal-kicker">
+            <i class="bi bi-fire-fill" aria-hidden="true"></i>
+            오늘의 핫딜
+          </p>
+          <h1 data-hotdeal-hero-title th:text="${selectedHotDeal != null ? selectedHotDeal.title : ''}">
+            핫딜 제목
+          </h1>
+          <p class="hotdeal-hero__description">
+            선택한 핫딜에 포함된 특가 상품과 남은 시간을 확인해보세요.
+          </p>
+          <div class="hotdeal-hero__timer">
+            <span>종료까지</span>
+            <strong data-hotdeal-timer
+                    th:attr="data-remaining-seconds=${selectedHotDeal != null ? selectedHotDeal.remainingSeconds : 0}">
+              00:00:00
+            </strong>
+          </div>
+        </div>
+        <div class="hotdeal-hero__image">
+          <img data-hotdeal-hero-image
+               th:src="${selectedHotDeal == null || #strings.isEmpty(selectedHotDeal.heroImageLocation) ? '/images/logo-hi-eating.png' : selectedHotDeal.heroImageLocation}"
+               th:alt="${selectedHotDeal != null ? selectedHotDeal.title : '핫딜'}"
+               data-fallback-src="/images/logo-hi-eating.png">
+        </div>
+      </section>
+
+      <nav class="hotdeal-tabs" aria-label="핫딜 선택" th:if="${!#lists.isEmpty(activeHotDeals)}">
+        <a data-hotdeal-tab
+           data-hotdeal-tab-id=""
+           th:attr="data-hotdeal-tab-title='전체 핫딜 상품'"
+           th:href="@{/hot-deals(sort=${condition.sort})}"
+           th:classappend="${selectedHotDealId == null} ? ' is-active'">
+          전체
+        </a>
+        <a th:each="hotDeal : ${activeHotDeals}"
+           data-hotdeal-tab
+           th:attr="data-hotdeal-tab-id=${hotDeal.id},data-hotdeal-tab-title=${hotDeal.title},data-hotdeal-tab-image=${hotDeal.heroImageLocation},data-hotdeal-tab-remaining=${hotDeal.remainingSeconds}"
+           th:href="@{/hot-deals(hotDealId=${hotDeal.id}, sort=${condition.sort})}"
+           th:classappend="${selectedHotDealId != null && selectedHotDealId == hotDeal.id} ? ' is-active'"
+           th:text="${hotDeal.title}">
+          핫딜 제목
+        </a>
+      </nav>
+
+      <header class="hotdeal-list-header">
+        <div>
+          <p class="hotdeal-kicker">Selected Deal</p>
+          <h2 data-hotdeal-list-title
+              th:text="${selectedHotDealId == null ? '전체 핫딜 상품' : selectedHotDeal.title}">
+            전체 핫딜 상품
+          </h2>
+        </div>
+        <label class="visually-hidden" for="hotdeal-sort">정렬</label>
+        <select id="hotdeal-sort" class="hotdeal-sort" data-hotdeal-sort>
+          <option value="popular" th:selected="${condition.sort == 'popular'}">인기순</option>
+          <option value="latest" th:selected="${condition.sort == 'latest'}">최신순</option>
+          <option value="priceAsc" th:selected="${condition.sort == 'priceAsc'}">낮은가격순</option>
+          <option value="priceDesc" th:selected="${condition.sort == 'priceDesc'}">높은가격순</option>
+        </select>
+      </header>
+
+      <p class="hotdeal-empty" data-hotdeal-empty th:hidden="${productPage.hasProducts()}">
+        조건에 맞는 핫딜 상품이 없습니다.
+      </p>
+
+      <div class="hotdeal-grid" data-hotdeal-grid th:hidden="${!productPage.hasProducts()}">
+        <article class="hotdeal-product-card" th:each="product : ${productPage.products}">
+          <a class="hotdeal-product-card__image" th:href="@{/product/{id}(id=${product.productId})}">
+            <img th:src="${#strings.isEmpty(product.pictureLocation) ? '/images/logo-hi-eating.png' : product.pictureLocation}"
+                 th:alt="${product.productName}"
+                 data-fallback-src="/images/logo-hi-eating.png">
+            <span class="hotdeal-product-card__badge" th:text="|${product.discountRate}%|">20%</span>
+            <span class="hotdeal-product-card__stock" th:text="|재고 ${product.stock}|">재고 10</span>
+          </a>
+
+          <p class="hotdeal-product-card__deal" th:text="${product.hotDealTitle}">핫딜 제목</p>
+          <a class="hotdeal-product-card__name"
+             th:href="@{/product/{id}(id=${product.productId})}"
+             th:text="${product.productName}">
+            상품명
+          </a>
+
+          <div class="hotdeal-product-card__price">
+            <span th:text="|${product.discountRate}%|">20%</span>
+            <strong th:text="${#numbers.formatInteger(product.hotDealPrice, 0, 'COMMA')} + '원'">9,900원</strong>
+          </div>
+          <del th:text="${#numbers.formatInteger(product.originalPrice, 0, 'COMMA')} + '원'">12,000원</del>
+          <p class="hotdeal-product-card__meta">
+            <span th:text="|조회 ${product.viewCount}|">조회 0</span>
+            <span th:text="|구매 ${product.totalQuantity}|">구매 0</span>
+          </p>
+        </article>
+      </div>
+
+      <div class="hotdeal-loader" data-hotdeal-loader hidden>상품을 불러오는 중입니다.</div>
+      <div class="hotdeal-loader" data-hotdeal-end th:hidden="${productPage.hasMore}">
+        모든 핫딜 상품을 확인했습니다.
+      </div>
+      <div data-hotdeal-sentinel></div>
+    </div>
+  </section>
+</body>
+</html>

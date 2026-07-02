@@ -8,6 +8,7 @@
   <select id="findActiveHotDealProducts" resultType="HotDealProductsResponseDto">
     SELECT
       h.id AS hotDealId,
+      p.id AS productId,
       hp.product_option_id AS productOptionId,
       h.title AS hotDealTitle,
       p.name AS productName,
@@ -33,5 +34,85 @@
       AND SYSTIMESTAMP BETWEEN h.starts_at AND h.ends_at
       AND po.stock > 0
     ORDER BY h.ends_at, h.id, hp.product_option_id
+  </select>
+
+  <select id="findActiveHotDeals" resultType="ActiveHotDealResponseDto">
+    SELECT
+      h.id,
+      h.title,
+      h.starts_at AS startsAt,
+      h.ends_at AS endsAt,
+      GREATEST(0, FLOOR((CAST(h.ends_at AS DATE) - SYSDATE) * 86400)) AS remainingSeconds,
+      (
+        SELECT pp.picture_saved_location
+        FROM hot_deal_products hp
+          JOIN product_options po ON po.id = hp.product_option_id
+          JOIN product_pictures pp ON pp.product_id = po.product_id
+        WHERE hp.hot_deal_id = h.id
+        ORDER BY po.product_id ASC, pp.display_order ASC, pp.id ASC
+        FETCH FIRST 1 ROWS ONLY
+      ) AS heroImageLocation
+    FROM hot_deals h
+    WHERE h.status = 'ACTIVE'
+      AND h.deleted_at IS NULL
+      AND SYSTIMESTAMP BETWEEN h.starts_at AND h.ends_at
+    ORDER BY h.ends_at ASC, h.id ASC
+  </select>
+
+  <select id="findHotDealProducts" resultType="HotDealProductListItemResponseDto">
+    SELECT
+      h.id AS hotDealId,
+      h.title AS hotDealTitle,
+      p.id AS productId,
+      hp.product_option_id AS productOptionId,
+      p.name AS productName,
+      pp.picture_saved_location AS pictureLocation,
+      hp.original_price AS originalPrice,
+      hp.hot_deal_price AS hotDealPrice,
+      FLOOR((hp.original_price - hp.hot_deal_price) / hp.original_price * 100) AS discountRate,
+      po.stock AS stock,
+      p.view_count AS viewCount,
+      NVL(purchase_stat.total_quantity, 0) AS totalQuantity,
+      h.ends_at AS endsAt,
+      GREATEST(0, FLOOR((CAST(h.ends_at AS DATE) - SYSDATE) * 86400)) AS remainingSeconds
+    FROM hot_deals h
+      JOIN hot_deal_products hp ON hp.hot_deal_id = h.id
+      JOIN product_options po ON po.id = hp.product_option_id
+      JOIN products p ON p.id = po.product_id
+      LEFT JOIN product_pictures pp
+        ON pp.id = (
+          SELECT MIN(pp2.id)
+          FROM product_pictures pp2
+          WHERE pp2.product_id = p.id
+        )
+      LEFT JOIN (
+        SELECT
+          product_option_id,
+          SUM(quantity) AS total_quantity
+        FROM purchases
+        GROUP BY product_option_id
+      ) purchase_stat ON purchase_stat.product_option_id = hp.product_option_id
+    WHERE h.status = 'ACTIVE'
+      AND h.deleted_at IS NULL
+      AND SYSTIMESTAMP BETWEEN h.starts_at AND h.ends_at
+      AND po.stock > 0
+      <if test="hotDealId != null">
+        AND h.id = #{hotDealId}
+      </if>
+    <choose>
+      <when test="sort == 'latest'">
+        ORDER BY hp.created_at DESC, p.id DESC
+      </when>
+      <when test="sort == 'priceAsc'">
+        ORDER BY hp.hot_deal_price ASC, p.id ASC
+      </when>
+      <when test="sort == 'priceDesc'">
+        ORDER BY hp.hot_deal_price DESC, p.id ASC
+      </when>
+      <otherwise>
+        ORDER BY NVL(purchase_stat.total_quantity, 0) DESC, p.view_count DESC, p.id ASC
+      </otherwise>
+    </choose>
+    OFFSET #{offset} ROWS FETCH NEXT #{limit} ROWS ONLY
   </select>
 </mapper>

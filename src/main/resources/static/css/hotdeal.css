@@ -1,0 +1,371 @@
+.hotdeal-page {
+  background: #fff;
+  padding: 46px clamp(18px, 4vw, 64px) 96px;
+}
+
+.hotdeal-shell {
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.hotdeal-hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, .95fr) minmax(340px, 1.05fr);
+  align-items: stretch;
+  overflow: hidden;
+  height: 320px;
+  border-radius: 8px;
+  background: #fff2e8;
+  box-shadow: 0 12px 30px rgba(242, 61, 40, .09);
+}
+
+.hotdeal-hero::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1;
+  width: 61%;
+  background: linear-gradient(135deg, #ff5a21 0%, #f53824 68%, #ef2e20 100%);
+  clip-path: polygon(0 0, 86% 0, 100% 100%, 0 100%);
+}
+
+.hotdeal-hero--empty {
+  grid-template-columns: 1fr;
+  background: linear-gradient(135deg, #ff5a21 0%, #f53824 100%);
+}
+
+.hotdeal-hero--empty::before {
+  display: none;
+}
+
+.hotdeal-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.hotdeal-kicker i {
+  font-size: 19px;
+  line-height: 1;
+}
+
+.hotdeal-hero h1 {
+  margin: 0;
+  color: #fff;
+  font-size: clamp(30px, 4vw, 40px);
+  font-weight: 900;
+  line-height: 1.12;
+}
+
+.hotdeal-hero__copy {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: inherit;
+  padding: clamp(30px, 4vw, 46px) clamp(32px, 5vw, 56px);
+}
+
+.hotdeal-hero__description {
+  max-width: 390px;
+  margin: 14px 0 24px;
+  color: rgba(255, 255, 255, .9);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.65;
+}
+
+.hotdeal-hero__timer {
+  display: grid;
+  width: fit-content;
+  gap: 7px;
+}
+
+.hotdeal-hero__timer span {
+  color: rgba(255, 255, 255, .78);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.hotdeal-hero__timer strong {
+  display: inline-flex;
+  min-width: 138px;
+  justify-content: center;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .14);
+  color: #fff;
+  padding: 9px 14px;
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .15);
+}
+
+.hotdeal-hero__image {
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.hotdeal-hero__image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hotdeal-hero__image img[src$="logo-hi-eating.png"] {
+  object-fit: contain;
+  padding: clamp(42px, 7vw, 76px);
+}
+
+.hotdeal-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 28px 0 24px;
+}
+
+.hotdeal-tabs a {
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
+  border: 1px solid #eadfd8;
+  border-radius: 999px;
+  background: #fff;
+  color: #4c423c;
+  padding: 0 16px;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.hotdeal-tabs a:hover,
+.hotdeal-tabs a.is-active {
+  border-color: var(--color-brand, #ff4d1f);
+  background: var(--color-brand, #ff4d1f);
+  color: #fff;
+}
+
+.hotdeal-list-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 22px;
+  border-bottom: 1px solid #eee8e2;
+  margin-bottom: 28px;
+  padding-bottom: 20px;
+}
+
+.hotdeal-list-header h2 {
+  margin: 0;
+  color: #211d1a;
+  font-size: 25px;
+  font-weight: 900;
+}
+
+.hotdeal-sort {
+  width: 164px;
+  border: 1px solid #ded7d2;
+  border-radius: 8px;
+  background: #fff;
+  color: #342d28;
+  padding: 10px 12px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.hotdeal-empty,
+.hotdeal-loader {
+  border: 1px solid #eee8e2;
+  border-radius: 8px;
+  padding: 42px 24px;
+  color: #665f59;
+  text-align: center;
+  font-weight: 800;
+}
+
+.hotdeal-loader {
+  margin-top: 34px;
+  border: 0;
+  padding: 16px;
+  color: #948982;
+}
+
+.hotdeal-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 36px 24px;
+}
+
+.hotdeal-product-card {
+  min-width: 0;
+}
+
+.hotdeal-product-card__image {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  aspect-ratio: 1 / 1;
+  border-radius: 8px;
+  background: #f6f1ed;
+}
+
+.hotdeal-product-card__image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 220ms ease;
+}
+
+.hotdeal-product-card__image:hover img {
+  transform: scale(1.035);
+}
+
+.hotdeal-product-card__image img[src$="logo-hi-eating.png"] {
+  object-fit: contain;
+  padding: 34px;
+  background: #fff7f1;
+}
+
+.hotdeal-product-card__badge,
+.hotdeal-product-card__stock {
+  position: absolute;
+  border-radius: 6px;
+  color: #fff;
+  padding: 6px 8px;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.hotdeal-product-card__badge {
+  top: 10px;
+  left: 10px;
+  background: #ff3d25;
+}
+
+.hotdeal-product-card__stock {
+  right: 10px;
+  bottom: 10px;
+  background: rgba(36, 31, 27, .78);
+}
+
+.hotdeal-product-card__deal {
+  overflow: hidden;
+  margin: 12px 0 5px;
+  color: var(--color-brand-strong, #e83d12);
+  font-size: 12px;
+  font-weight: 900;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hotdeal-product-card__name {
+  display: block;
+  color: #292420;
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.45;
+  text-decoration: none;
+}
+
+.hotdeal-product-card__price {
+  display: flex;
+  gap: 7px;
+  align-items: baseline;
+  margin-top: 7px;
+}
+
+.hotdeal-product-card__price span {
+  color: #f33221;
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.hotdeal-product-card__price strong {
+  color: #201c19;
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.hotdeal-product-card del {
+  display: block;
+  margin-top: 2px;
+  color: #afa7a0;
+  font-size: 13px;
+}
+
+.hotdeal-product-card__meta {
+  display: flex;
+  gap: 10px;
+  margin: 8px 0 0;
+  color: #9a9189;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+@media (max-width: 991.98px) {
+  .hotdeal-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .hotdeal-hero::before {
+    width: 100%;
+    clip-path: none;
+  }
+
+  .hotdeal-hero__image {
+    display: none;
+  }
+
+  .hotdeal-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 575.98px) {
+  .hotdeal-page {
+    padding-right: 18px;
+    padding-left: 18px;
+  }
+
+  .hotdeal-list-header {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .hotdeal-hero,
+  .hotdeal-hero--empty {
+    min-height: 190px;
+  }
+
+  .hotdeal-hero__copy {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    min-height: 0; /* 기존 min-height: inherit 제거 */
+
+    padding: clamp(30px, 4vw, 46px) clamp(32px, 5vw, 56px);
+  }
+
+  .hotdeal-sort {
+    width: 100%;
+  }
+
+  .hotdeal-grid {
+    grid-template-columns: 1fr;
+  }
+}
