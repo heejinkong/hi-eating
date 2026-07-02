@@ -3,6 +3,7 @@ package kr.or.hieating.hotdeal.admin.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -18,8 +19,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class HotDealCreateRequestDTO {
-  @NotNull(message = "핫딜 제목은 필수 입력값입니다.") @Size(max = 10, message = "핫딜 제목은 공백 포함 10글자 이하로 입력해주세요.") private String title;
+public class HotDealUpdateRequestDTO {
+  @NotBlank(message = "핫딜 제목은 필수 입력값입니다.") @Size(max = 10, message = "핫딜 제목은 공백 포함 10글자 이하로 입력해주세요.") private String title;
 
   @Size(max = 200, message = "핫딜 설명은 공백 포함 200글자 이하로 입력해주세요.") private String description;
 

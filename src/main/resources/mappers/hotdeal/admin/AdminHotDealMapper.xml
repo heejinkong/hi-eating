@@ -11,7 +11,7 @@
             h.ends_at AS endsAt,
             h.status AS status,
             COUNT(hp.product_option_id) AS productCount,
-            COALESCE(SUM(hp.hot_deal_price), 0) AS discountPrice
+            COALESCE(ROUND(AVG(100 - (hp.hot_deal_price * 100 / NULLIF(hp.original_price, 0)))), 0) AS discountRate
         FROM hot_deals h
         LEFT JOIN hot_deal_products hp ON h.id = hp.hot_deal_id
         WHERE h.deleted_at IS NULL
@@ -29,4 +29,45 @@
         INSERT INTO hot_deal_products (hot_deal_id, product_option_id, original_price, hot_deal_price)
         VALUES (#{hotDealId}, #{productOptionId}, #{originalPrice}, #{hotDealPrice})
     </insert>
+
+    <update id="updateHotDeal">
+        UPDATE hot_deals
+        SET title = #{title},
+            description = #{description},
+            starts_at = #{startsAt},
+            ends_at = #{endsAt},
+            status = #{status},
+            updated_at = SYSTIMESTAMP
+        WHERE id = #{id} AND deleted_at IS NULL
+    </update>
+
+    <delete id="deleteHotDealProductsByHotDealId">
+        DELETE FROM hot_deal_products
+        WHERE hot_deal_id = #{hotDealId}
+    </delete>
+
+    <select id="selectHotDealById" resultType="kr.or.hieating.hotdeal.domain.HotDeals">
+        SELECT id, created_by AS createdBy, title, description, starts_at AS startsAt, ends_at AS endsAt, status, created_at AS createdAt, updated_at AS updatedAt, deleted_at AS deletedAt
+        FROM hot_deals
+        WHERE id = #{id} AND deleted_at IS NULL
+    </select>
+
+    <select id="selectHotDealProductsDetailByHotDealId" resultType="kr.or.hieating.hotdeal.admin.dto.HotDealDetailResponseDTO$ProductItemDTO">
+        SELECT 
+            hp.product_option_id AS productOptionId,
+            p.name AS productName,
+            hp.original_price AS originalPrice,
+            hp.hot_deal_price AS hotDealPrice
+        FROM hot_deal_products hp
+        INNER JOIN product_options o ON hp.product_option_id = o.id
+        INNER JOIN products p ON o.product_id = p.id
+        WHERE hp.hot_deal_id = #{hotDealId}
+    </select>
+
+    <update id="softDeleteHotDeal">
+        UPDATE hot_deals
+        SET status = 'DELETED',
+        deleted_at = SYSTIMESTAMP
+        WHERE id = #{id}
+    </update>
 </mapper>

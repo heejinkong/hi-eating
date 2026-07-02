@@ -165,7 +165,7 @@
                       <th style="width: 25%">핫딜명</th>
                       <th style="width: 30%">기간</th>
                       <th style="width: 12%">상품 수</th>
-                      <th style="width: 15%">할인가</th>
+                      <th style="width: 15%">할인율</th>
                       <th style="width: 10%">상태</th>
                       <th class="text-center" style="width: 8%">관리</th>
                     </tr>
@@ -311,7 +311,12 @@
                   </button>
                 </div>
 
-                <button type="button" class="action-btn btn-close-hotdeal mt-2">
+                <button
+                  type="button"
+                  id="btnEndHotDeal"
+                  class="action-btn btn-close-hotdeal mt-2"
+                  style="display: none"
+                >
                   선택 상품으로 핫딜 종료
                 </button>
               </form>

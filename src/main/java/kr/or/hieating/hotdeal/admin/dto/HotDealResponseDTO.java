@@ -14,5 +14,5 @@ public class HotDealResponseDTO {
   private LocalDateTime endsAt;
   private String status;
   private Integer productCount;
-  private Integer discountPrice;
+  private Integer discountRate;
 }
