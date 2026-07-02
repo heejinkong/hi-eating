@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.or.hieating.auth.mapper.AuthMapper">
+	<select id="findByEmail" resultType="Users">
+		SELECT id, email, password, name, gender, birth
+		FROM users
+		WHERE email = #{email}
+		  AND deleted_at IS NULL
+	</select>
+	<select id="findAuthoritiesByUserId" resultType="String">
+		SELECT auth
+		FROM user_auth
+		WHERE user_id = #{userId}
+	</select>
+
+	<select id="countByEmail" resultType="int">
+		SELECT COUNT(*)
+		FROM users
+		WHERE email = #{email}
+		  AND deleted_at IS NULL
+	</select>
+
+	<insert id="insertUser" parameterType="SignupUserParam">
+		INSERT INTO users (
+			email,
+			password,
+			name,
+			gender,
+			birth,
+			created_at
+		)
+		VALUES (
+			#{email},
+			#{password},
+			#{name},
+			#{gender},
+			#{birth},
+			SYSTIMESTAMP
+		)
+	</insert>
+
+	<insert id="insertUserAuth">
+		INSERT INTO user_auth (
+			user_id,
+			auth,
+			created_at
+		)
+		VALUES (
+			#{userId},
+			#{auth},
+			SYSTIMESTAMP
+		)
+	</insert>
+</mapper>
