@@ -22,7 +22,9 @@ public enum ErrorStatus implements BaseErrorCode {
   INVALID_SORT_BY(HttpStatus.BAD_REQUEST, "HOTDEAL4001", "유효하지 않은 정렬 기준입니다."),
   INVALID_START_DATE(HttpStatus.BAD_REQUEST, "HOTDEAL4002", "시작일은 오늘 이후로 설정해야 합니다."),
   INVALID_END_DATE(HttpStatus.BAD_REQUEST, "HOTDEAL4003", "종료일은 시작일 이후로 설정해야 합니다."),
-  HOT_DEAL_NOT_FOUND(HttpStatus.NOT_FOUND, "HOTDEAL4004", "해당 핫딜이 존재하지 않습니다.");
+  HOT_DEAL_NOT_FOUND(HttpStatus.NOT_FOUND, "HOTDEAL4004", "해당 핫딜이 존재하지 않습니다."),
+  INVALID_STATISTICS_DATE_RANGE(
+      HttpStatus.BAD_REQUEST, "STATISTICS4001", "시작날짜는 끝날짜 이후로 설정할 수 없습니다.");
 
   private final HttpStatus httpStatus;
   private final String code;
