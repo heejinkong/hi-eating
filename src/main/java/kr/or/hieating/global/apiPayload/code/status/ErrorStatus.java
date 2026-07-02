@@ -17,6 +17,12 @@ public enum ErrorStatus implements BaseErrorCode {
   PROMOTION_NOT_FOUND(HttpStatus.NOT_FOUND, "PROMOTION4001", "해당 배너 프로모션이 존재하지 않습니다."),
   PROMOTION_REORDER_LIMIT(
       HttpStatus.BAD_REQUEST, "PROMOTION4002", "더 이상 순서를 쪼갤 수 없습니다. 재배치가 필요합니다."),
+  INVALID_PROMOTION_DATE(HttpStatus.BAD_REQUEST, "PROMOTION4003", "프로모션 시작일은 종료일보다 이전이거나 같아야 합니다."),
+  INVALID_FILE_TYPE(
+      HttpStatus.BAD_REQUEST,
+      "PROMOTION4004",
+      "이미지 파일만 업로드할 수 있습니다. (허용 확장자: jpg, jpeg, png, gif, webp)"),
+  EMPTY_FILE(HttpStatus.BAD_REQUEST, "PROMOTION4005", "업로드할 이미지 파일이 비어 있습니다."),
 
   // 핫딜 관련 에러
   INVALID_SORT_BY(HttpStatus.BAD_REQUEST, "HOTDEAL4001", "유효하지 않은 정렬 기준입니다."),

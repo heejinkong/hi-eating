@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.or.hieating.promotion.admin.mapper.AdminPromotionMapper">
+
+    <select id="selectAllPromotions" resultType="kr.or.hieating.promotion.domain.Promotions">
+        SELECT
+            id,
+            title,
+            img_src AS imgSrc,
+            link,
+            display_order AS displayOrder,
+            starts_at AS startsAt,
+            ends_at AS endsAt,
+            created_at AS createdAt,
+            updated_at AS updatedAt
+        FROM promotions
+        ORDER BY display_order ASC
+    </select>
+
+    <select id="selectMaxDisplayOrder" resultType="int">
+        SELECT COALESCE(MAX(display_order), 0) FROM promotions
+    </select>
+
+    <insert id="insertPromotion" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO promotions (title, img_src, link, display_order, starts_at, ends_at, created_at)
+        VALUES (#{title}, #{imgSrc}, #{link}, (SELECT COALESCE(MAX(display_order), 0) + 1000 FROM promotions), #{startsAt}, #{endsAt}, SYSTIMESTAMP)
+    </insert>
+
+    <update id="updatePromotion">
+        UPDATE promotions
+        <set>
+            <if test="title != null">title = #{title},</if>
+            <if test="imgSrc != null">img_src = #{imgSrc},</if>
+            <if test="link != null">link = #{link},</if>
+            <if test="startsAt != null">starts_at = #{startsAt},</if>
+            <if test="endsAt != null">ends_at = #{endsAt},</if>
+            updated_at = SYSTIMESTAMP
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <select id="selectPromotionById" resultType="kr.or.hieating.promotion.domain.Promotions">
+        SELECT
+            id,
+            title,
+            img_src AS imgSrc,
+            link,
+            display_order AS displayOrder,
+            starts_at AS startsAt,
+            ends_at AS endsAt,
+            created_at AS createdAt,
+            updated_at AS updatedAt
+        FROM promotions
+        WHERE id = #{id}
+    </select>
+
+    <delete id="deletePromotion">
+        DELETE FROM promotions WHERE id = #{id}
+    </delete>
+
+</mapper>

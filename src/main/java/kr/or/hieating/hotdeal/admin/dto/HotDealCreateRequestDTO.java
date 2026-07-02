@@ -13,9 +13,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.extern.jackson.Jacksonized;
 
 @Getter
 @Builder
+@Jacksonized
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class HotDealCreateRequestDTO {
@@ -35,6 +37,7 @@ public class HotDealCreateRequestDTO {
 
   @Getter
   @Builder
+  @Jacksonized
   @NoArgsConstructor(access = AccessLevel.PROTECTED)
   @AllArgsConstructor
   public static class ProductItemDTO {
