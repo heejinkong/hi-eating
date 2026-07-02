@@ -1,0 +1,130 @@
+:root {
+  --statistics-bg: #fbfbfb;
+  --statistics-text: #111111;
+  --statistics-orange: #ff7433;
+  --statistics-orange-soft: #fff0e8;
+}
+
+body {
+  background: var(--statistics-bg);
+  color: var(--statistics-text);
+}
+
+.statistics-main {
+  padding: 4rem 3rem 3rem;
+}
+
+.statistics-accent {
+  color: var(--statistics-orange);
+}
+
+.btn-statistics-primary {
+  --bs-btn-color: #ffffff;
+  --bs-btn-bg: var(--statistics-orange);
+  --bs-btn-border-color: var(--statistics-orange);
+  --bs-btn-hover-color: #ffffff;
+  --bs-btn-hover-bg: #f06426;
+  --bs-btn-hover-border-color: #f06426;
+}
+
+.metric-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  border-radius: 12px;
+  color: var(--statistics-orange);
+  background: var(--statistics-orange-soft);
+  font-size: 1.35rem;
+}
+
+.date-input {
+  min-width: 150px;
+}
+
+.period-select {
+  min-width: 142px;
+}
+
+.period-tabs .btn {
+  min-width: 44px;
+  color: #8b8b8b;
+}
+
+.period-tabs .btn.active {
+  color: var(--statistics-orange);
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(255, 116, 51, 0.12);
+}
+
+.bar-chart-frame {
+  height: 260px;
+}
+
+.donut-chart-frame {
+  height: 230px;
+}
+
+.chart-legend {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.chart-legend li {
+  display: grid;
+  grid-template-columns: 10px minmax(68px, 1fr) minmax(86px, auto) 42px;
+  align-items: center;
+  gap: 0.55rem;
+  color: #555555;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.legend-color {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}
+
+.legend-label {
+  color: #4f4f4f;
+}
+
+.chart-legend strong {
+  justify-self: end;
+  color: #111111;
+  font-size: 0.84rem;
+}
+
+.chart-legend em {
+  justify-self: end;
+  color: #777777;
+  font-style: normal;
+  font-size: 0.8rem;
+}
+
+.chart-card.chart-unavailable::after {
+  display: block;
+  margin-top: 1rem;
+  color: #c0392b;
+  font-size: 0.85rem;
+  font-weight: 800;
+  content: '차트 리소스를 불러오지 못했습니다.';
+}
+
+@media (max-width: 760px) {
+  .statistics-main {
+    padding: 3rem 1rem 2rem;
+  }
+
+  .date-input,
+  .period-select {
+    width: 100%;
+  }
+
+  .bar-chart-frame {
+    height: 240px;
+  }
+}

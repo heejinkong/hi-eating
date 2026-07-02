@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+<div class="admin-layout" th:fragment="content">
+  <aside th:replace="~{admin/fragments/sidebar :: adminSidebar('statistics')}"></aside>
+
+  <main class="main-container statistics-main">
+    <header
+      class="d-flex flex-column flex-md-row justify-content-between align-items-md-start gap-3 mb-4">
+      <div>
+        <h1 class="fw-bold mb-2">통계</h1>
+        <p class="text-muted fw-semibold mb-0">매출 현황을 다양한 기준으로 분석할 수 있습니다.</p>
+      </div>
+      <nav aria-label="breadcrumb"
+           class="breadcrumb-area d-inline-flex align-items-center gap-2 fw-bold">
+        <i class="bi bi-house-door-fill text-muted"></i>
+        <i class="bi bi-chevron-right text-muted"></i>
+        <span class="statistics-accent">통계</span>
+      </nav>
+    </header>
+
+    <section aria-label="주요 통계" class="row row-cols-1 row-cols-md-2 row-cols-xl-4 g-3 mb-4">
+      <div class="col" th:each="metric : ${metrics}">
+        <article class="card h-100 border-0 shadow-sm rounded-3">
+          <div class="card-body d-flex align-items-center gap-3 p-4">
+            <div class="metric-icon">
+              <i class="bi" th:classappend="${metric.iconClass}"></i>
+            </div>
+            <div>
+              <p class="text-muted fw-bold small mb-2" th:text="${metric.title}"></p>
+              <strong class="d-block fs-4 lh-1 mb-2"
+                      th:text="${#numbers.formatInteger(metric.value, 0, 'COMMA')} + ${metric.unit}"></strong>
+              <span class="statistics-accent fw-bold small"
+                    th:text="${metric.comparisonText}"></span>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section aria-label="통계 조회 기간" class="card border-0 shadow-sm rounded-3 mb-4">
+      <div
+        class="card-body d-flex flex-column flex-xl-row align-items-xl-center justify-content-between gap-3 p-3 p-md-4">
+        <div class="d-flex flex-column flex-md-row align-items-md-center gap-2">
+          <label class="mb-0">
+            <span class="visually-hidden">시작일</span>
+            <input class="form-control form-control-sm fw-bold date-input" th:value="${periodStart}"
+                   type="date">
+          </label>
+          <span class="text-muted fw-bold d-none d-md-inline">-</span>
+          <label class="mb-0">
+            <span class="visually-hidden">종료일</span>
+            <input class="form-control form-control-sm fw-bold date-input" th:value="${periodEnd}"
+                   type="date">
+          </label>
+          <button class="btn btn-sm btn-statistics-primary fw-bold px-4" type="button">조회</button>
+        </div>
+
+        <label class="mb-0">
+          <span class="visually-hidden">기간 설정</span>
+          <select class="form-select form-select-sm fw-bold period-select">
+            <option selected>기간 설정</option>
+            <option>오늘</option>
+            <option>최근 7일</option>
+            <option>이번 달</option>
+            <option>최근 3개월</option>
+          </select>
+        </label>
+      </div>
+    </section>
+
+    <section aria-label="매출 차트" class="row g-4">
+      <div class="col-12 col-xl-6">
+        <article class="card chart-card h-100 border-0 shadow-sm rounded-3">
+          <div class="card-body p-4">
+            <div
+              class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-2 mb-3">
+              <h2 class="fs-6 fw-bold mb-0" th:text="${ageSalesChart.title}"></h2>
+            </div>
+            <div class="bar-chart-frame">
+              <canvas id="ageSalesChart"
+                      th:data-colors="${ageSalesChart.colorsText()}"
+                      th:data-labels="${ageSalesChart.labelsText()}"
+                      th:data-values="${ageSalesChart.valuesText()}"></canvas>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <div class="col-12 col-xl-6">
+        <article class="card chart-card h-100 border-0 shadow-sm rounded-3">
+          <div class="card-body p-4">
+            <div
+              class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-2 mb-3">
+              <h2 class="fs-6 fw-bold mb-0" th:text="${categorySalesChart.title}"></h2>
+            </div>
+            <div class="row align-items-center g-3">
+              <div class="col-12 col-md-5">
+                <div class="donut-chart-frame">
+                  <canvas id="categorySalesChart"
+                          th:data-center-value="${#numbers.formatInteger(categorySalesChart.totalSalesAmount(), 0, 'COMMA') + '원'}"
+                          th:data-colors="${categorySalesChart.colorsText()}"
+                          th:data-labels="${categorySalesChart.labelsText()}"
+                          th:data-values="${categorySalesChart.valuesText()}"></canvas>
+                </div>
+              </div>
+              <div class="col-12 col-md-7">
+                <ul class="chart-legend list-unstyled mb-0">
+                  <li th:each="point : ${categorySalesChart.points}">
+                    <span class="legend-color"
+                          th:style="'background-color: ' + ${point.color}"></span>
+                    <span class="legend-label" th:text="${point.label}"></span>
+                    <strong
+                      th:text="${#numbers.formatInteger(point.salesAmount, 0, 'COMMA')} + '원'"></strong>
+                    <em th:text="${point.salesRate} + '%'"></em>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <div class="col-12 col-xl-6">
+        <article class="card chart-card h-100 border-0 shadow-sm rounded-3">
+          <div class="card-body p-4">
+            <div
+              class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-2 mb-3">
+              <h2 class="fs-6 fw-bold mb-0" th:text="${genderSalesChart.title}"></h2>
+            </div>
+            <div class="row align-items-center g-3">
+              <div class="col-12 col-md-5">
+                <div class="donut-chart-frame">
+                  <canvas id="genderSalesChart"
+                          th:data-center-value="${#numbers.formatInteger(genderSalesChart.totalSalesAmount(), 0, 'COMMA') + '원'}"
+                          th:data-colors="${genderSalesChart.colorsText()}"
+                          th:data-labels="${genderSalesChart.labelsText()}"
+                          th:data-values="${genderSalesChart.valuesText()}"></canvas>
+                </div>
+              </div>
+              <div class="col-12 col-md-7">
+                <ul class="chart-legend list-unstyled mb-0">
+                  <li th:each="point : ${genderSalesChart.points}">
+                    <span class="legend-color"
+                          th:style="'background-color: ' + ${point.color}"></span>
+                    <span class="legend-label" th:text="${point.label}"></span>
+                    <strong
+                      th:text="${#numbers.formatInteger(point.salesAmount, 0, 'COMMA')} + '원'"></strong>
+                    <em th:text="${point.salesRate} + '%'"></em>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <div class="col-12 col-xl-6">
+        <article class="card chart-card h-100 border-0 shadow-sm rounded-3">
+          <div class="card-body p-4">
+            <div
+              class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-2 mb-3">
+              <h2 class="fs-6 fw-bold mb-0" th:text="${priceSalesChart.title}"></h2>
+            </div>
+            <div class="bar-chart-frame">
+              <canvas id="priceSalesChart"
+                      th:data-colors="${priceSalesChart.colorsText()}"
+                      th:data-labels="${priceSalesChart.labelsText()}"
+                      th:data-values="${priceSalesChart.valuesText()}"></canvas>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+</div>
+</body>
+</html>

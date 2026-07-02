@@ -54,3 +54,132 @@ body {
   background: var(--color-page);
   font-family: var(--font-family-base);
 }
+
+.admin-layout {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.sidebar {
+  width: 250px;
+  border-right: 1px solid #e6e6e6;
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  padding: 1.5rem 1rem;
+  flex-shrink: 0;
+  transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body.sidebar-collapsed .sidebar {
+  margin-left: -250px;
+}
+
+.brand-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2.5rem;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.logo-img {
+  height: 42px;
+  width: auto;
+  object-fit: contain;
+}
+
+.logo-text {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #e05e2b;
+  letter-spacing: 0;
+}
+
+.sidebar-toggle-btn {
+  position: fixed;
+  left: 215px;
+  top: 29px;
+  z-index: 1001;
+  width: 32px;
+  height: 32px;
+  background-color: #ffffff;
+  border: 1px solid #e6e6e6;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s, box-shadow 0.3s;
+  color: #888888;
+  outline: none;
+}
+
+.sidebar-toggle-btn:hover {
+  background-color: #f2f2f2;
+  color: #111111;
+}
+
+body.sidebar-collapsed .sidebar-toggle-btn {
+  left: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid #e6e6e6;
+  padding-top: 1rem;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.user-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.user-name {
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.user-email {
+  font-size: 0.75rem;
+  color: #888888;
+  margin: 0;
+}
+
+.main-container {
+  flex-grow: 1;
+  overflow-x: hidden;
+  transition: padding-left 0.3s ease;
+}
+
+body.sidebar-collapsed .main-container {
+  padding-left: 5rem;
+}
