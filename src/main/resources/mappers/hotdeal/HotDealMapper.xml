@@ -74,7 +74,8 @@
       p.view_count AS viewCount,
       NVL(purchase_stat.total_quantity, 0) AS totalQuantity,
       h.ends_at AS endsAt,
-      GREATEST(0, FLOOR((CAST(h.ends_at AS DATE) - SYSDATE) * 86400)) AS remainingSeconds
+      GREATEST(0, FLOOR((CAST(h.ends_at AS DATE) - SYSDATE) * 86400)) AS remainingSeconds,
+      CASE WHEN favorite_stat.product_id IS NULL THEN 0 ELSE 1 END AS favorite
     FROM hot_deals h
       JOIN hot_deal_products hp ON hp.hot_deal_id = h.id
       JOIN product_options po ON po.id = hp.product_option_id
@@ -92,6 +93,11 @@
         FROM purchases
         GROUP BY product_option_id
       ) purchase_stat ON purchase_stat.product_option_id = hp.product_option_id
+      LEFT JOIN (
+        SELECT DISTINCT product_id
+        FROM favorites
+        WHERE user_id = #{userId}
+      ) favorite_stat ON favorite_stat.product_id = p.id
     WHERE h.status = 'ACTIVE'
       AND h.deleted_at IS NULL
       AND SYSTIMESTAMP BETWEEN h.starts_at AND h.ends_at

@@ -10,4 +10,5 @@ public class MostPurchasedProductResponseDto {
   private int price;
   private long totalQuantity;
   private String pictureLocation;
+  private boolean favorite;
 }

@@ -13,7 +13,7 @@ import org.apache.ibatis.annotations.Param;
 @Mapper
 public interface ProductMapper {
 
-  List<MostPurchasedProductResponseDto> findMostPurchasedProducts();
+  List<MostPurchasedProductResponseDto> findMostPurchasedProducts(@Param("userId") Long userId);
 
   Optional<ProductDetailRowDto> findProductDetailRow(@Param("productId") Long productId);
 

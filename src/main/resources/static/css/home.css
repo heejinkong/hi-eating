@@ -305,6 +305,10 @@
   background: #fff7f1;
 }
 
+.product-card__cart {
+  display: none;
+}
+
 .product-card__placeholder {
   display: grid;
   height: 100%;

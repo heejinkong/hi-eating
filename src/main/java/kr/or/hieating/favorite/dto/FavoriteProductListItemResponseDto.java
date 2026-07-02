@@ -1,9 +1,10 @@
-package kr.or.hieating.product.dto;
+package kr.or.hieating.favorite.dto;
 
+import java.time.LocalDateTime;
 import lombok.Data;
 
 @Data
-public class ProductListItemResponseDto {
+public class FavoriteProductListItemResponseDto {
 
   private Long productId;
   private String productName;
@@ -13,5 +14,5 @@ public class ProductListItemResponseDto {
   private int viewCount;
   private int totalQuantity;
   private String pictureLocation;
-  private boolean favorite;
+  private LocalDateTime favoriteCreatedAt;
 }

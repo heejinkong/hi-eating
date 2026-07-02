@@ -5,6 +5,7 @@ import kr.or.hieating.hotdeal.dto.ActiveHotDealResponseDto;
 import kr.or.hieating.hotdeal.dto.HotDealProductListPageResponseDto;
 import kr.or.hieating.hotdeal.dto.HotDealProductSearchCondition;
 import kr.or.hieating.hotdeal.service.HotDealService;
+import kr.or.hieating.utils.UserResolver;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class HotDealController {
 
   private final HotDealService hotDealService;
+  private final UserResolver userResolver;
 
   @GetMapping("/hot-deals")
   public String hotDeals(
@@ -24,7 +26,7 @@ public class HotDealController {
       @RequestParam(defaultValue = "popular") String sort,
       Model model) {
     HotDealProductSearchCondition condition =
-        new HotDealProductSearchCondition(hotDealId, sort, 1, null);
+        new HotDealProductSearchCondition(hotDealId, userResolver.currentUserId(), sort, 1, null);
     List<ActiveHotDealResponseDto> activeHotDeals = hotDealService.findActiveHotDeals();
     ActiveHotDealResponseDto selectedHotDeal = findSelectedHotDeal(activeHotDeals, hotDealId);
 
@@ -48,7 +50,8 @@ public class HotDealController {
       @RequestParam(defaultValue = "1") Integer page,
       @RequestParam(required = false) Integer size) {
     return hotDealService.findHotDealProducts(
-        new HotDealProductSearchCondition(hotDealId, sort, page, size));
+        new HotDealProductSearchCondition(
+            hotDealId, userResolver.currentUserId(), sort, page, size));
   }
 
   private ActiveHotDealResponseDto findSelectedHotDeal(

@@ -20,4 +20,5 @@ public class HotDealProductListItemResponseDto {
   private int totalQuantity;
   private LocalDateTime endsAt;
   private long remainingSeconds;
+  private boolean favorite;
 }

@@ -102,22 +102,27 @@
 
           <div class="product-grid" th:if="${productPage.hasProducts()}">
             <article class="catalog-product-card" th:each="product : ${productPage.products}">
-              <a
-                class="catalog-product-card__image"
-                th:href="@{/product/{id}(id=${product.productId})}"
-              >
-                <img
-                  th:src="${#strings.isEmpty(product.pictureLocation) ? '/images/logo-hi-eating.png' : product.pictureLocation}"
-                  th:alt="${product.productName}"
-                  data-fallback-src="/images/logo-hi-eating.png"
-                />
-                <span
-                  class="catalog-product-card__badge"
-                  th:if="${product.discountRate > 0}"
-                  th:text="|${product.discountRate}%|"
-                  >20%</span
+              <div class="catalog-product-card__image">
+                <a
+                  class="catalog-product-card__image-link"
+                  th:href="@{/product/{id}(id=${product.productId})}"
                 >
-              </a>
+                  <img
+                    th:src="${#strings.isEmpty(product.pictureLocation) ? '/images/logo-hi-eating.png' : product.pictureLocation}"
+                    th:alt="${product.productName}"
+                    data-fallback-src="/images/logo-hi-eating.png"
+                  />
+                  <span
+                    class="catalog-product-card__badge"
+                    th:if="${product.discountRate > 0}"
+                    th:text="|${product.discountRate}%|"
+                    >20%</span
+                  >
+                </a>
+                <th:block
+                  th:replace="~{fragments/favorite-button :: button(${product.productId}, ${product.favorite})}"
+                ></th:block>
+              </div>
 
               <a
                 class="catalog-product-card__name"

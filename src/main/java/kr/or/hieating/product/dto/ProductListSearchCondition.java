@@ -8,6 +8,7 @@ public class ProductListSearchCondition {
   public static final int DEFAULT_SIZE = 18;
 
   private final Long categoryId;
+  private final Long userId;
   private final Integer minPrice;
   private final Integer maxPrice;
   private final Integer minDiscountRate;
@@ -18,12 +19,14 @@ public class ProductListSearchCondition {
 
   public ProductListSearchCondition(
       Long categoryId,
+      Long userId,
       Integer minPrice,
       Integer maxPrice,
       Integer minDiscountRate,
       String sort,
       Integer page) {
     this.categoryId = categoryId;
+    this.userId = userId;
     this.minPrice = normalizePositive(minPrice);
     this.maxPrice = normalizePositive(maxPrice);
     this.minDiscountRate = normalizePositive(minDiscountRate);
@@ -31,6 +34,16 @@ public class ProductListSearchCondition {
     this.page = Math.max(page == null ? 1 : page, 1);
     this.size = DEFAULT_SIZE;
     this.offset = (this.page - 1) * this.size;
+  }
+
+  public ProductListSearchCondition(
+      Long categoryId,
+      Integer minPrice,
+      Integer maxPrice,
+      Integer minDiscountRate,
+      String sort,
+      Integer page) {
+    this(categoryId, null, minPrice, maxPrice, minDiscountRate, sort, page);
   }
 
   private static Integer normalizePositive(Integer value) {

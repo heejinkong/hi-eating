@@ -12,6 +12,7 @@ import kr.or.hieating.product.dto.ProductListSearchCondition;
 import kr.or.hieating.product.mapper.ProductMapper;
 import kr.or.hieating.review.domain.ReviewSummary;
 import kr.or.hieating.utils.ImageUrlResolver;
+import kr.or.hieating.utils.UserResolver;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,9 +24,11 @@ public class ProductService {
 
   private final ProductMapper productMapper;
   private final ImageUrlResolver imageUrlResolver;
+  private final UserResolver userResolver;
 
   public List<MostPurchasedProductResponseDto> findMostPurchasedProducts() {
-    List<MostPurchasedProductResponseDto> products = productMapper.findMostPurchasedProducts();
+    List<MostPurchasedProductResponseDto> products =
+        productMapper.findMostPurchasedProducts(userResolver.currentUserId());
     products.forEach(
         product ->
             product.setPictureLocation(imageUrlResolver.resolve(product.getPictureLocation())));

@@ -168,6 +168,9 @@
                 th:alt="${product.productName}"
                 th:src="${#strings.isEmpty(product.pictureLocation) ? '/images/logo-hi-eating.png' : product.pictureLocation}"
               />
+              <th:block
+                th:replace="~{fragments/favorite-button :: button(${product.productId}, ${product.favorite})}"
+              ></th:block>
               <button aria-label="즐겨찾기 담기" class="product-card__cart" type="button">
                 <i aria-hidden="true" class="bi bi-star"></i>
               </button>

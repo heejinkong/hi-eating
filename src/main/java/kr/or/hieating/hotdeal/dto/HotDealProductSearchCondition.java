@@ -9,6 +9,7 @@ public class HotDealProductSearchCondition {
   private static final int MAX_SIZE = 40;
 
   private final Long hotDealId;
+  private final Long userId;
   private final String sort;
   private final int page;
   private final int size;
@@ -16,7 +17,13 @@ public class HotDealProductSearchCondition {
   private final int limit;
 
   public HotDealProductSearchCondition(Long hotDealId, String sort, Integer page, Integer size) {
+    this(hotDealId, null, sort, page, size);
+  }
+
+  public HotDealProductSearchCondition(
+      Long hotDealId, Long userId, String sort, Integer page, Integer size) {
     this.hotDealId = hotDealId;
+    this.userId = userId;
     this.sort = normalizeSort(sort);
     this.page = Math.max(page == null ? 1 : page, 1);
     this.size = normalizeSize(size);

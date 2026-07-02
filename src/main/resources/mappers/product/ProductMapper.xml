@@ -34,6 +34,11 @@
         AND SYSTIMESTAMP BETWEEN h.starts_at AND h.ends_at
       GROUP BY po.product_id
     ) deal_stat ON deal_stat.product_id = p.id
+    LEFT JOIN (
+      SELECT DISTINCT product_id
+      FROM favorites
+      WHERE user_id = #{userId}
+    ) favorite_stat ON favorite_stat.product_id = p.id
     WHERE p.category_id = #{categoryId}
     <if test="minPrice != null">
       AND p.price &gt;= #{minPrice}
@@ -99,13 +104,19 @@
       p.id AS product_id,
       p.name AS product_name,
       p.price AS price,
-    SUM(pc.quantity) AS total_quantity,
-    pp.picture_saved_location AS pictureLocation
+      SUM(pc.quantity) AS total_quantity,
+      pp.picture_saved_location AS pictureLocation,
+      CASE WHEN favorite_stat.product_id IS NULL THEN 0 ELSE 1 END AS favorite
     FROM purchases pc
     JOIN product_options po
     ON pc.product_option_id = po.id
     JOIN products p
     ON po.product_id = p.id
+    LEFT JOIN (
+      SELECT DISTINCT product_id
+      FROM favorites
+      WHERE user_id = #{userId}
+    ) favorite_stat ON favorite_stat.product_id = p.id
     LEFT JOIN product_pictures pp
       ON pp.id = (
       SELECT MIN(pp2.id)
@@ -116,7 +127,8 @@
     p.id,
     p.name,
     p.price,
-    pp.picture_saved_location
+    pp.picture_saved_location,
+    favorite_stat.product_id
     ORDER BY
     total_quantity DESC,
     p.id ASC
@@ -132,7 +144,8 @@
       NVL(deal_stat.discount_rate, 0) AS discountRate,
       p.view_count AS viewCount,
       NVL(purchase_stat.total_quantity, 0) AS totalQuantity,
-      pp.picture_saved_location AS pictureLocation
+      pp.picture_saved_location AS pictureLocation,
+      CASE WHEN favorite_stat.product_id IS NULL THEN 0 ELSE 1 END AS favorite
     <include refid="productListBase" />
     <choose>
       <when test="sort == 'latest'">

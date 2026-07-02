@@ -4,17 +4,25 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import kr.or.hieating.favorite.domain.Favorite;
+import kr.or.hieating.favorite.service.FavoriteService;
 import kr.or.hieating.product.domain.Product;
 import kr.or.hieating.purchase.domain.Purchase;
 import kr.or.hieating.user.domain.User;
+import kr.or.hieating.utils.UserResolver;
 import kr.or.hieating.visit.domain.Visit;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
+@RequiredArgsConstructor
 public class MyPageController {
+
+  private final FavoriteService favoriteService;
+  private final UserResolver userResolver;
 
   @GetMapping("/mypage")
   public String myPage(Model model) {
@@ -106,6 +114,9 @@ public class MyPageController {
                 "ON_SALE",
                 LocalDateTime.now().minusDays(18),
                 null));
+    Set<Long> favoriteProductIds =
+        favoriteService.findFavoriteProductIds(
+            userResolver.currentUserId(), recommendedProducts.stream().map(Product::id).toList());
     Map<Long, String> productImageUrls =
         Map.of(
             recentOrderProduct.id(),
@@ -135,6 +146,7 @@ public class MyPageController {
     model.addAttribute("recentOrderProduct", recentOrderProduct);
     model.addAttribute("productImageUrls", productImageUrls);
     model.addAttribute("recommendedProducts", recommendedProducts);
+    model.addAttribute("favoriteProductIds", favoriteProductIds);
     return "layout/base";
   }
 }

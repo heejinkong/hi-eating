@@ -51,16 +51,26 @@
   const productCardTemplate = (product) => {
     const imageSrc = product.pictureLocation || '/images/logo-hi-eating.png';
     const detailUrl = `/product/${product.productId}`;
+    const favorite = Boolean(product.favorite);
 
     return `
       <article class="hotdeal-product-card">
-        <a class="hotdeal-product-card__image" href="${detailUrl}">
-          <img src="${escapeHtml(imageSrc)}"
-               alt="${escapeHtml(product.productName)}"
-               data-fallback-src="/images/logo-hi-eating.png">
-          <span class="hotdeal-product-card__badge">${product.discountRate}%</span>
-          <span class="hotdeal-product-card__stock">\uC7AC\uACE0 ${product.stock}</span>
-        </a>
+        <div class="hotdeal-product-card__image">
+          <a class="hotdeal-product-card__image-link" href="${detailUrl}">
+            <img src="${escapeHtml(imageSrc)}"
+                 alt="${escapeHtml(product.productName)}"
+                 data-fallback-src="/images/logo-hi-eating.png">
+            <span class="hotdeal-product-card__badge">${product.discountRate}%</span>
+            <span class="hotdeal-product-card__stock">\uC7AC\uACE0 ${product.stock}</span>
+          </a>
+          <button aria-label="\uAD00\uC2EC \uC0C1\uD488 \uC990\uACA8\uCC3E\uAE30"
+                  class="product-favorite-button position-absolute d-inline-flex align-items-center justify-content-center rounded-circle${favorite ? ' is-active' : ''}"
+                  data-product-id="${product.productId}"
+                  aria-pressed="${favorite}"
+                  type="button">
+            <i aria-hidden="true" class="bi ${favorite ? 'bi-star-fill' : 'bi-star'}"></i>
+          </button>
+        </div>
         <p class="hotdeal-product-card__deal">${escapeHtml(product.hotDealTitle)}</p>
         <a class="hotdeal-product-card__name" href="${detailUrl}">
           ${escapeHtml(product.productName)}
