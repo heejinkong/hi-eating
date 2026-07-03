@@ -37,7 +37,7 @@
     LEFT JOIN (
       SELECT DISTINCT product_id
       FROM favorites
-      WHERE user_id = #{userId}
+      WHERE user_id = #{userId,jdbcType=NUMERIC}
     ) favorite_stat ON favorite_stat.product_id = p.id
     WHERE
       LOWER(p.name) LIKE #{keywordLike} <!-- LIKE 검색 -->

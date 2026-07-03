@@ -116,7 +116,8 @@ public class MyPageController {
                 null));
     Set<Long> favoriteProductIds =
         favoriteService.findFavoriteProductIds(
-            userResolver.currentUserId(), recommendedProducts.stream().map(Product::id).toList());
+            userResolver.requireCurrentUserId(),
+            recommendedProducts.stream().map(Product::id).toList());
     Map<Long, String> productImageUrls =
         Map.of(
             recentOrderProduct.id(),

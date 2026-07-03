@@ -26,7 +26,8 @@ public class HotDealController {
       @RequestParam(defaultValue = "popular") String sort,
       Model model) {
     HotDealProductSearchCondition condition =
-        new HotDealProductSearchCondition(hotDealId, userResolver.currentUserId(), sort, 1, null);
+        new HotDealProductSearchCondition(
+            hotDealId, userResolver.currentUserIdOrNull(), sort, 1, null);
     List<ActiveHotDealResponseDto> activeHotDeals = hotDealService.findActiveHotDeals();
     ActiveHotDealResponseDto selectedHotDeal = findSelectedHotDeal(activeHotDeals, hotDealId);
 
@@ -51,7 +52,7 @@ public class HotDealController {
       @RequestParam(required = false) Integer size) {
     return hotDealService.findHotDealProducts(
         new HotDealProductSearchCondition(
-            hotDealId, userResolver.currentUserId(), sort, page, size));
+            hotDealId, userResolver.currentUserIdOrNull(), sort, page, size));
   }
 
   private ActiveHotDealResponseDto findSelectedHotDeal(

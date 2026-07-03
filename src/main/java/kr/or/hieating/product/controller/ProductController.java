@@ -51,7 +51,7 @@ public class ProductController {
     ProductListSearchCondition condition =
         new ProductListSearchCondition(
             categoryId,
-            userResolver.currentUserId(),
+            userResolver.currentUserIdOrNull(),
             minPrice,
             maxPrice,
             minDiscountRate,

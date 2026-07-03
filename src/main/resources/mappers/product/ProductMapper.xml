@@ -9,10 +9,11 @@
     JOIN categories c ON c.id = p.category_id
     LEFT JOIN (
       SELECT
-        pc.product_id,
-        SUM(pc.quantity) AS total_quantity
-      FROM purchases pc
-      GROUP BY pc.product_id
+        po.product_id,
+        SUM(ppo.quantity) AS total_quantity
+      FROM purchase_product_options ppo
+      JOIN product_options po ON po.id = ppo.product_option_id
+      GROUP BY po.product_id
     ) purchase_stat ON purchase_stat.product_id = p.id
     LEFT JOIN product_pictures pp
       ON pp.id = (
@@ -36,7 +37,7 @@
     LEFT JOIN (
       SELECT DISTINCT product_id
       FROM favorites
-      WHERE user_id = #{userId}
+      WHERE user_id = #{userId,jdbcType=NUMERIC}
     ) favorite_stat ON favorite_stat.product_id = p.id
     WHERE p.category_id = #{categoryId}
     <if test="minPrice != null">
@@ -103,16 +104,37 @@
       p.id AS product_id,
       p.name AS product_name,
       p.price AS price,
-      SUM(pc.quantity) AS total_quantity,
+      deal_stat.sale_price AS sale_price,
+      NVL(deal_stat.discount_rate, 0) AS discount_rate,
+      purchase_stat.total_quantity AS total_quantity,
       pp.picture_saved_location AS pictureLocation,
       CASE WHEN favorite_stat.product_id IS NULL THEN 0 ELSE 1 END AS favorite
-    FROM purchases pc
-    JOIN products p
-    ON pc.product_id = p.id
+    FROM products p
+    JOIN (
+      SELECT
+        po.product_id,
+        SUM(ppo.quantity) AS total_quantity
+      FROM purchase_product_options ppo
+      JOIN product_options po ON po.id = ppo.product_option_id
+      GROUP BY po.product_id
+    ) purchase_stat ON purchase_stat.product_id = p.id
+    LEFT JOIN (
+      SELECT
+        po.product_id,
+        MIN(hp.hot_deal_price) AS sale_price,
+        MAX(FLOOR((hp.original_price - hp.hot_deal_price) / hp.original_price * 100)) AS discount_rate
+      FROM hot_deals h
+      JOIN hot_deal_products hp ON hp.hot_deal_id = h.id
+      JOIN product_options po ON po.id = hp.product_option_id
+      WHERE h.status = 'ACTIVE'
+        AND h.deleted_at IS NULL
+        AND SYSTIMESTAMP BETWEEN h.starts_at AND h.ends_at
+      GROUP BY po.product_id
+    ) deal_stat ON deal_stat.product_id = p.id
     LEFT JOIN (
       SELECT DISTINCT product_id
       FROM favorites
-      WHERE user_id = #{userId}
+      WHERE user_id = #{userId,jdbcType=NUMERIC}
     ) favorite_stat ON favorite_stat.product_id = p.id
     LEFT JOIN product_pictures pp
       ON pp.id = (
@@ -124,6 +146,9 @@
     p.id,
     p.name,
     p.price,
+    deal_stat.sale_price,
+    deal_stat.discount_rate,
+    purchase_stat.total_quantity,
     pp.picture_saved_location,
     favorite_stat.product_id
     ORDER BY

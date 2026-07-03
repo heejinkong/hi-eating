@@ -22,7 +22,7 @@ public class FavoriteController {
       @RequestParam(defaultValue = "latest") String sort,
       @RequestParam(defaultValue = "1") Integer page,
       Model model) {
-    Long userId = userResolver.currentUserId();
+    Long userId = userResolver.requireCurrentUserId();
     FavoriteProductSearchCondition condition =
         new FavoriteProductSearchCondition(userId, sort, page);
     FavoriteProductListPageResponseDto productPage =

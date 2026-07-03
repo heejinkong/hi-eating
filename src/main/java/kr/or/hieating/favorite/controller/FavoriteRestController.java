@@ -17,7 +17,7 @@ public class FavoriteRestController {
 
   @PostMapping("/api/favorites/{productId}/toggle")
   public FavoriteToggleResponseDto toggleFavorite(@PathVariable Long productId) {
-    Long userId = userResolver.currentUserId();
+    Long userId = userResolver.requireCurrentUserId();
     boolean favorite = favoriteService.toggleFavorite(userId, productId);
     return new FavoriteToggleResponseDto(productId, favorite);
   }

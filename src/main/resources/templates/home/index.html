@@ -198,10 +198,25 @@
               상품명
             </a>
             <p class="product-card__price">
-              <strong th:text="${#numbers.formatInteger(product.price, 0, 'COMMA')} + '원'">
+              <span
+                class="discount-rate"
+                th:if="${product.discountRate > 0}"
+                th:text="|${product.discountRate}%|"
+              >
+                20%
+              </span>
+              <strong
+                th:text="${#numbers.formatInteger(product.salePrice != null ? product.salePrice : product.price, 0, 'COMMA')} + '원'"
+              >
                 3,280원
               </strong>
             </p>
+            <del
+              th:if="${product.discountRate > 0}"
+              th:text="${#numbers.formatInteger(product.price, 0, 'COMMA')} + '원'"
+            >
+              4,100원
+            </del>
             <p class="product-card__quantity" th:text="|누적 ${product.totalQuantity}개 판매|">
               누적 0개 판매
             </p>

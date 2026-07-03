@@ -28,7 +28,7 @@ public class ProductService {
 
   public List<MostPurchasedProductResponseDto> findMostPurchasedProducts() {
     List<MostPurchasedProductResponseDto> products =
-        productMapper.findMostPurchasedProducts(userResolver.currentUserId());
+        productMapper.findMostPurchasedProducts(userResolver.currentUserIdOrNull());
     products.forEach(
         product ->
             product.setPictureLocation(imageUrlResolver.resolve(product.getPictureLocation())));

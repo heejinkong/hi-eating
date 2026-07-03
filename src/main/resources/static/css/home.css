@@ -403,9 +403,29 @@
 }
 
 .product-card__price {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: baseline;
   margin: 0;
   color: #222;
   font-size: 16px;
+}
+
+.product-card__price .discount-rate {
+  color: #ff3d25;
+  font-weight: 900;
+}
+
+.product-card__price strong {
+  font-weight: 900;
+}
+
+.product-card del {
+  display: block;
+  margin-top: 2px;
+  color: #aaa09a;
+  font-size: 12px;
 }
 
 .product-card__quantity {

@@ -70,7 +70,23 @@
       });
 
       if (!response.ok) {
-        throw new Error('Failed to toggle favorite.');
+        const error = new Error('Failed to toggle favorite.');
+        error.status = response.status;
+        error.redirectedToLogin = response.redirected && response.url.includes('/login');
+        throw error;
+      }
+
+      if (response.redirected && response.url.includes('/login')) {
+        const error = new Error('Login required.');
+        error.redirectedToLogin = true;
+        throw error;
+      }
+
+      const contentType = response.headers.get('content-type') || '';
+      if (!contentType.includes('application/json')) {
+        const error = new Error('Unexpected favorite response.');
+        error.redirectedToLogin = response.url.includes('/login');
+        throw error;
       }
 
       const data = await response.json();
@@ -81,9 +97,11 @@
       }
     } catch (error) {
       console.error(error);
-      window.alert(
-        '\uC990\uACA8\uCC3E\uAE30 \uCC98\uB9AC\uC5D0 \uC2E4\uD328\uD588\uC2B5\uB2C8\uB2E4. \uC7A0\uC2DC \uD6C4 \uB2E4\uC2DC \uC2DC\uB3C4\uD574\uC8FC\uC138\uC694.',
-      );
+      const message =
+        error.status === 401 || error.status === 403 || error.redirectedToLogin
+          ? '즐겨찾기는 로그인한 사용자만 이용할 수 있습니다. 로그인 후 다시 시도해주세요.'
+          : '즐겨찾기 처리에 실패했습니다. 잠시 후 다시 시도해주세요.';
+      window.alert(message);
     } finally {
       button.classList.remove('is-loading');
       button.disabled = false;
