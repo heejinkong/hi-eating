@@ -10,11 +10,10 @@
       JOIN products p ON p.id = f.product_id
       LEFT JOIN (
         SELECT
-          po.product_id,
-          SUM(ppo.quantity) AS total_quantity
-        FROM purchase_product_options ppo
-          JOIN product_options po ON po.id = ppo.product_option_id
-        GROUP BY po.product_id
+          pc.product_id,
+          SUM(pc.quantity) AS total_quantity
+        FROM purchases pc
+        GROUP BY pc.product_id
       ) purchase_stat ON purchase_stat.product_id = p.id
       LEFT JOIN product_pictures pp
         ON pp.id = (
@@ -70,6 +69,12 @@
   <select id="countFavoriteProducts" resultType="int">
     SELECT COUNT(*)
     <include refid="favoriteProductBase" />
+  </select>
+
+  <select id="countFavoritesByUserId" resultType="int">
+    SELECT COUNT(*)
+    FROM favorites
+    WHERE user_id = #{userId}
   </select>
 
   <select id="countFavorite" resultType="int">

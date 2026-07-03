@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.or.hieating.visit.mapper.VisitMapper">
+
+  <select id="countVisitsByUserId" resultType="int">
+    SELECT COUNT(*)
+    FROM visits
+    WHERE user_id = #{userId}
+  </select>
+
+  <update id="upsertVisit">
+    MERGE INTO visits v
+    USING (
+      SELECT
+        #{userId} AS user_id,
+        #{productId} AS product_id
+      FROM dual
+    ) source
+    ON (
+      v.user_id = source.user_id
+      AND v.product_id = source.product_id
+    )
+    WHEN MATCHED THEN
+      UPDATE SET updated_at = SYSTIMESTAMP
+    WHEN NOT MATCHED THEN
+      INSERT (
+        user_id,
+        product_id,
+        created_at,
+        updated_at
+      ) VALUES (
+        source.user_id,
+        source.product_id,
+        SYSTIMESTAMP,
+        SYSTIMESTAMP
+      )
+  </update>
+</mapper>

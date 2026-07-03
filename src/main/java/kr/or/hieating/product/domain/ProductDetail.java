@@ -13,6 +13,8 @@ public record ProductDetail(
     String name,
     String description,
     int price,
+    Integer salePrice,
+    int discountRate,
     int viewCount,
     String status,
     LocalDateTime createdAt,
@@ -23,6 +25,14 @@ public record ProductDetail(
 
   public String formattedPrice() {
     return String.format(Locale.KOREA, "%,d원", price);
+  }
+
+  public boolean hasHotDeal() {
+    return salePrice != null && salePrice > 0 && salePrice < price;
+  }
+
+  public String formattedSalePrice() {
+    return String.format(Locale.KOREA, "%,d원", hasHotDeal() ? salePrice : price);
   }
 
   public String safeDescriptionHtml() {

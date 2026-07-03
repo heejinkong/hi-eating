@@ -123,9 +123,10 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       const currentValue = Number.parseInt(quantityInput.value, 10) || 1;
+      const maxValue = parseMaxQuantity(quantityInput);
       const nextValue =
         button.dataset.quantityAction === 'increase'
-          ? currentValue + 1
+          ? Math.min(maxValue, currentValue + 1)
           : Math.max(1, currentValue - 1);
 
       quantityInput.value = String(nextValue);
@@ -135,7 +136,8 @@ document.addEventListener('DOMContentLoaded', () => {
   if (quantityInput) {
     quantityInput.addEventListener('change', () => {
       const currentValue = Number.parseInt(quantityInput.value, 10) || 1;
-      quantityInput.value = String(Math.max(1, currentValue));
+      const maxValue = parseMaxQuantity(quantityInput);
+      quantityInput.value = String(Math.min(maxValue, Math.max(1, currentValue)));
     });
   }
 
@@ -199,6 +201,11 @@ document.addEventListener('DOMContentLoaded', () => {
       'd-none',
       state !== 'loaded' || reviewPagination.children.length === 0,
     );
+  }
+
+  function parseMaxQuantity(input) {
+    const maxValue = Number.parseInt(input.max, 10);
+    return Number.isNaN(maxValue) ? Number.MAX_SAFE_INTEGER : maxValue;
   }
 
   function renderReviews(reviews) {

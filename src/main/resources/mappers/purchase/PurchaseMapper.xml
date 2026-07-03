@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.or.hieating.purchase.mapper.PurchaseMapper">
+
+  <select id="findProductForPurchase" resultType="kr.or.hieating.purchase.dto.ProductPurchaseTargetDto">
+    SELECT
+      p.id AS productId,
+      NVL(deal_stat.sale_price, p.price) AS price,
+      p.status
+    FROM products p
+    LEFT JOIN (
+      SELECT
+        po.product_id,
+        MIN(hp.hot_deal_price) AS sale_price
+      FROM hot_deals h
+      JOIN hot_deal_products hp ON hp.hot_deal_id = h.id
+      JOIN product_options po ON po.id = hp.product_option_id
+      WHERE h.status = 'ACTIVE'
+        AND h.deleted_at IS NULL
+        AND SYSTIMESTAMP BETWEEN h.starts_at AND h.ends_at
+      GROUP BY po.product_id
+    ) deal_stat ON deal_stat.product_id = p.id
+    WHERE p.id = #{productId}
+  </select>
+
+  <select id="countPurchasesByUserId" resultType="int">
+    SELECT COUNT(*)
+    FROM purchases
+    WHERE user_id = #{userId}
+  </select>
+
+  <select id="findLatestPurchaseProductByUserId" resultType="kr.or.hieating.purchase.dto.RecentPurchaseProductDto">
+    SELECT
+      pc.id AS purchaseId,
+      pc.product_id AS productId,
+      p.name AS productName,
+      p.status AS productStatus,
+      pc.quantity,
+      pc.purchase_price AS purchasePrice,
+      pc.created_at AS purchasedAt,
+      pp.picture_saved_location AS pictureLocation
+    FROM purchases pc
+    JOIN products p
+      ON p.id = pc.product_id
+    LEFT JOIN product_pictures pp
+      ON pp.id = (
+        SELECT MIN(pp2.id)
+        FROM product_pictures pp2
+        WHERE pp2.product_id = p.id
+      )
+    WHERE pc.user_id = #{userId}
+    ORDER BY pc.created_at DESC, pc.id DESC
+    FETCH FIRST 1 ROWS ONLY
+  </select>
+
+  <select id="findProductOptionsForPurchase" resultType="kr.or.hieating.purchase.dto.PurchaseProductOptionStockDto">
+    SELECT
+      id AS productOptionId,
+      stock
+    FROM product_options
+    WHERE product_id = #{productId}
+      AND stock > 0
+    ORDER BY expire_date ASC, id ASC
+    FOR UPDATE
+  </select>
+
+  <insert id="insertPurchase" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+    INSERT INTO purchases (
+      user_id,
+      product_id,
+      quantity,
+      purchase_price,
+      created_at,
+      updated_at
+    ) VALUES (
+      #{userId},
+      #{productId},
+      #{quantity},
+      #{purchasePrice},
+      SYSTIMESTAMP,
+      SYSTIMESTAMP
+    )
+  </insert>
+
+  <insert id="insertPurchaseProductOption">
+    INSERT INTO purchase_product_options (
+      purchase_id,
+      product_option_id,
+      quantity,
+      created_at,
+      updated_at
+    ) VALUES (
+      #{purchaseId},
+      #{productOptionId},
+      #{quantity},
+      SYSTIMESTAMP,
+      SYSTIMESTAMP
+    )
+  </insert>
+
+  <update id="decreaseProductOptionStock">
+    UPDATE product_options
+    SET
+      stock = stock - #{quantity},
+      updated_at = SYSTIMESTAMP
+    WHERE id = #{productOptionId}
+      AND stock >= #{quantity}
+  </update>
+</mapper>

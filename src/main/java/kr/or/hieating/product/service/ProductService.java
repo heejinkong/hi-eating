@@ -2,6 +2,7 @@ package kr.or.hieating.product.service;
 
 import java.util.List;
 import java.util.Optional;
+import kr.or.hieating.favorite.service.FavoriteService;
 import kr.or.hieating.product.domain.ProductDetail;
 import kr.or.hieating.product.domain.ProductOption;
 import kr.or.hieating.product.dto.MostPurchasedProductResponseDto;
@@ -25,6 +26,7 @@ public class ProductService {
   private final ProductMapper productMapper;
   private final ImageUrlResolver imageUrlResolver;
   private final UserResolver userResolver;
+  private final FavoriteService favoriteService;
 
   public List<MostPurchasedProductResponseDto> findMostPurchasedProducts() {
     List<MostPurchasedProductResponseDto> products =
@@ -42,11 +44,14 @@ public class ProductService {
   }
 
   private ProductDetail createProductDetail(ProductDetailRowDto product, Long productId) {
+    Long userId = userResolver.currentUserIdOrNull();
     List<String> imageUrls =
         productMapper.findProductImageUrls(productId).stream()
             .map(imageUrlResolver::resolve)
             .toList();
     List<ProductOption> options = productMapper.findProductOptions(productId);
+    boolean favorite =
+        favoriteService.findFavoriteProductIds(userId, List.of(productId)).contains(productId);
 
     if (imageUrls.isEmpty()) {
       imageUrls = FALLBACK_IMAGE_URLS;
@@ -59,13 +64,15 @@ public class ProductService {
         product.getName(),
         product.getDescription(),
         product.getPrice(),
+        product.getSalePrice(),
+        product.getDiscountRate(),
         product.getViewCount(),
         product.getStatus(),
         product.getCreatedAt(),
         imageUrls,
         options,
         new ReviewSummary(product.getAverageRating(), product.getReviewCount()),
-        false);
+        favorite);
   }
 
   public ProductListPageResponseDto findProductsByCategory(ProductListSearchCondition condition) {

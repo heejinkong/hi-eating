@@ -8,6 +8,7 @@ import kr.or.hieating.product.dto.ProductListPageResponseDto;
 import kr.or.hieating.product.dto.ProductListSearchCondition;
 import kr.or.hieating.product.service.ProductService;
 import kr.or.hieating.utils.UserResolver;
+import kr.or.hieating.visit.service.VisitService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -20,9 +21,11 @@ import org.springframework.web.server.ResponseStatusException;
 @Controller
 @RequiredArgsConstructor
 public class ProductController {
+
   private final ProductService productService;
   private final CategoryService categoryService;
   private final UserResolver userResolver;
+  private final VisitService visitService;
 
   @GetMapping("/product/{id}")
   public String detail(@PathVariable Long id, Model model) {
@@ -30,6 +33,12 @@ public class ProductController {
         productService
             .findProductDetail(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+    Long userId = userResolver.currentUserIdOrNull();
+
+    if (userId != null) {
+      visitService.recordVisit(userId, id);
+    }
 
     model.addAttribute("contentTemplate", "product/detail");
     model.addAttribute("contentFragment", "content");

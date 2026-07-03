@@ -4,6 +4,22 @@
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="kr.or.hieating.product.mapper.ProductMapper">
+  <sql id="dealStatJoin">
+    LEFT JOIN (
+      SELECT
+        po.product_id,
+        MIN(hp.hot_deal_price) AS sale_price,
+        MAX(FLOOR((hp.original_price - hp.hot_deal_price) / hp.original_price * 100)) AS discount_rate
+      FROM hot_deals h
+      JOIN hot_deal_products hp ON hp.hot_deal_id = h.id
+      JOIN product_options po ON po.id = hp.product_option_id
+      WHERE h.status = 'ACTIVE'
+        AND h.deleted_at IS NULL
+        AND SYSTIMESTAMP BETWEEN h.starts_at AND h.ends_at
+      GROUP BY po.product_id
+    ) deal_stat ON deal_stat.product_id = p.id
+  </sql>
+
   <sql id="productListBase">
     FROM products p
     JOIN categories c ON c.id = p.category_id
@@ -21,19 +37,7 @@
         FROM product_pictures pp2
         WHERE pp2.product_id = p.id
       )
-    LEFT JOIN (
-      SELECT
-        po.product_id,
-        MIN(hp.hot_deal_price) AS sale_price,
-        MAX(FLOOR((hp.original_price - hp.hot_deal_price) / hp.original_price * 100)) AS discount_rate
-      FROM hot_deals h
-      JOIN hot_deal_products hp ON hp.hot_deal_id = h.id
-      JOIN product_options po ON po.id = hp.product_option_id
-      WHERE h.status = 'ACTIVE'
-        AND h.deleted_at IS NULL
-        AND SYSTIMESTAMP BETWEEN h.starts_at AND h.ends_at
-      GROUP BY po.product_id
-    ) deal_stat ON deal_stat.product_id = p.id
+    <include refid="dealStatJoin" />
     LEFT JOIN (
       SELECT DISTINCT product_id
       FROM favorites
@@ -59,6 +63,8 @@
       p.name,
       p.description,
       p.price,
+      deal_stat.sale_price AS salePrice,
+      NVL(deal_stat.discount_rate, 0) AS discountRate,
       p.view_count AS viewCount,
       p.status,
       p.created_at AS createdAt,
@@ -77,6 +83,7 @@
     FROM products p
     JOIN categories c
       ON c.id = p.category_id
+    <include refid="dealStatJoin" />
     WHERE p.id = #{productId}
   </select>
 

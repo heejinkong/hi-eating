@@ -39,12 +39,35 @@
           <div class="col-lg-6">
             <article class="product-purchase-panel">
               <h1 class="mb-3" th:text="${product.name}"></h1>
-              <strong
-                class="product-price d-block mb-4"
-                th:text="${product.formattedPrice()}"
-              ></strong>
+              <div class="d-flex align-items-baseline flex-wrap gap-3 mb-4">
+                <del
+                  class="product-price-original"
+                  th:if="${product.hasHotDeal()}"
+                  th:text="${product.formattedPrice()}"
+                ></del>
+                <strong
+                  class="product-price"
+                  th:classappend="${product.hasHotDeal()} ? ' product-price-hotdeal'"
+                  th:text="${product.formattedSalePrice()}"
+                ></strong>
+              </div>
 
-              <div class="purchase-controls d-flex flex-column flex-sm-row gap-3">
+              <div
+                class="purchase-message purchase-message-success mb-3"
+                th:if="${purchaseSuccessMessage != null}"
+                th:text="${purchaseSuccessMessage}"
+              ></div>
+              <div
+                class="purchase-message purchase-message-error mb-3"
+                th:if="${purchaseErrorMessage != null}"
+                th:text="${purchaseErrorMessage}"
+              ></div>
+
+              <form
+                class="purchase-controls d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center gap-3"
+                method="post"
+                th:action="@{/product/{productId}/purchase(productId=${product.id})}"
+              >
                 <div class="quantity-control d-inline-flex align-items-center">
                   <button class="quantity-button" data-quantity-action="decrease" type="button">
                     <i aria-hidden="true" class="bi bi-dash"></i>
@@ -52,7 +75,11 @@
                   <input
                     class="quantity-input"
                     id="productQuantity"
+                    max="1"
                     min="1"
+                    name="quantity"
+                    required
+                    th:max="${product.totalStock()}"
                     type="number"
                     value="1"
                   />
@@ -60,8 +87,17 @@
                     <i aria-hidden="true" class="bi bi-plus"></i>
                   </button>
                 </div>
-                <button class="buy-button btn" type="button">구매하기</button>
-              </div>
+                <button
+                  class="buy-button btn"
+                  th:disabled="${product.totalStock() <= 0 || product.status != 'ON_SALE'}"
+                  type="submit"
+                >
+                  구매하기
+                </button>
+                <th:block
+                  th:replace="~{fragments/favorite-button :: button(${product.id}, ${product.favorite})}"
+                ></th:block>
+              </form>
             </article>
           </div>
         </section>
@@ -111,10 +147,10 @@
             <section
               aria-labelledby="product-reviews-tab"
               class="tab-pane fade review-list"
-              th:data-review-api-url="@{/api/products/{productId}/reviews(productId=${product.id})}"
               id="product-reviews"
               role="tabpanel"
               tabindex="0"
+              th:data-review-api-url="@{/api/products/{productId}/reviews(productId=${product.id})}"
             >
               <div
                 class="review-tab-header d-flex align-items-center justify-content-between gap-3"

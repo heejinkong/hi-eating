@@ -14,6 +14,8 @@ public interface FavoriteMapper {
 
   int countFavoriteProducts(FavoriteProductSearchCondition condition);
 
+  int countFavoritesByUserId(@Param("userId") Long userId);
+
   int countFavorite(@Param("userId") Long userId, @Param("productId") Long productId);
 
   int insertFavorite(@Param("userId") Long userId, @Param("productId") Long productId);

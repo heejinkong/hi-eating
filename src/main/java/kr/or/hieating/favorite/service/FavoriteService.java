@@ -34,6 +34,10 @@ public class FavoriteService {
         products, condition.getPage(), condition.getSize(), totalCount, totalPages);
   }
 
+  public int countFavorites(Long userId) {
+    return favoriteMapper.countFavoritesByUserId(userId);
+  }
+
   @Transactional
   public boolean toggleFavorite(Long userId, Long productId) {
     boolean alreadyFavorite = favoriteMapper.countFavorite(userId, productId) > 0;

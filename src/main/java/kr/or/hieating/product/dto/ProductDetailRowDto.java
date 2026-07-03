@@ -12,6 +12,8 @@ public class ProductDetailRowDto {
   private String name;
   private String description;
   private int price;
+  private Integer salePrice;
+  private int discountRate;
   private int viewCount;
   private String status;
   private LocalDateTime createdAt;

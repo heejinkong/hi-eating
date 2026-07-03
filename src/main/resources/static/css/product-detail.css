@@ -98,13 +98,32 @@
 }
 
 .product-purchase-panel {
+  position: relative;
   display: flex;
   flex-direction: column;
   padding: 10px 0 0;
   background: #ffffff;
 }
 
+.product-purchase-panel .product-favorite-button {
+  position: static !important;
+  right: auto;
+  bottom: auto;
+  flex: 0 0 52px;
+  width: 52px;
+  height: 52px;
+  background: rgba(99, 92, 70, 0.72);
+  font-size: 20px;
+}
+
+.product-purchase-panel .product-favorite-button:hover,
+.product-purchase-panel .product-favorite-button:focus-visible,
+.product-purchase-panel .product-favorite-button.is-active {
+  background: var(--color-brand, #ff4d1f);
+}
+
 .product-purchase-panel h1 {
+  padding-right: 52px;
   color: var(--color-ink, #191716);
   font-size: 30px;
   font-weight: 900;
@@ -116,6 +135,41 @@
   font-size: 32px;
   font-weight: 900;
   line-height: 1;
+}
+
+.product-price-original {
+  color: var(--color-muted, #77716d);
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.product-price-hotdeal {
+  color: var(--color-brand, #ff4d1f);
+}
+
+.product-stock {
+  color: var(--color-muted, #77716d);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.purchase-message {
+  max-width: 440px;
+  padding: 12px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.purchase-message-success {
+  color: #176a35;
+  background: #e9f8ef;
+}
+
+.purchase-message-error {
+  color: var(--color-brand-strong, #e83d12);
+  background: var(--color-soft, #fff3ed);
 }
 
 .purchase-controls {
@@ -185,6 +239,14 @@
   border-color: var(--color-brand-strong, #e83d12);
   background: var(--color-brand-strong, #e83d12);
   color: #ffffff;
+}
+
+.buy-button:disabled {
+  border-color: var(--color-line, #eee5df);
+  background: #d8d1cc;
+  color: #ffffff;
+  cursor: not-allowed;
+  opacity: 1;
 }
 
 .product-tabs {

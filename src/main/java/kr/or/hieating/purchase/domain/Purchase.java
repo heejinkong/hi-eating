@@ -7,7 +7,7 @@ import java.util.Locale;
 public record Purchase(
     Long id,
     Long userId,
-    Long productOptionId,
+    Long productId,
     int quantity,
     int purchasePrice,
     LocalDateTime createdAt,
