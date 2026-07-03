@@ -64,16 +64,17 @@
     </div>
 
     <!-- 프로필 섹션 (하단 고정) -->
-    <div class="user-profile">
+    <div class="user-profile" th:if="${currentUser != null}">
       <div class="user-info">
-        <img
-          src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=100"
-          class="user-avatar"
-          alt="profile"
-        />
+        <div
+          class="user-avatar bg-light d-flex align-items-center justify-content-center text-secondary"
+          style="border: 1px solid #e0e0e0"
+        >
+          <i class="bi bi-person-fill" style="font-size: 1.25rem"></i>
+        </div>
         <div class="user-details">
-          <span class="user-name">Eddy</span>
-          <span class="user-email">eddy@alphaca.kr</span>
+          <span class="user-name" th:text="${currentUser.name}">Eddy</span>
+          <span class="user-email" th:text="${currentUser.email}">eddy@alphaca.kr</span>
         </div>
       </div>
       <button class="selector-btn"><i class="bi bi-chevron-expand"></i></button>
