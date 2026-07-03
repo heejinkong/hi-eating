@@ -174,8 +174,16 @@
   background: transparent;
 }
 
-.nav-hotdeal {
+.site-header .nav-hotdeal {
   min-width: 56px;
+  color: #ff3d25;
+  font-weight: 800;
+}
+
+.site-header .nav-hotdeal:hover,
+.site-header .nav-hotdeal:focus,
+.site-header .nav-hotdeal:active {
+  color: #d92312;
 }
 
 .nav-icon-link {

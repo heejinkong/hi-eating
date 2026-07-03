@@ -41,7 +41,7 @@
     LEFT JOIN (
       SELECT DISTINCT product_id
       FROM favorites
-      WHERE user_id = #{userId,jdbcType=NUMERIC}
+      WHERE user_id = #{userId}
     ) favorite_stat ON favorite_stat.product_id = p.id
     WHERE p.category_id = #{categoryId}
     <if test="minPrice != null">
@@ -141,7 +141,7 @@
     LEFT JOIN (
       SELECT DISTINCT product_id
       FROM favorites
-      WHERE user_id = #{userId,jdbcType=NUMERIC}
+      WHERE user_id = #{userId}
     ) favorite_stat ON favorite_stat.product_id = p.id
     LEFT JOIN product_pictures pp
       ON pp.id = (
