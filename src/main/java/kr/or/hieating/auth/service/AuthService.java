@@ -17,6 +17,9 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class AuthService {
 
+  private static final String ROLE_USER = "ROLE_USER";
+  private static final String ROLE_ADMIN = "ROLE_ADMIN";
+
   private final List<SignupValidator> signupValidators;
   private final List<EmailCheckValidator> emailCheckValidators;
   private final AuthMapper authMapper;
@@ -37,6 +40,15 @@ public class AuthService {
 
   @Transactional
   public void signup(SignupRequestDto request) {
+    createAccount(request, ROLE_USER);
+  }
+
+  @Transactional
+  public void createAdmin(SignupRequestDto request) {
+    createAccount(request, ROLE_ADMIN);
+  }
+
+  private void createAccount(SignupRequestDto request, String role) {
     signupValidators.forEach(validator -> validator.validate(request)); // 연쇄책임패턴 회원가입 검증
 
     String encodedPassword = passwordEncoder.encode(request.getPassword());
@@ -44,6 +56,6 @@ public class AuthService {
 
     authMapper.insertUser(userParam);
     Users createdUser = authMapper.findByEmail(userParam.getEmail());
-    authMapper.insertUserAuth(createdUser.getId(), "ROLE_USER");
+    authMapper.insertUserAuth(createdUser.getId(), role);
   }
 }

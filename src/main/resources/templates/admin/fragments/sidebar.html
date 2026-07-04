@@ -2,7 +2,7 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
   <!--
   어드민 전용 레이아웃 사이드바 프래그먼트
-  - 파라미터 activeMenu: 현재 활성화된 메뉴를 강조 표시합니다 ('hotdeals', 'statistics', 'promotions')
+  - 파라미터 activeMenu: 현재 활성화된 메뉴를 강조 표시합니다 ('hotdeals', 'statistics', 'promotions', 'users')
 -->
   <aside class="sidebar" th:fragment="adminSidebar(activeMenu)">
     <div>
@@ -58,6 +58,21 @@
               th:style="${activeMenu == 'promotions'} ? 'color: #ffffff !important;' : 'color: var(--text-muted);'"
             ></i>
             프로모션 설정
+          </a>
+        </li>
+
+        <!-- 4. 관리자 계정 -->
+        <li class="nav-item">
+          <a
+            class="nav-link py-2 px-3 text-dark d-flex align-items-center gap-3"
+            href="/admin/users"
+            th:style="${activeMenu == 'users'} ? 'background: linear-gradient(90deg, #ff6b6b 0%, #ff8e53 100%); color: #ffffff !important; font-weight: 700; border-radius: 8px; box-shadow: 0 4px 10px rgba(255, 107, 107, 0.2);' : 'font-weight: 600; border-radius: 8px;'"
+          >
+            <i
+              class="bi bi-person-gear"
+              th:style="${activeMenu == 'users'} ? 'color: #ffffff !important;' : 'color: var(--text-muted);'"
+            ></i>
+            관리자 계정
           </a>
         </li>
       </ul>

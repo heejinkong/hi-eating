@@ -22,11 +22,52 @@
 		WHERE user_id = #{userId}
 	</select>
 
+	<select id="findUsersWithoutAdminRole" resultType="kr.or.hieating.auth.admin.dto.AdminUserRoleTargetDto">
+		SELECT u.id, u.email, u.name, u.gender, u.birth
+		FROM users u
+		WHERE u.deleted_at IS NULL
+		  AND NOT EXISTS (
+			SELECT 1
+			FROM user_auth ua
+			WHERE ua.user_id = u.id
+			  AND ua.auth = 'ROLE_ADMIN'
+		  )
+		ORDER BY u.created_at DESC, u.id DESC
+	</select>
+
+	<select id="findAdminUsersExcluding" resultType="kr.or.hieating.auth.admin.dto.AdminUserRoleTargetDto">
+		SELECT u.id, u.email, u.name, u.gender, u.birth
+		FROM users u
+		WHERE u.deleted_at IS NULL
+		  AND u.id != #{userId}
+		  AND EXISTS (
+			SELECT 1
+			FROM user_auth ua
+			WHERE ua.user_id = u.id
+			  AND ua.auth = 'ROLE_ADMIN'
+		  )
+		ORDER BY u.created_at DESC, u.id DESC
+	</select>
+
 	<select id="countByEmail" resultType="int">
 		SELECT COUNT(*)
 		FROM users
 		WHERE email = #{email}
 		  AND deleted_at IS NULL
+	</select>
+
+	<select id="countUserById" resultType="int">
+		SELECT COUNT(*)
+		FROM users
+		WHERE id = #{userId}
+		  AND deleted_at IS NULL
+	</select>
+
+	<select id="countUserAuthority" resultType="int">
+		SELECT COUNT(*)
+		FROM user_auth
+		WHERE user_id = #{userId}
+		  AND auth = #{auth}
 	</select>
 
 	<insert id="insertUser" parameterType="SignupUserParam">
@@ -60,6 +101,12 @@
 			SYSTIMESTAMP
 		)
 	</insert>
+
+	<delete id="deleteUserAuth">
+		DELETE FROM user_auth
+		WHERE user_id = #{userId}
+		  AND auth = #{auth}
+	</delete>
 
 	<update id="updateUserProfile">
 		UPDATE users
