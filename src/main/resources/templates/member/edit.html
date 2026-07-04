@@ -24,8 +24,16 @@
 
             <div class="member-edit-fields">
               <div class="member-edit-row">
-                <span class="member-edit-label">이름</span>
-                <p class="member-edit-static" th:text="${member.name}">이재우</p>
+                <label class="member-edit-label" for="member-name">이름</label>
+                <input
+                  class="member-edit-input"
+                  id="member-name"
+                  type="text"
+                  name="name"
+                  maxlength="100"
+                  autocomplete="name"
+                  th:value="${member.name}"
+                />
               </div>
 
               <div class="member-edit-row">
@@ -34,8 +42,14 @@
               </div>
 
               <div class="member-edit-row">
-                <span class="member-edit-label">생년월일</span>
-                <p class="member-edit-static" th:text="${birthText}">1999년04월27일</p>
+                <label class="member-edit-label" for="member-birth">생년월일</label>
+                <input
+                  class="member-edit-input"
+                  id="member-birth"
+                  type="date"
+                  name="birth"
+                  th:value="${member.birth}"
+                />
               </div>
 
               <fieldset class="member-edit-row member-edit-gender-row">
@@ -64,10 +78,6 @@
                 </div>
               </fieldset>
             </div>
-
-            <p class="member-edit-help">
-              * 이름을 개명한 경우 고객센터로 문의해 주세요. (고객센터 : 1800-0700)
-            </p>
           </div>
 
           <div class="member-edit-actions">

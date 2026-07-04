@@ -2,15 +2,14 @@ package kr.or.hieating.mypage.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
-import java.security.Principal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import kr.or.hieating.auth.domain.Users;
 import kr.or.hieating.auth.mapper.AuthMapper;
+import kr.or.hieating.auth.security.HiEatingUserPrincipal;
 import kr.or.hieating.favorite.service.FavoriteService;
 import kr.or.hieating.global.apiPayload.code.status.ErrorStatus;
 import kr.or.hieating.global.apiPayload.exception.GeneralException;
@@ -21,6 +20,9 @@ import kr.or.hieating.user.domain.User;
 import kr.or.hieating.utils.UserResolver;
 import kr.or.hieating.visit.service.VisitService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -37,8 +39,6 @@ public class MyPageController {
   private final PurchaseService purchaseService;
   private final VisitService visitService;
   private final UserResolver userResolver;
-  private static final DateTimeFormatter BIRTH_TEXT_FORMATTER =
-      DateTimeFormatter.ofPattern("yyyy년MM월dd일");
   private static final Set<String> EDITABLE_GENDERS = Set.of("MALE", "FEMALE");
   private final AuthMapper authMapper;
 
@@ -147,8 +147,8 @@ public class MyPageController {
   }
 
   @GetMapping("/mypage/edit")
-  public String editMember(Principal principal, Model model) {
-    Users member = findCurrentMember(principal);
+  public String editMember(Model model) {
+    Users member = findCurrentMember();
     if (member == null) {
       return "redirect:/login";
     }
@@ -159,26 +159,32 @@ public class MyPageController {
 
   @PostMapping("/mypage/edit")
   public String updateMember(
-      Principal principal,
+      @RequestParam(name = "name", required = false) String name,
+      @RequestParam(name = "birth", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+          LocalDate birth,
       @RequestParam(name = "gender", required = false) String gender,
       Model model,
       RedirectAttributes redirectAttributes) {
-    Users member = findCurrentMember(principal);
+    Users member = findCurrentMember();
     if (member == null) {
       return "redirect:/login";
     }
 
     try {
-      validateMemberEdit(gender);
+      String normalizedName = validateAndNormalizeName(name);
+      validateMemberEdit(birth, gender);
 
-      int updated = authMapper.updateUserProfile(member.getId(), gender);
+      int updated = authMapper.updateUserProfile(member.getId(), normalizedName, birth, gender);
       if (updated == 0) {
         throw new IllegalArgumentException("회원 정보를 수정할 수 없습니다.");
       }
 
       redirectAttributes.addFlashAttribute("editMessage", "회원 정보가 수정되었습니다.");
+      refreshCurrentPrincipalName(normalizedName);
       return "redirect:/mypage/edit";
     } catch (IllegalArgumentException exception) {
+      member.setName(name);
+      member.setBirth(birth);
       member.setGender(gender);
       model.addAttribute("editError", exception.getMessage());
       setEditPage(model, member);
@@ -187,8 +193,8 @@ public class MyPageController {
   }
 
   @PostMapping("/mypage/withdraw")
-  public String withdrawMember(Principal principal, HttpServletRequest request) {
-    Users member = findCurrentMember(principal);
+  public String withdrawMember(HttpServletRequest request) {
+    Users member = findCurrentMember();
     if (member == null) {
       throw new GeneralException(ErrorStatus.MEMBER_NOT_FOUND);
     }
@@ -214,20 +220,62 @@ public class MyPageController {
     model.addAttribute("pageScript", "member-edit");
 
     model.addAttribute("member", member);
-    model.addAttribute("birthText", member.getBirth().format(BIRTH_TEXT_FORMATTER));
   }
 
-  private Users findCurrentMember(Principal principal) {
-    if (principal == null) {
+  private Users findCurrentMember() {
+    Long userId = userResolver.currentUserIdOrNull();
+    if (userId == null) {
       return null;
     }
 
-    return authMapper.findByEmail(principal.getName());
+    return authMapper.findById(userId);
   }
 
-  private void validateMemberEdit(String gender) {
+  private String validateAndNormalizeName(String name) {
+    if (name == null || name.trim().isEmpty()) {
+      throw new IllegalArgumentException("이름을 입력해 주세요.");
+    }
+
+    String normalizedName = name.trim();
+    if (normalizedName.length() > 100) {
+      throw new IllegalArgumentException("이름은 100자 이하로 입력해 주세요.");
+    }
+
+    return normalizedName;
+  }
+
+  private void validateMemberEdit(LocalDate birth, String gender) {
+    if (birth == null) {
+      throw new IllegalArgumentException("생년월일을 입력해 주세요.");
+    }
+
+    if (birth.isAfter(LocalDate.now())) {
+      throw new IllegalArgumentException("생년월일은 오늘 이후 날짜를 입력할 수 없습니다.");
+    }
+
     if (!EDITABLE_GENDERS.contains(gender)) {
       throw new IllegalArgumentException("성별 값을 확인해 주세요.");
     }
+  }
+
+  private void refreshCurrentPrincipalName(String name) {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    if (authentication == null
+        || !(authentication.getPrincipal() instanceof HiEatingUserPrincipal userPrincipal)) {
+      return;
+    }
+
+    HiEatingUserPrincipal refreshedPrincipal =
+        new HiEatingUserPrincipal(
+            userPrincipal.getId(),
+            userPrincipal.getEmail(),
+            null,
+            name,
+            userPrincipal.getAuthorities());
+    UsernamePasswordAuthenticationToken refreshedAuthentication =
+        new UsernamePasswordAuthenticationToken(
+            refreshedPrincipal, authentication.getCredentials(), authentication.getAuthorities());
+    refreshedAuthentication.setDetails(authentication.getDetails());
+    SecurityContextHolder.getContext().setAuthentication(refreshedAuthentication);
   }
 }

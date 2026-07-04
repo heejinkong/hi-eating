@@ -10,6 +10,12 @@
 		WHERE email = #{email}
 		  AND deleted_at IS NULL
 	</select>
+	<select id="findById" resultType="Users">
+		SELECT id, email, password, name, gender, birth
+		FROM users
+		WHERE id = #{id}
+		  AND deleted_at IS NULL
+	</select>
 	<select id="findAuthoritiesByUserId" resultType="String">
 		SELECT auth
 		FROM user_auth
@@ -57,7 +63,9 @@
 
 	<update id="updateUserProfile">
 		UPDATE users
-		SET gender = #{gender},
+		SET name = #{name},
+			birth = #{birth},
+			gender = #{gender},
 			updated_at = SYSTIMESTAMP
 		WHERE id = #{userId}
 		  AND deleted_at IS NULL
