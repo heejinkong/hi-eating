@@ -26,7 +26,7 @@
           WHERE po.product_id = p.id
             AND h.deleted_at IS NULL
             AND SYSTIMESTAMP BETWEEN h.starts_at AND h.ends_at
-            AND FLOOR((hp.original_price - hp.hot_deal_price) / hp.original_price * 100)
+            AND FLOOR((hp.original_price - hp.hot_deal_price) / NULLIF(hp.original_price, 0) * 100)
               &gt;= #{minDiscountRate}
         )
       </if>
@@ -63,9 +63,20 @@
     LEFT JOIN (
       SELECT
         po.product_id,
-        MIN(hp.hot_deal_price) AS sale_price,
-        MAX(FLOOR((hp.original_price - hp.hot_deal_price) / hp.original_price * 100))
-          AS discount_rate
+        MIN(hp.hot_deal_price)
+          KEEP (
+            DENSE_RANK FIRST ORDER BY
+              hp.hot_deal_price ASC,
+              FLOOR((hp.original_price - hp.hot_deal_price) / NULLIF(hp.original_price, 0) * 100) DESC NULLS LAST,
+              hp.product_option_id ASC
+          ) AS sale_price,
+        MIN(FLOOR((hp.original_price - hp.hot_deal_price) / NULLIF(hp.original_price, 0) * 100))
+          KEEP (
+            DENSE_RANK FIRST ORDER BY
+              hp.hot_deal_price ASC,
+              FLOOR((hp.original_price - hp.hot_deal_price) / NULLIF(hp.original_price, 0) * 100) DESC NULLS LAST,
+              hp.product_option_id ASC
+          ) AS discount_rate
       FROM matched_products mp2
       JOIN product_options po ON po.product_id = mp2.id
       JOIN hot_deal_products hp ON hp.product_option_id = po.id

@@ -70,6 +70,42 @@
   color: #ffffff;
 }
 
+.table-builder-entry-card {
+  min-height: 118px;
+  border: 1px solid var(--color-line, #eee5df);
+  border-radius: 8px;
+  padding: 26px 30px;
+  box-shadow: 0 8px 24px rgba(45, 31, 20, 0.06);
+}
+
+.table-builder-entry-card h2 {
+  color: var(--color-ink, #191716);
+  font-size: 22px;
+  font-weight: 900;
+}
+
+.table-builder-entry-card p {
+  color: var(--color-muted, #77716d);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.table-builder-entry-button {
+  min-width: 196px;
+  min-height: 54px;
+  border-radius: 8px;
+  background: var(--color-brand, #ff4d1f);
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.table-builder-entry-button:hover,
+.table-builder-entry-button:focus {
+  background: var(--color-brand-strong, #e83d12);
+  color: #ffffff;
+}
+
 .section-heading h1,
 .section-heading h2 {
   color: var(--color-ink, #191716);
@@ -323,6 +359,14 @@
 
 @media (max-width: 480px) {
   .deal-button {
+    width: 100%;
+  }
+
+  .table-builder-entry-card {
+    padding: 22px 18px;
+  }
+
+  .table-builder-entry-button {
     width: 100%;
   }
 

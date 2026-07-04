@@ -15,7 +15,7 @@
       pp.picture_saved_location AS pictureLocation,
       hp.original_price AS originalPrice,
       hp.hot_deal_price AS hotDealPrice,
-      FLOOR((hp.original_price - hp.hot_deal_price) / hp.original_price * 100) AS discountRate,
+      NVL(FLOOR((hp.original_price - hp.hot_deal_price) / NULLIF(hp.original_price, 0) * 100), 0) AS discountRate,
       po.stock AS stock,
       h.ends_at AS endsAt,
       GREATEST(0, FLOOR((CAST(h.ends_at AS DATE) - SYSDATE) * 86400)) AS remainingSeconds
@@ -67,7 +67,7 @@
       pp.picture_saved_location AS pictureLocation,
       hp.original_price AS originalPrice,
       hp.hot_deal_price AS hotDealPrice,
-      FLOOR((hp.original_price - hp.hot_deal_price) / hp.original_price * 100) AS discountRate,
+      NVL(FLOOR((hp.original_price - hp.hot_deal_price) / NULLIF(hp.original_price, 0) * 100), 0) AS discountRate,
       po.stock AS stock,
       p.view_count AS viewCount,
       NVL(purchase_stat.total_quantity, 0) AS totalQuantity,

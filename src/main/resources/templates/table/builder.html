@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+  <body>
+    <section
+      th:fragment="content"
+      class="table-builder-page"
+      th:data-table-model-src="${tableModelSrc}"
+    >
+      <div class="table-builder-shell">
+        <aside class="table-product-panel" aria-label="식탁에 올릴 상품">
+          <header class="table-panel-header">
+            <p>My Table</p>
+            <h1>내 식탁 꾸미기</h1>
+          </header>
+
+          <label class="table-search">
+            <i class="bi bi-search" aria-hidden="true"></i>
+            <input id="table-product-search" type="search" placeholder="상품 검색" />
+          </label>
+
+          <div class="table-product-list" aria-live="polite">
+            <article
+              th:each="product : ${products}"
+              class="table-product-card"
+              th:classappend="${!product.hasModel()} ? ' is-disabled'"
+              th:data-product-id="${product.productId}"
+              th:data-product-name="${product.productName}"
+              th:data-glb-src="${product.glbSrc}"
+            >
+              <span class="table-product-card__image">
+                <img
+                  th:src="${#strings.isEmpty(product.pictureLocation) ? '/images/logo-hi-eating.png' : product.pictureLocation}"
+                  th:alt="${product.productName}"
+                  data-fallback-src="/images/logo-hi-eating.png"
+                />
+              </span>
+              <span class="table-product-card__body">
+                <span class="table-product-card__name-row">
+                  <strong th:text="${product.productName}">상품명</strong>
+                  <i
+                    th:if="${product.favorite}"
+                    class="bi bi-star-fill table-product-card__favorite"
+                    aria-label="즐겨찾기 상품"
+                  ></i>
+                </span>
+                <span class="table-product-card__price">
+                  <em th:if="${product.discountRate > 0}" th:text="|${product.discountRate}%|"
+                    >20%</em
+                  >
+                  <span
+                    th:text="${#numbers.formatInteger(product.salePrice != null ? product.salePrice : product.price, 0, 'COMMA')} + '원'"
+                    >9,900원</span
+                  >
+                </span>
+                <small th:if="${!product.hasModel()}">3D 모델 없음</small>
+              </span>
+              <button
+                type="button"
+                class="table-product-card__toggle"
+                th:disabled="${!product.hasModel()}"
+                th:aria-label="${product.hasModel()} ? ${product.productName} + ' 추가' : ${product.productName} + ' 모델 없음'"
+              >
+                <i class="bi bi-plus-lg" aria-hidden="true"></i>
+              </button>
+            </article>
+          </div>
+
+          <p class="table-product-empty" th:if="${#lists.isEmpty(products)}">
+            판매 중인 상품이 없습니다.
+          </p>
+        </aside>
+
+        <section class="table-stage" aria-label="3D 식탁 미리보기">
+          <div class="table-stage__topbar">
+            <div class="table-stage__status" id="table-builder-status">3D 모델 로딩 중...</div>
+            <div class="table-stage__actions">
+              <div class="table-model-picker" aria-label="테이블 모델 선택">
+                <button
+                  type="button"
+                  class="table-model-picker__button is-active"
+                  data-table-model-src="/models/table.glb"
+                  aria-pressed="true"
+                >
+                  1
+                </button>
+                <button
+                  type="button"
+                  class="table-model-picker__button"
+                  data-table-model-src="/models/table2.glb"
+                  aria-pressed="false"
+                >
+                  2
+                </button>
+                <button
+                  type="button"
+                  class="table-model-picker__button"
+                  data-table-model-src="/models/table3.glb"
+                  aria-pressed="false"
+                >
+                  3
+                </button>
+                <button
+                  type="button"
+                  class="table-model-picker__button"
+                  data-table-model-src="/models/table4.glb"
+                  aria-pressed="false"
+                >
+                  4
+                </button>
+              </div>
+              <button type="button" id="table-reset-btn" class="table-icon-button">
+                <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
+                <span class="visually-hidden">위치 초기화</span>
+              </button>
+              <button type="button" id="table-capture-btn" class="table-primary-button">
+                <i class="bi bi-camera" aria-hidden="true"></i>
+                <span>캡쳐하기</span>
+              </button>
+            </div>
+          </div>
+
+          <div id="table-viewer" class="table-viewer" aria-label="3D 캔버스"></div>
+
+          <div class="table-key-hint" aria-label="키보드 조작 안내">
+            <span>선택한 모델 회전</span>
+            <kbd>Q</kbd>
+            <small>왼쪽</small>
+            <kbd>E</kbd>
+            <small>오른쪽</small>
+          </div>
+
+          <a id="table-capture-link" class="table-capture-link" href="#" target="_blank" hidden>
+            저장된 이미지 보기
+          </a>
+        </section>
+      </div>
+
+      <script type="importmap">
+        {
+          "imports": {
+            "three": "https://unpkg.com/three@0.166.1/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.166.1/examples/jsm/"
+          }
+        }
+      </script>
+      <script type="module" th:src="@{/js/table-builder.js}"></script>
+    </section>
+  </body>
+</html>

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.or.hieating.table.mapper.TableBuilderMapper">
+  <select id="findTableBuilderProducts" resultType="TableBuilderProductDto">
+    SELECT
+      p.id AS productId,
+      p.name AS productName,
+      p.price AS price,
+      deal_stat.sale_price AS salePrice,
+      NVL(deal_stat.discount_rate, 0) AS discountRate,
+      pp.picture_saved_location AS pictureLocation,
+      p.glb_src AS glbSrc,
+      <choose>
+        <when test="userId != null">
+          CASE WHEN favorite_stat.product_id IS NULL THEN 0 ELSE 1 END AS favorite
+        </when>
+        <otherwise>
+          0 AS favorite
+        </otherwise>
+      </choose>
+    FROM products p
+    LEFT JOIN (
+      SELECT
+        po.product_id,
+        MIN(hp.hot_deal_price)
+          KEEP (
+            DENSE_RANK FIRST ORDER BY
+              hp.hot_deal_price ASC,
+              FLOOR((hp.original_price - hp.hot_deal_price) / NULLIF(hp.original_price, 0) * 100) DESC NULLS LAST,
+              hp.product_option_id ASC
+          ) AS sale_price,
+        MIN(FLOOR((hp.original_price - hp.hot_deal_price) / NULLIF(hp.original_price, 0) * 100))
+          KEEP (
+            DENSE_RANK FIRST ORDER BY
+              hp.hot_deal_price ASC,
+              FLOOR((hp.original_price - hp.hot_deal_price) / NULLIF(hp.original_price, 0) * 100) DESC NULLS LAST,
+              hp.product_option_id ASC
+          ) AS discount_rate
+      FROM hot_deals h
+      JOIN hot_deal_products hp ON hp.hot_deal_id = h.id
+      JOIN product_options po ON po.id = hp.product_option_id
+      WHERE h.status = 'ACTIVE'
+        AND h.deleted_at IS NULL
+        AND SYSTIMESTAMP BETWEEN h.starts_at AND h.ends_at
+      GROUP BY po.product_id
+    ) deal_stat ON deal_stat.product_id = p.id
+    LEFT JOIN product_pictures pp
+      ON pp.id = (
+        SELECT MIN(pp2.id)
+        FROM product_pictures pp2
+        WHERE pp2.product_id = p.id
+      )
+    <if test="userId != null">
+      LEFT JOIN (
+        SELECT DISTINCT product_id
+        FROM favorites
+        WHERE user_id = #{userId}
+      ) favorite_stat ON favorite_stat.product_id = p.id
+    </if>
+    WHERE p.status = 'ON_SALE'
+    ORDER BY
+      favorite DESC,
+      CASE WHEN p.glb_src IS NULL THEN 1 ELSE 0 END,
+      p.created_at DESC,
+      p.id DESC
+  </select>
+
+  <insert id="insertPost" parameterType="TableCaptureCreateCommand" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+    INSERT INTO posts (
+      user_id,
+      likes,
+      img_src,
+      created_at
+    ) VALUES (
+      #{userId},
+      0,
+      #{imgSrc},
+      SYSTIMESTAMP
+    )
+  </insert>
+</mapper>
