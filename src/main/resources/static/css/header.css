@@ -72,6 +72,12 @@
   color: var(--color-muted);
 }
 
+.auth-link-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 15px;
+}
+
 .auth-links a:hover {
   color: var(--color-brand);
 }
@@ -223,6 +229,7 @@
   :root {
     --header-brand-height: 176px;
   }
+
   .nav-category-trigger,
   .nav-hotdeal {
     font-size: 13px;

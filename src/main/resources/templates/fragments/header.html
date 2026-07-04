@@ -2,8 +2,8 @@
 
 <html
   lang="ko"
-  xmlns:th="http://www.thymeleaf.org"
   xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+  xmlns:th="http://www.thymeleaf.org"
 >
   <body>
     <header class="site-header sticky-top bg-white" th:fragment="siteHeader">
@@ -34,15 +34,15 @@
             </button>
           </form>
           <nav
-            class="auth-links small order-2 order-lg-3 ms-auto d-flex align-items-center justify-content-end gap-2 gap-lg-3 text-nowrap"
             aria-label="회원 메뉴"
+            class="auth-links small order-2 order-lg-3 ms-auto d-flex align-items-center justify-content-end gap-2 gap-lg-3 text-nowrap"
           >
-            <span sec:authorize="isAnonymous()">
+            <span class="auth-link-group" sec:authorize="isAnonymous()">
               <a th:href="@{/login}">로그인</a>
               <a th:href="@{/signup}">회원가입</a>
             </span>
-            <span sec:authorize="isAuthenticated()">
-              <b><span sec:authentication="name"></span></b>계정으로 로그인 되었습니다
+            <span class="auth-link-group" sec:authorize="isAuthenticated()">
+              <b><span sec:authentication="name"></span></b>
               <a th:href="@{/mypage}">마이페이지</a>
               <a th:href="@{/logout}">로그아웃</a>
               <a sec:authorize="hasRole('ADMIN')" th:href="@{/admin/hotdeals}">관리자 페이지</a>
