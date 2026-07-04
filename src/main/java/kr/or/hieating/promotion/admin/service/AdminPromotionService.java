@@ -4,10 +4,13 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import kr.or.hieating.global.apiPayload.code.status.ErrorStatus;
 import kr.or.hieating.global.apiPayload.exception.GeneralException;
+import kr.or.hieating.promotion.admin.dto.PromotionReorderRequestDTO;
 import kr.or.hieating.promotion.admin.mapper.AdminPromotionMapper;
 import kr.or.hieating.promotion.domain.Promotions;
 import lombok.RequiredArgsConstructor;
@@ -93,6 +96,74 @@ public class AdminPromotionService {
 
     // 데이터베이스에서 최종 배너 레코드 삭제
     adminPromotionMapper.deletePromotion(id);
+  }
+
+  @Transactional
+  public void reorderPromotions(PromotionReorderRequestDTO request) {
+    List<Integer> adjacentIds =
+        java.util.stream.Stream.of(
+                request.getMovedPromotionId(),
+                request.getPreviousPromotionId(),
+                request.getNextPromotionId())
+            .filter(java.util.Objects::nonNull)
+            .distinct()
+            .sorted()
+            .toList();
+
+    List<Promotions> adjacentPromotions =
+        adminPromotionMapper.selectPromotionsByIdsForUpdate(adjacentIds);
+
+    if (adjacentPromotions.size() != adjacentIds.size()) {
+      throw new GeneralException(ErrorStatus._BAD_REQUEST);
+    }
+
+    Map<Integer, Promotions> promotionById = new HashMap<>();
+    adjacentPromotions.forEach(promotion -> promotionById.put(promotion.getId(), promotion)); //
+
+    Integer previousId = request.getPreviousPromotionId();
+    Integer nextId = request.getNextPromotionId();
+
+    if (previousId == null && nextId == null) {
+      return;
+    }
+
+    if (previousId == null) {
+      int newOrder = promotionById.get(nextId).getDisplayOrder() - 1000;
+      adminPromotionMapper.updateDisplayOrder(request.getMovedPromotionId(), newOrder);
+      return;
+    }
+
+    if (nextId == null) {
+      int newOrder = promotionById.get(previousId).getDisplayOrder() + 1000;
+      adminPromotionMapper.updateDisplayOrder(request.getMovedPromotionId(), newOrder);
+      return;
+    }
+
+    int previousOrder = promotionById.get(previousId).getDisplayOrder();
+    int nextOrder = promotionById.get(nextId).getDisplayOrder();
+    if (nextOrder - previousOrder > 1) {
+      int newOrder = previousOrder + (nextOrder - previousOrder) / 2;
+      adminPromotionMapper.updateDisplayOrder(request.getMovedPromotionId(), newOrder);
+      return;
+    }
+
+    rebalanceDisplayOrders(request.getOrderedPromotionIds());
+  }
+
+  // 1점보다 작을 경우 타는 함수
+  private void rebalanceDisplayOrders(List<Integer> orderedPromotionIds) {
+    List<Integer> storedPromotionIds = adminPromotionMapper.selectAllPromotionIdsForUpdate();
+    if (storedPromotionIds.size() != orderedPromotionIds.size()
+        || !storedPromotionIds.containsAll(orderedPromotionIds)) {
+      throw new GeneralException(ErrorStatus._BAD_REQUEST);
+    }
+
+    // UNIQUE 제약조건과 기존 순서값이 충돌하지 않도록 먼저 모든 값을 임시 영역으로 이동합니다.
+    adminPromotionMapper.moveDisplayOrdersToTemporaryRange();
+
+    for (int index = 0; index < orderedPromotionIds.size(); index++) {
+      adminPromotionMapper.updateDisplayOrder(orderedPromotionIds.get(index), (index + 1) * 1000);
+    }
   }
 
   /**

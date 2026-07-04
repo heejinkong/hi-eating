@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import kr.or.hieating.global.apiPayload.ApiResponse;
 import kr.or.hieating.global.apiPayload.code.status.ErrorStatus;
 import kr.or.hieating.global.apiPayload.exception.GeneralException;
+import kr.or.hieating.promotion.admin.dto.PromotionReorderRequestDTO;
 import kr.or.hieating.promotion.admin.dto.PromotionUpdateRequestDTO;
 import kr.or.hieating.promotion.admin.service.AdminPromotionService;
 import kr.or.hieating.promotion.domain.Promotions;
@@ -14,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -85,6 +87,13 @@ public class AdminPromotionRestController {
   @DeleteMapping("/{id}")
   public ApiResponse<Void> deletePromotion(@PathVariable("id") int id) {
     adminPromotionService.deletePromotion(id);
+    return ApiResponse.onSuccess(null);
+  }
+
+  @PatchMapping("/order")
+  public ApiResponse<Void> reorderPromotions(
+      @Valid @RequestBody PromotionReorderRequestDTO request) {
+    adminPromotionService.reorderPromotions(request);
     return ApiResponse.onSuccess(null);
   }
 }

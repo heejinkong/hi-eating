@@ -57,6 +57,36 @@
         WHERE id = #{id}
     </select>
 
+    <select id="selectPromotionsByIdsForUpdate" resultType="kr.or.hieating.promotion.domain.Promotions">
+        SELECT id, display_order AS displayOrder
+        FROM promotions
+        WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        ORDER BY id
+        FOR UPDATE
+    </select>
+
+    <select id="selectAllPromotionIdsForUpdate" resultType="int">
+        SELECT id
+        FROM promotions
+        ORDER BY id
+        FOR UPDATE
+    </select>
+
+    <update id="updateDisplayOrder">
+        UPDATE promotions
+        SET display_order = #{displayOrder},
+            updated_at = SYSTIMESTAMP
+        WHERE id = #{id}
+    </update>
+
+    <update id="moveDisplayOrdersToTemporaryRange">
+        UPDATE promotions
+        SET display_order = display_order + 1000000000
+    </update>
+
     <delete id="deletePromotion">
         DELETE FROM promotions WHERE id = #{id}
     </delete>
