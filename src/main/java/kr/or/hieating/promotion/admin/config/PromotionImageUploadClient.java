@@ -1,6 +1,7 @@
 package kr.or.hieating.promotion.admin.config;
 
 import java.io.IOException;
+import java.net.http.HttpClient;
 import java.time.Duration;
 import java.util.List;
 import kr.or.hieating.global.apiPayload.code.status.ErrorStatus;
@@ -11,7 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.MediaType;
-import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -28,12 +30,16 @@ public class PromotionImageUploadClient {
 
   private final RestClient restClient;
   private final String uploadUrl;
+  private final String deleteUrl;
   private final String publicBaseUrl;
   private final String publicPathPrefix;
 
   public PromotionImageUploadClient(
       RestClient.Builder restClientBuilder,
       @Value("${greenfood.promotion-image.upload-url}") String uploadUrl,
+      @Value(
+              "${greenfood.promotion-image.delete-url:${greenfood.promotion-image.upload-url}/{filename}}")
+          String deleteUrl,
       @Value("${greenfood.promotion-image.public-base-url}") String publicBaseUrl,
       @Value("${greenfood.promotion-image.public-path-prefix:/uploads/images}")
           String publicPathPrefix,
@@ -44,6 +50,7 @@ public class PromotionImageUploadClient {
             .requestFactory(createRequestFactory(connectTimeoutMillis, readTimeoutMillis))
             .build();
     this.uploadUrl = uploadUrl;
+    this.deleteUrl = deleteUrl;
     this.publicBaseUrl = normalizeBaseUrl(publicBaseUrl);
     this.publicPathPrefix = normalizePublicPathPrefix(publicPathPrefix);
   }
@@ -65,7 +72,8 @@ public class PromotionImageUploadClient {
         throw new GeneralException(ErrorStatus._INTERNAL_SERVER_ERROR);
       }
 
-      return publicBaseUrl + publicPathPrefix + "/" + response.getSavedFileName();
+      String savedFileName = stripLeadingSlashes(response.getSavedFileName().trim());
+      return publicBaseUrl + publicPathPrefix + "/" + savedFileName;
     } catch (GeneralException e) {
       throw e;
     } catch (Exception e) {
@@ -74,10 +82,28 @@ public class PromotionImageUploadClient {
     }
   }
 
-  private SimpleClientHttpRequestFactory createRequestFactory(
+  public void delete(String imageUrl) {
+    String savedFileName = extractSavedFileName(imageUrl);
+    if (!StringUtils.hasText(savedFileName)) {
+      return;
+    }
+
+    try {
+      restClient.delete().uri(deleteUrl, savedFileName).retrieve().toBodilessEntity();
+    } catch (Exception e) {
+      log.warn(
+          "Promotion image delete failed. deleteUrl={}, savedFileName={}",
+          deleteUrl,
+          savedFileName,
+          e);
+    }
+  }
+
+  private ClientHttpRequestFactory createRequestFactory(
       long connectTimeoutMillis, long readTimeoutMillis) {
-    SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
-    requestFactory.setConnectTimeout(Duration.ofMillis(connectTimeoutMillis));
+    HttpClient httpClient =
+        HttpClient.newBuilder().connectTimeout(Duration.ofMillis(connectTimeoutMillis)).build();
+    JdkClientHttpRequestFactory requestFactory = new JdkClientHttpRequestFactory(httpClient);
     requestFactory.setReadTimeout(Duration.ofMillis(readTimeoutMillis));
     return requestFactory;
   }
@@ -130,6 +156,46 @@ public class PromotionImageUploadClient {
       normalized = normalized.substring(0, normalized.length() - 1);
     }
     return normalized;
+  }
+
+  private String extractSavedFileName(String imageUrl) {
+    if (!StringUtils.hasText(imageUrl)) {
+      return null;
+    }
+
+    String trimmedUrl = imageUrl.trim();
+    String publicUrlPrefix = publicBaseUrl + publicPathPrefix + "/";
+    if (trimmedUrl.startsWith(publicUrlPrefix)) {
+      return cleanSavedFileName(trimmedUrl.substring(publicUrlPrefix.length()));
+    }
+
+    String relativePathPrefix = publicPathPrefix + "/";
+    if (trimmedUrl.startsWith(relativePathPrefix)) {
+      return cleanSavedFileName(trimmedUrl.substring(relativePathPrefix.length()));
+    }
+
+    return null;
+  }
+
+  private String cleanSavedFileName(String savedFileName) {
+    String cleaned = stripLeadingSlashes(savedFileName);
+    int queryStart = cleaned.indexOf('?');
+    if (queryStart >= 0) {
+      cleaned = cleaned.substring(0, queryStart);
+    }
+    int fragmentStart = cleaned.indexOf('#');
+    if (fragmentStart >= 0) {
+      cleaned = cleaned.substring(0, fragmentStart);
+    }
+    return cleaned;
+  }
+
+  private String stripLeadingSlashes(String value) {
+    String stripped = value;
+    while (stripped.startsWith("/")) {
+      stripped = stripped.substring(1);
+    }
+    return stripped;
   }
 
   @Getter

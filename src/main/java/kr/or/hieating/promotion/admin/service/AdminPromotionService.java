@@ -55,6 +55,10 @@ public class AdminPromotionService {
   public void updatePromotionDetails(
       int id, MultipartFile file, String title, String link, LocalDate startsAt, LocalDate endsAt) {
     String newImgSrc = null;
+    Promotions existingPromotion = adminPromotionMapper.selectPromotionById(id);
+    if (existingPromotion == null) {
+      throw new GeneralException(ErrorStatus._BAD_REQUEST);
+    }
 
     // 새로운 이미지 파일이 전달된 경우 업로드 처리
     if (file != null && !file.isEmpty()) {
@@ -72,10 +76,19 @@ public class AdminPromotionService {
             .build();
 
     adminPromotionMapper.updatePromotion(promotion);
+    if (newImgSrc != null) {
+      promotionImageUploadClient.delete(existingPromotion.getImgSrc());
+    }
   }
 
   @Transactional
   public void deletePromotion(int id) {
+    Promotions promotion = adminPromotionMapper.selectPromotionById(id);
+    if (promotion == null) {
+      throw new GeneralException(ErrorStatus._BAD_REQUEST);
+    }
+
+    promotionImageUploadClient.delete(promotion.getImgSrc());
     adminPromotionMapper.deletePromotion(id);
   }
 
@@ -142,60 +155,6 @@ public class AdminPromotionService {
     // UNIQUE 제약조건과 기존 순서값이 충돌하지 않도록 먼저 모든 값을 임시 영역으로 이동합니다.
     adminPromotionMapper.moveDisplayOrdersToTemporaryRange();
 
-    for (int index = 0; index < orderedPromotionIds.size(); index++) {
-      adminPromotionMapper.updateDisplayOrder(orderedPromotionIds.get(index), (index + 1) * 1000);
-    }
-  }
-
-  /**
-   * 이미지 업로드를 공통 처리하고, 확장자 및 Content-Type을 화이트리스트로 검증합니다. 경로 조작(Path Traversal) 방지를 위해 고유 UUID 파일명만
-   * 사용합니다.
-   */
-  private String uploadImage(MultipartFile file) {
-    if (file == null || file.isEmpty()) {
-      throw new GeneralException(ErrorStatus.EMPTY_FILE);
-    }
-
-    Map<Integer, Promotions> promotionById = new HashMap<>();
-    adjacentPromotions.forEach(promotion -> promotionById.put(promotion.getId(), promotion));
-
-    Integer previousId = request.getPreviousPromotionId();
-    Integer nextId = request.getNextPromotionId();
-    if (previousId == null && nextId == null) {
-      return;
-    }
-
-    if (previousId == null) {
-      adminPromotionMapper.updateDisplayOrder(
-          request.getMovedPromotionId(), promotionById.get(nextId).getDisplayOrder() - 1000);
-      return;
-    }
-
-    if (nextId == null) {
-      adminPromotionMapper.updateDisplayOrder(
-          request.getMovedPromotionId(), promotionById.get(previousId).getDisplayOrder() + 1000);
-      return;
-    }
-
-    int previousOrder = promotionById.get(previousId).getDisplayOrder();
-    int nextOrder = promotionById.get(nextId).getDisplayOrder();
-    if (nextOrder - previousOrder > 1) {
-      int newOrder = previousOrder + (nextOrder - previousOrder) / 2;
-      adminPromotionMapper.updateDisplayOrder(request.getMovedPromotionId(), newOrder);
-      return;
-    }
-
-    rebalanceDisplayOrders(request.getOrderedPromotionIds());
-  }
-
-  private void rebalanceDisplayOrders(List<Integer> orderedPromotionIds) {
-    List<Integer> storedPromotionIds = adminPromotionMapper.selectAllPromotionIdsForUpdate();
-    if (storedPromotionIds.size() != orderedPromotionIds.size()
-        || !storedPromotionIds.containsAll(orderedPromotionIds)) {
-      throw new GeneralException(ErrorStatus._BAD_REQUEST);
-    }
-
-    adminPromotionMapper.moveDisplayOrdersToTemporaryRange();
     for (int index = 0; index < orderedPromotionIds.size(); index++) {
       adminPromotionMapper.updateDisplayOrder(orderedPromotionIds.get(index), (index + 1) * 1000);
     }

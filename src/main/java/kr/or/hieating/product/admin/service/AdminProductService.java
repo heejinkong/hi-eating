@@ -25,6 +25,10 @@ public class AdminProductService {
     List<ProductSearchResponseDTO> list =
         adminProductMapper.searchProductsForHotDeal(
             normalizedKeyword, categoryId, hotDealId, sortBy, offset, size);
+    list.forEach(
+        product ->
+            product.setPictureLocation(imageUrlResolver.resolve(product.getPictureLocation())));
+
     int totalCount =
         adminProductMapper.countProductsForHotDeal(normalizedKeyword, categoryId, hotDealId);
     int totalPages = (int) Math.ceil((double) totalCount / size);

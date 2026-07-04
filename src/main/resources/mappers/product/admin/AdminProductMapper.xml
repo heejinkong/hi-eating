@@ -21,7 +21,7 @@
             p.id AS productId,
             o.id AS productOptionId,
             p.name AS name,
-            pp.picture_saved_location AS pictureLocation,
+            first_picture.picture_saved_location AS pictureLocation,
             c.name AS categoryName,
             p.price AS price,
             o.stock AS stock,
@@ -29,6 +29,17 @@
         FROM matched_products mp
         INNER JOIN products p ON p.id = mp.id
         INNER JOIN product_options o ON p.id = o.product_id
+        LEFT JOIN (
+            SELECT product_id, picture_saved_location
+            FROM (
+                SELECT
+                    product_id,
+                    picture_saved_location,
+                    ROW_NUMBER() OVER (PARTITION BY product_id ORDER BY display_order ASC, id ASC) AS row_num
+                FROM product_pictures
+            )
+            WHERE row_num = 1
+        ) first_picture ON first_picture.product_id = p.id
         LEFT JOIN categories c ON p.category_id = c.id
         <choose>
             <when test="sortBy == 'EXPIRE_ASC'">
