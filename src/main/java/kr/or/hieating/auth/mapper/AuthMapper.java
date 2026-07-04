@@ -30,6 +30,8 @@ public interface AuthMapper {
 
   int insertUserAuth(@Param("userId") long userId, @Param("auth") String auth);
 
+  int deleteUserAuth(@Param("userId") long userId, @Param("auth") String auth);
+
   int updateUserProfile(
       @Param("userId") long userId,
       @Param("name") String name,
