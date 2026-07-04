@@ -4,6 +4,19 @@
 <mapper namespace="kr.or.hieating.product.admin.mapper.AdminProductMapper">
 
     <select id="searchProductsForHotDeal" resultType="kr.or.hieating.product.admin.dto.ProductSearchResponseDTO">
+        WITH matched_products AS (
+            SELECT /*+ MATERIALIZE */
+                p.id
+            FROM products p
+            <where>
+                <if test="keyword != null and keyword != ''">
+                    AND CONTAINS(p.name, '%' || #{keyword} || '%') &gt; 0
+                </if>
+                <if test="categoryId != null">
+                    AND p.category_id = #{categoryId}
+                </if>
+            </where>
+        )
         SELECT 
             p.id AS productId,
             o.id AS productOptionId,
@@ -12,53 +25,10 @@
             p.price AS price,
             o.stock AS stock,
             o.expire_date AS expireDate
-        FROM products p
+        FROM matched_products mp
+        INNER JOIN products p ON p.id = mp.id
         INNER JOIN product_options o ON p.id = o.product_id
         LEFT JOIN categories c ON p.category_id = c.id
-        <where>
-            <choose>
-                <when test="hotDealId != null">
-                    AND (
-                        EXISTS (
-                            SELECT 1
-                            FROM hot_deal_products hp
-                            WHERE hp.hot_deal_id = #{hotDealId}
-                              AND hp.product_option_id = o.id
-                        )
-                        OR (
-                            o.expire_date >= TRUNC(SYSDATE)
-                            <if test="keyword != null and keyword != ''">
-                                AND p.name LIKE CONCAT('%', #{keyword}, '%')
-                            </if>
-                            <if test="categoryId != null">
-                                AND p.category_id = #{categoryId}
-                            </if>
-                        )
-                    )
-                </when>
-                <otherwise>
-                    AND o.expire_date >= TRUNC(SYSDATE)
-                    <if test="keyword != null and keyword != ''">
-                        AND p.name LIKE CONCAT('%', #{keyword}, '%')
-                    </if>
-                    <if test="categoryId != null">
-                        AND p.category_id = #{categoryId}
-                    </if>
-                </otherwise>
-            </choose>
-        </where>
-        ORDER BY
-        <if test="hotDealId != null">
-            CASE
-                WHEN EXISTS (
-                    SELECT 1
-                    FROM hot_deal_products hp
-                    WHERE hp.hot_deal_id = #{hotDealId}
-                      AND hp.product_option_id = o.id
-                ) THEN 0
-                ELSE 1
-            END,
-        </if>
         <choose>
             <when test="sortBy == 'EXPIRE_ASC'">
                 o.expire_date ASC
@@ -74,41 +44,22 @@
     </select>
 
     <select id="countProductsForHotDeal" resultType="int">
+        WITH matched_products AS (
+            SELECT /*+ MATERIALIZE */
+                p.id
+            FROM products p
+            <where>
+                <if test="keyword != null and keyword != ''">
+                    AND CONTAINS(p.name, '%' || #{keyword} || '%') &gt; 0
+                </if>
+                <if test="categoryId != null">
+                    AND p.category_id = #{categoryId}
+                </if>
+            </where>
+        )
         SELECT COUNT(*)
-        FROM products p
-        INNER JOIN product_options o ON p.id = o.product_id
-        <where>
-            <choose>
-                <when test="hotDealId != null">
-                    AND (
-                        EXISTS (
-                            SELECT 1
-                            FROM hot_deal_products hp
-                            WHERE hp.hot_deal_id = #{hotDealId}
-                              AND hp.product_option_id = o.id
-                        )
-                        OR (
-                            o.expire_date >= TRUNC(SYSDATE)
-                            <if test="keyword != null and keyword != ''">
-                                AND p.name LIKE CONCAT('%', #{keyword}, '%')
-                            </if>
-                            <if test="categoryId != null">
-                                AND p.category_id = #{categoryId}
-                            </if>
-                        )
-                    )
-                </when>
-                <otherwise>
-                    AND o.expire_date >= TRUNC(SYSDATE)
-                    <if test="keyword != null and keyword != ''">
-                        AND p.name LIKE CONCAT('%', #{keyword}, '%')
-                    </if>
-                    <if test="categoryId != null">
-                        AND p.category_id = #{categoryId}
-                    </if>
-                </otherwise>
-            </choose>
-        </where>
+        FROM matched_products mp
+        INNER JOIN product_options o ON mp.id = o.product_id
     </select>
 
     <select id="selectAllCategories" resultType="kr.or.hieating.product.admin.dto.CategoryResponseDTO">
