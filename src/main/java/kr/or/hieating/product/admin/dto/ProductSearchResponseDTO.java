@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Builder
@@ -15,6 +16,7 @@ public class ProductSearchResponseDTO {
   private Long productId;
   private Long productOptionId;
   private String name;
+  @Setter private String pictureLocation;
   private String categoryName;
   private Integer price;
   private Integer stock;

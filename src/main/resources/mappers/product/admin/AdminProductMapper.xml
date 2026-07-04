@@ -21,6 +21,7 @@
             p.id AS productId,
             o.id AS productOptionId,
             p.name AS name,
+            pp.picture_saved_location AS pictureLocation,
             c.name AS categoryName,
             p.price AS price,
             o.stock AS stock,

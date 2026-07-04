@@ -203,12 +203,25 @@ body {
 .product-icon-box {
   width: 36px;
   height: 36px;
+  flex-shrink: 0;
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #ffffff;
+  overflow: hidden;
+  background-color: #f2f2f2;
+  color: #888888;
   font-size: 1.1rem;
+}
+
+.product-thumbnail {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.product-thumbnail-fallback {
+  color: #888888;
 }
 
 .product-name-lbl {

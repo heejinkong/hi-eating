@@ -237,12 +237,17 @@ function searchProducts(resetPage = false) {
                 : 'badge-gray';
           const isDiscarded = p.status === '폐기';
           const isChecked = selectedProducts.some((item) => item.optionId === p.productOptionId);
+          const productImage = p.pictureLocation
+            ? `<img src="${p.pictureLocation}" alt="${p.name}" class="product-thumbnail"
+                    onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+               <i class="bi bi-box product-thumbnail-fallback" style="display: none;"></i>`
+            : '<i class="bi bi-box product-thumbnail-fallback"></i>';
 
           html += `
                       <div class="product-row">
                         <div class="product-info-cell">
-                          <div class="product-icon-box" style="background-color: #f2f2f2; color: #888888;">
-                            <i class="bi bi-box" style="color: #888888;"></i>
+                          <div class="product-icon-box">
+                            ${productImage}
                           </div>
                           <div>
                             <h4 class="product-name-lbl">${p.name}</h4>
