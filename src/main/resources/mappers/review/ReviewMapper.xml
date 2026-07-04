@@ -4,6 +4,36 @@
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="kr.or.hieating.review.mapper.ReviewMapper">
+  <sql id="reviewFormColumns">
+    pc.id AS purchaseId,
+    pc.product_id AS productId,
+    c.name AS brandName,
+    p.name AS productName,
+    pc.quantity || '개 · ' || TO_CHAR(pc.created_at, 'YYYY.MM.DD') || ' 구매' AS optionName,
+    pp.picture_saved_location AS productImageUrl
+  </sql>
+
+  <sql id="reviewFormBase">
+    FROM purchases pc
+    JOIN products p
+      ON p.id = pc.product_id
+    JOIN categories c
+      ON c.id = p.category_id
+    LEFT JOIN product_pictures pp
+      ON pp.id = (
+        SELECT MIN(pp2.id)
+        FROM product_pictures pp2
+        WHERE pp2.product_id = p.id
+      )
+    WHERE pc.user_id = #{userId}
+      AND NOT EXISTS (
+        SELECT 1
+        FROM reviews r
+        WHERE r.purchase_id = pc.id
+          AND r.deleted_at IS NULL
+      )
+  </sql>
+
   <select id="countProductReviews" resultType="int">
     SELECT COUNT(*)
     FROM reviews
@@ -30,4 +60,49 @@
     ORDER BY r.created_at DESC, r.id DESC
     OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
   </select>
+
+  <select id="findReviewFormByPurchaseId" resultType="ReviewFormResponseDto">
+    SELECT
+      <include refid="reviewFormColumns" />
+    <include refid="reviewFormBase" />
+      AND pc.id = #{purchaseId}
+  </select>
+
+  <select id="findLatestReviewFormByProductId" resultType="ReviewFormResponseDto">
+    SELECT
+      <include refid="reviewFormColumns" />
+    <include refid="reviewFormBase" />
+      AND pc.product_id = #{productId}
+    ORDER BY pc.created_at DESC, pc.id DESC
+    FETCH FIRST 1 ROWS ONLY
+  </select>
+
+  <select id="countReviewByPurchaseId" resultType="int">
+    SELECT COUNT(*)
+    FROM reviews
+    WHERE purchase_id = #{purchaseId}
+      AND deleted_at IS NULL
+  </select>
+
+  <insert id="insertReview" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+    INSERT INTO reviews (
+      user_id,
+      product_id,
+      purchase_id,
+      rating,
+      content,
+      img_src,
+      created_at,
+      updated_at
+    ) VALUES (
+      #{userId},
+      #{productId},
+      #{purchaseId},
+      #{rating},
+      #{content},
+      #{imgSrc},
+      SYSTIMESTAMP,
+      SYSTIMESTAMP
+    )
+  </insert>
 </mapper>

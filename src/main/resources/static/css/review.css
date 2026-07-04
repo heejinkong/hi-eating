@@ -196,6 +196,16 @@
   background: var(--color-brand-strong, #e83d12);
 }
 
+.review-submit-button:disabled {
+  opacity: 0.68;
+}
+
+.review-submit-message {
+  color: var(--color-brand-strong, #e83d12);
+  font-size: 14px;
+  font-weight: 800;
+}
+
 @media (max-width: 575.98px) {
   .review-title-bar {
     margin-inline: -16px;

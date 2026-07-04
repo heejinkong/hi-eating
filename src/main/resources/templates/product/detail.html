@@ -164,7 +164,7 @@
                 </h2>
                 <a
                   class="review-write-link d-inline-flex align-items-center gap-2"
-                  th:href="@{/review/new}"
+                  th:href="@{/review/new(productId=${product.id})}"
                 >
                   <i aria-hidden="true" class="bi bi-plus-circle-fill"></i>
                   리뷰 작성하기

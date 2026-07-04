@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
+  const form = document.querySelector('#reviewForm');
   const ratingInput = document.querySelector('#reviewRating');
   const stars = Array.from(document.querySelectorAll('.review-star'));
   const textarea = document.querySelector('#reviewContent');
@@ -7,6 +8,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const imagePreview = document.querySelector('#reviewImagePreview');
   const imagePreviewImg = imagePreview?.querySelector('img');
   const imageRemoveButton = document.querySelector('#reviewImageRemove');
+  const submitButton = form?.querySelector('.review-submit-button');
+  const submitMessage = document.querySelector('#reviewSubmitMessage');
   let previewObjectUrl = null;
 
   const updateStars = (rating) => {
@@ -79,4 +82,67 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   imageRemoveButton?.addEventListener('click', clearPreview);
+
+  const showSubmitMessage = (message) => {
+    if (!submitMessage) {
+      alert(message);
+      return;
+    }
+
+    submitMessage.textContent = message;
+    submitMessage.removeAttribute('hidden');
+  };
+
+  const clearSubmitMessage = () => {
+    submitMessage?.setAttribute('hidden', '');
+    if (submitMessage) {
+      submitMessage.textContent = '';
+    }
+  };
+
+  form?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    clearSubmitMessage();
+
+    const rating = Number(ratingInput?.value || 0);
+    if (rating < 1 || rating > 5) {
+      showSubmitMessage('별점을 입력해주세요.');
+      return;
+    }
+
+    if (!textarea?.value.trim()) {
+      showSubmitMessage('리뷰 내용을 입력해주세요.');
+      textarea?.focus();
+      return;
+    }
+
+    const formData = new FormData(form);
+
+    if (submitButton) {
+      submitButton.disabled = true;
+      submitButton.textContent = '등록 중...';
+    }
+
+    try {
+      const response = await fetch(form.action, {
+        method: 'POST',
+        body: formData,
+      });
+      const apiResponse = await response.json();
+
+      if (!response.ok || !apiResponse.isSuccess) {
+        throw new Error(apiResponse.message || '리뷰 등록에 실패했습니다.');
+      }
+
+      const redirectUrl = apiResponse.result?.redirectUrl || '/mypage';
+      window.location.href = `${redirectUrl}#product-reviews`;
+    } catch (error) {
+      showSubmitMessage(error.message || '리뷰 등록에 실패했습니다.');
+    } finally {
+      if (submitButton) {
+        submitButton.disabled = false;
+        submitButton.textContent = '리뷰 등록하기';
+      }
+    }
+  });
 });

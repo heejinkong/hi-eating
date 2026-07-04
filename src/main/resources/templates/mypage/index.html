@@ -76,7 +76,7 @@
 
             <a
               class="review-button btn d-flex align-items-center justify-content-center w-100"
-              th:href="@{/review/new}"
+              th:href="@{/review/new(purchaseId=${recentPurchaseProduct.purchaseId})}"
               >후기 작성</a
             >
           </article>

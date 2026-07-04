@@ -24,6 +24,17 @@ public enum ErrorStatus implements BaseErrorCode {
       "이미지 파일만 업로드할 수 있습니다. (허용 확장자: jpg, jpeg, png, gif, webp)"),
   EMPTY_FILE(HttpStatus.BAD_REQUEST, "PROMOTION4005", "업로드할 이미지 파일이 비어 있습니다."),
 
+  // 리뷰 관련 에러
+  REVIEW_FORM_NOT_FOUND(HttpStatus.NOT_FOUND, "REVIEW4001", "리뷰를 작성할 수 있는 구매 내역이 없습니다."),
+  DUPLICATE_REVIEW(HttpStatus.BAD_REQUEST, "REVIEW4002", "이미 작성된 리뷰가 있는 구매 내역입니다."),
+  INVALID_REVIEW_TARGET(HttpStatus.BAD_REQUEST, "REVIEW4003", "구매 정보와 상품 정보가 일치하지 않습니다."),
+  INVALID_REVIEW_IMAGE_FILE_TYPE(
+      HttpStatus.BAD_REQUEST,
+      "REVIEW4004",
+      "이미지 파일만 업로드할 수 있습니다. (허용 확장자: jpg, jpeg, png, gif, webp)"),
+  EMPTY_REVIEW_IMAGE_FILE(HttpStatus.BAD_REQUEST, "REVIEW4005", "업로드할 이미지 파일이 비어 있습니다."),
+  REVIEW_IMAGE_UPLOAD_FAILED(HttpStatus.BAD_GATEWAY, "REVIEW5001", "리뷰 이미지 업로드에 실패했습니다."),
+
   // 핫딜 관련 에러
   INVALID_SORT_BY(HttpStatus.BAD_REQUEST, "HOTDEAL4001", "유효하지 않은 정렬 기준입니다."),
   INVALID_START_DATE(HttpStatus.BAD_REQUEST, "HOTDEAL4002", "시작일은 오늘 이후로 설정해야 합니다."),

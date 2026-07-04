@@ -8,10 +8,11 @@
         </header>
 
         <form
-          action="#"
           class="review-form d-flex flex-column gap-4"
           enctype="multipart/form-data"
+          id="reviewForm"
           method="post"
+          th:action="@{/api/reviews}"
         >
           <input name="purchaseId" th:value="${reviewForm.purchaseId}" type="hidden" />
           <input name="productId" th:value="${reviewForm.productId}" type="hidden" />
@@ -149,8 +150,10 @@
             </div>
           </section>
 
+          <p class="review-submit-message mb-0 text-center" hidden id="reviewSubmitMessage"></p>
+
           <div class="d-flex justify-content-center pt-2">
-            <button class="review-submit-button btn" type="button">리뷰 등록하기</button>
+            <button class="review-submit-button btn" type="submit">리뷰 등록하기</button>
           </div>
         </form>
       </div>

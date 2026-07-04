@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const reviewError = document.getElementById('reviewError');
   const reviewPagination = document.getElementById('reviewPagination');
   const reviewCount = document.getElementById('reviewCount');
+  const reviewWriteLink = document.querySelector('.review-write-link');
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const reviewPageSize = 5;
   let imageChangeToken = 0;
@@ -142,7 +143,46 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   if (reviewPanel && reviewList && reviewPagination) {
+    openReviewTabFromHash();
     loadReviews(currentReviewPage);
+  }
+
+  reviewWriteLink?.addEventListener('click', async (event) => {
+    event.preventDefault();
+
+    try {
+      const response = await fetch(reviewWriteLink.href, {
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Review form is not available.');
+      }
+
+      window.location.href = reviewWriteLink.href;
+    } catch (error) {
+      alert('구매한 적 없는 상품입니다.');
+    }
+  });
+
+  function openReviewTabFromHash() {
+    if (window.location.hash !== '#product-reviews') {
+      return;
+    }
+
+    const reviewTabButton = document.getElementById('product-reviews-tab');
+    if (!reviewTabButton) {
+      return;
+    }
+
+    if (window.bootstrap?.Tab) {
+      window.bootstrap.Tab.getOrCreateInstance(reviewTabButton).show();
+      return;
+    }
+
+    reviewTabButton.click();
   }
 
   async function loadReviews(page) {
