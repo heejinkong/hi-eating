@@ -11,12 +11,15 @@ public interface AdminProductMapper {
   List<ProductSearchResponseDTO> searchProductsForHotDeal(
       @Param("keyword") String keyword,
       @Param("categoryId") Long categoryId,
+      @Param("hotDealId") Integer hotDealId,
       @Param("sortBy") String sortBy,
       @Param("offset") int offset,
       @Param("size") int size);
 
   int countProductsForHotDeal(
-      @Param("keyword") String keyword, @Param("categoryId") Long categoryId);
+      @Param("keyword") String keyword,
+      @Param("categoryId") Long categoryId,
+      @Param("hotDealId") Integer hotDealId);
 
   List<CategoryResponseDTO> selectAllCategories();
 }

@@ -20,8 +20,11 @@ public class ProductSearchResponseDTO {
   private Integer stock;
   private LocalDate expireDate;
 
-  /** 유통기한과 오늘 날짜를 비교하여 유통 상태를 실시간으로 판별 */
   public String getStatus() {
+    if (this.expireDate != null && this.expireDate.isBefore(LocalDate.now())) {
+      return "폐기";
+    }
+
     if (this.expireDate == null) {
       return "일반";
     }

@@ -16,22 +16,58 @@
         INNER JOIN product_options o ON p.id = o.product_id
         LEFT JOIN categories c ON p.category_id = c.id
         <where>
-            <if test="keyword != null and keyword != ''">
-                AND p.name LIKE CONCAT('%', #{keyword}, '%')
-            </if>
-            <if test="categoryId != null">
-                AND p.category_id = #{categoryId}
-            </if>
+            <choose>
+                <when test="hotDealId != null">
+                    AND (
+                        EXISTS (
+                            SELECT 1
+                            FROM hot_deal_products hp
+                            WHERE hp.hot_deal_id = #{hotDealId}
+                              AND hp.product_option_id = o.id
+                        )
+                        OR (
+                            o.expire_date >= TRUNC(SYSDATE)
+                            <if test="keyword != null and keyword != ''">
+                                AND p.name LIKE CONCAT('%', #{keyword}, '%')
+                            </if>
+                            <if test="categoryId != null">
+                                AND p.category_id = #{categoryId}
+                            </if>
+                        )
+                    )
+                </when>
+                <otherwise>
+                    AND o.expire_date >= TRUNC(SYSDATE)
+                    <if test="keyword != null and keyword != ''">
+                        AND p.name LIKE CONCAT('%', #{keyword}, '%')
+                    </if>
+                    <if test="categoryId != null">
+                        AND p.category_id = #{categoryId}
+                    </if>
+                </otherwise>
+            </choose>
         </where>
+        ORDER BY
+        <if test="hotDealId != null">
+            CASE
+                WHEN EXISTS (
+                    SELECT 1
+                    FROM hot_deal_products hp
+                    WHERE hp.hot_deal_id = #{hotDealId}
+                      AND hp.product_option_id = o.id
+                ) THEN 0
+                ELSE 1
+            END,
+        </if>
         <choose>
             <when test="sortBy == 'EXPIRE_ASC'">
-                ORDER BY o.expire_date ASC
+                o.expire_date ASC
             </when>
             <when test="sortBy == 'STOCK_ASC'">
-                ORDER BY o.stock ASC, o.expire_date ASC
+                o.stock ASC, o.expire_date ASC
             </when>
             <otherwise>
-                ORDER BY p.id DESC
+                p.id DESC
             </otherwise>
         </choose>
         OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
@@ -42,12 +78,36 @@
         FROM products p
         INNER JOIN product_options o ON p.id = o.product_id
         <where>
-            <if test="keyword != null and keyword != ''">
-                AND p.name LIKE CONCAT('%', #{keyword}, '%')
-            </if>
-            <if test="categoryId != null">
-                AND p.category_id = #{categoryId}
-            </if>
+            <choose>
+                <when test="hotDealId != null">
+                    AND (
+                        EXISTS (
+                            SELECT 1
+                            FROM hot_deal_products hp
+                            WHERE hp.hot_deal_id = #{hotDealId}
+                              AND hp.product_option_id = o.id
+                        )
+                        OR (
+                            o.expire_date >= TRUNC(SYSDATE)
+                            <if test="keyword != null and keyword != ''">
+                                AND p.name LIKE CONCAT('%', #{keyword}, '%')
+                            </if>
+                            <if test="categoryId != null">
+                                AND p.category_id = #{categoryId}
+                            </if>
+                        )
+                    )
+                </when>
+                <otherwise>
+                    AND o.expire_date >= TRUNC(SYSDATE)
+                    <if test="keyword != null and keyword != ''">
+                        AND p.name LIKE CONCAT('%', #{keyword}, '%')
+                    </if>
+                    <if test="categoryId != null">
+                        AND p.category_id = #{categoryId}
+                    </if>
+                </otherwise>
+            </choose>
         </where>
     </select>
 

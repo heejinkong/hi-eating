@@ -189,6 +189,7 @@ function searchProducts(resetPage = false) {
   let url = `/admin/api/products?sortBy=${currentSort}&page=${currentPage}`;
   if (keyword) url += `&keyword=${encodeURIComponent(keyword)}`;
   if (categoryId) url += `&categoryId=${categoryId}`;
+  if (editingHotDealId !== null) url += `&hotDealId=${editingHotDealId}`;
 
   fetch(url)
     .then((res) => res.json())
@@ -228,7 +229,13 @@ function searchProducts(resetPage = false) {
             if (diffDays <= 7) isUrgent = true;
           }
 
-          const statusBadgeClass = p.status === '유통임박' ? 'badge-orange' : 'badge-gray';
+          const statusBadgeClass =
+            p.status === '폐기'
+              ? 'badge-red'
+              : p.status === '유통임박'
+                ? 'badge-orange'
+                : 'badge-gray';
+          const isDiscarded = p.status === '폐기';
           const isChecked = selectedProducts.some((item) => item.optionId === p.productOptionId);
 
           html += `
@@ -254,7 +261,8 @@ function searchProducts(resetPage = false) {
                         </div>
                         <div class="text-center">
                           <input type="checkbox" class="checkbox-custom" data-option-id="${p.productOptionId}"
-                                 onclick="toggleProductSelect(${p.productOptionId}, '${p.name.replace(/'/g, "\\'")}', ${p.price}, this.checked)"
+                                 onclick="toggleProductSelect(${p.productOptionId}, '${p.name.replace(/'/g, "\\'")}', ${p.price}, this.checked, ${isDiscarded}, this)"
+                                 ${isDiscarded && !isChecked ? 'disabled' : ''}
                                  ${isChecked ? 'checked' : ''}>
                         </div>
                       </div>
@@ -330,14 +338,34 @@ function renderPagination(totalPages, activePage) {
 }
 
 // 목록에서 체크박스 토글 시 선택 배열 가감 처리
-function toggleProductSelect(optionId, name, price, isChecked) {
+function toggleProductSelect(
+  optionId,
+  name,
+  price,
+  isChecked,
+  isDiscarded = false,
+  checkbox = null,
+) {
+  const wasSelected = selectedProducts.some((item) => item.optionId === optionId);
+
+  if (isDiscarded && isChecked && !wasSelected) {
+    if (checkbox) {
+      checkbox.checked = false;
+      checkbox.disabled = true;
+    }
+    return;
+  }
+
   if (isChecked) {
     // Avoid duplicate
-    if (!selectedProducts.some((item) => item.optionId === optionId)) {
+    if (!wasSelected) {
       selectedProducts.push({ optionId, name, price });
     }
   } else {
     selectedProducts = selectedProducts.filter((item) => item.optionId !== optionId);
+    if (isDiscarded && checkbox) {
+      checkbox.disabled = true;
+    }
   }
   updateSelectedBox();
 }
@@ -361,12 +389,17 @@ function updateSelectedBox() {
 
   // 선택된 상품들의 총 가격 계산 및 30% 권장 할인가 추천 적용
   let totalOriginalPrice = 0;
-  let namesText = selectedProducts
+  const namesHtml = selectedProducts
     .map((item) => {
       totalOriginalPrice += item.price;
-      return item.name;
+      return `
+        <div class="selected-item-row">
+          <span>${escapeHtml(item.name)}</span>
+          ${item.discarded ? '<span class="selected-discarded-badge">폐기</span>' : ''}
+        </div>
+      `;
     })
-    .join('<br>');
+    .join('');
 
   box.innerHTML = `
       <div class="selected-header">
@@ -382,7 +415,7 @@ function updateSelectedBox() {
         <i class="bi bi-chevron-right text-muted"></i>
       </div>
       <div class="selected-item-names mt-2">
-        ${namesText}
+        ${namesHtml}
       </div>
     `;
 }
@@ -436,12 +469,15 @@ function resetHotDealForm() {
   if (btnEndHotDeal) {
     btnEndHotDeal.style.display = 'none';
   }
+
+  searchProducts(true);
 }
 
 // === 등록된 핫딜 페이징 및 정렬 기능 ===
 let registeredDeals = [];
 let currentDealPage = 1;
 let currentDealSort = 'ASC'; // 기본값: 오래된순 (ASC)
+let currentDealStatus = 'ALL';
 const dealPageSize = 3;
 
 // 정렬 상태 변경 및 active 클래스 토글
@@ -461,6 +497,12 @@ function changeDealSort(sortOrder) {
   }
 
   currentDealPage = 1; // 정렬 변경 시 1페이지로 리셋
+  renderRegisteredDeals();
+}
+
+function changeDealStatusFilter(status) {
+  currentDealStatus = status;
+  currentDealPage = 1;
   renderRegisteredDeals();
 }
 
@@ -496,13 +538,18 @@ function renderRegisteredDeals() {
   const paginationContainer = document.getElementById('registeredDealsPagination');
   if (!tbody) return;
 
-  totalCountLbl.innerText = `${registeredDeals.length}개`;
+  const filteredDeals =
+    currentDealStatus === 'ALL'
+      ? registeredDeals
+      : registeredDeals.filter((deal) => deal.status === currentDealStatus);
 
-  if (registeredDeals.length === 0) {
+  totalCountLbl.innerText = `${filteredDeals.length}개`;
+
+  if (filteredDeals.length === 0) {
     tbody.innerHTML = `
             <tr>
                 <td colspan="6" class="text-center py-5 text-muted">
-                    등록된 핫딜 기획전이 없습니다.
+                    선택한 상태의 핫딜이 없습니다.
                 </td>
             </tr>
         `;
@@ -510,8 +557,8 @@ function renderRegisteredDeals() {
     return;
   }
 
-  // 1. 기간 정렬
-  const sortedList = [...registeredDeals].sort((a, b) => {
+  // 1. 상태 필터가 적용된 목록을 기간순으로 정렬
+  const sortedList = [...filteredDeals].sort((a, b) => {
     const dateA = new Date(a.startsAt);
     const dateB = new Date(b.startsAt);
     return currentDealSort === 'ASC' ? dateA - dateB : dateB - dateA;
@@ -654,10 +701,12 @@ function loadHotDealForEdit(id) {
           optionId: p.productOptionId,
           name: p.productName,
           price: p.originalPrice,
+          expireDate: p.expireDate,
+          discarded: p.discarded,
         }));
 
         updateSelectedBox();
-        syncCheckboxes();
+        searchProducts(true);
 
         // 스크롤 포커싱
         document.querySelector('.right-sidebar-card').scrollIntoView({ behavior: 'smooth' });
@@ -669,13 +718,4 @@ function loadHotDealForEdit(id) {
       console.error('Error loading hotdeal detail:', err);
       alert('서버와 통신하는 중 오류가 발생했습니다.');
     });
-}
-
-// 왼쪽 검색 테이블 체크박스 상태 동기화
-function syncCheckboxes() {
-  const checkboxes = document.querySelectorAll('#productSearchResult .checkbox-custom');
-  checkboxes.forEach((cb) => {
-    const optionId = parseInt(cb.getAttribute('data-option-id'), 10);
-    cb.checked = selectedProducts.some((item) => item.optionId === optionId);
-  });
 }

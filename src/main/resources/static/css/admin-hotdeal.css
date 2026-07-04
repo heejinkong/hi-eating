@@ -135,6 +135,11 @@ body {
   gap: 0.5rem;
 }
 
+.deal-status-filter {
+  width: 120px;
+  min-width: 120px;
+}
+
 .btn-pill {
   border: 1.5px solid var(--border-gray);
   background-color: #ffffff;
@@ -247,6 +252,11 @@ body {
 .badge-gray {
   background-color: var(--tag-gray);
   color: var(--tag-text-gray);
+}
+
+.badge-red {
+  background-color: #fee2e2;
+  color: #b91c1c;
 }
 
 /* 체크박스 커스텀 스타일 */
@@ -370,6 +380,24 @@ body {
   font-weight: 700;
   line-height: 1.4;
   color: var(--text-dark);
+}
+
+.selected-item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.2rem 0;
+}
+
+.selected-discarded-badge {
+  flex-shrink: 0;
+  border-radius: 4px;
+  background-color: #fee2e2;
+  color: #b91c1c;
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 0.15rem 0.45rem;
 }
 
 .ai-btn-badge {

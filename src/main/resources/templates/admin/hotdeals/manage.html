@@ -125,6 +125,17 @@
 
                 <!-- 우측 정렬 필즈 + 전체 갯수 세트 -->
                 <div class="d-flex align-items-center gap-3">
+                  <select
+                    class="form-select form-control-custom deal-status-filter"
+                    id="dealStatusFilter"
+                    aria-label="핫딜 상태 필터"
+                    onchange="changeDealStatusFilter(this.value)"
+                  >
+                    <option value="ALL">전체 상태</option>
+                    <option value="ACTIVE">진행중</option>
+                    <option value="SCHEDULED">대기중</option>
+                    <option value="ENDED">종료됨</option>
+                  </select>
                   <!-- 시작일 정렬 필터 필즈 -->
                   <div class="filter-pills m-0">
                     <button

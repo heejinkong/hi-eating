@@ -11,6 +11,13 @@ import org.apache.ibatis.annotations.Param;
 @Mapper
 public interface AdminHotDealMapper {
 
+  int updateStatusesByPeriod();
+
+  int countExpiredProductOptions(@Param("productOptionIds") List<Integer> productOptionIds);
+
+  int countUnlinkedExpiredProductOptions(
+      @Param("hotDealId") int hotDealId, @Param("productOptionIds") List<Integer> productOptionIds);
+
   List<HotDealResponseDTO> selectManageableHotDeals();
 
   void insertHotDeal(HotDeals hotDeal);

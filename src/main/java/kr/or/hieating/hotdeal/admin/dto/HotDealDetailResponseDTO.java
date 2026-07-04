@@ -1,5 +1,6 @@
 package kr.or.hieating.hotdeal.admin.dto;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -29,5 +30,10 @@ public class HotDealDetailResponseDTO {
     private String productName;
     private Integer originalPrice;
     private Integer hotDealPrice;
+    private LocalDate expireDate;
+
+    public boolean isDiscarded() {
+      return expireDate != null && expireDate.isBefore(LocalDate.now());
+    }
   }
 }

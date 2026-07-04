@@ -19,6 +19,7 @@ public class AdminProductController {
   public ApiResponse<ProductPageResponseDTO> searchProducts(
       @RequestParam(required = false) String keyword,
       @RequestParam(required = false) Long categoryId,
+      @RequestParam(required = false) Integer hotDealId,
       @RequestParam(defaultValue = "EXPIRE_ASC") String sortBy,
       @RequestParam(defaultValue = "1") int page) {
 
@@ -28,7 +29,7 @@ public class AdminProductController {
 
     int size = 5; // Set page size to 5
     ProductPageResponseDTO result =
-        adminProductService.searchProducts(keyword, categoryId, sortBy, page, size);
+        adminProductService.searchProducts(keyword, categoryId, hotDealId, sortBy, page, size);
 
     return ApiResponse.onSuccess(result);
   }

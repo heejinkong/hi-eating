@@ -27,7 +27,9 @@ public class AdminHotDealService {
   private final AdminHotDealMapper adminHotDealMapper;
   private final UserResolver userResolver;
 
+  @Transactional
   public List<HotDealResponseDTO> getExistingHotDeals() {
+    adminHotDealMapper.updateStatusesByPeriod();
     return adminHotDealMapper.selectManageableHotDeals();
   }
 
@@ -42,6 +44,14 @@ public class AdminHotDealService {
 
     if (request.getEndsAt().isBefore(request.getStartsAt())) {
       throw new GeneralException(ErrorStatus.INVALID_END_DATE);
+    }
+
+    List<Integer> productOptionIds =
+        request.getProducts().stream()
+            .map(HotDealCreateRequestDTO.ProductItemDTO::getProductOptionId)
+            .toList();
+    if (adminHotDealMapper.countExpiredProductOptions(productOptionIds) > 0) {
+      throw new GeneralException(ErrorStatus._BAD_REQUEST);
     }
 
     String status = request.getStartsAt().isAfter(today) ? "SCHEDULED" : "ACTIVE";
@@ -96,6 +106,14 @@ public class AdminHotDealService {
 
     if (request.getEndsAt().isBefore(request.getStartsAt())) {
       throw new GeneralException(ErrorStatus.INVALID_END_DATE);
+    }
+
+    List<Integer> requestedProductOptionIds =
+        request.getProducts().stream()
+            .map(HotDealUpdateRequestDTO.ProductItemDTO::getProductOptionId)
+            .toList();
+    if (adminHotDealMapper.countUnlinkedExpiredProductOptions(id, requestedProductOptionIds) > 0) {
+      throw new GeneralException(ErrorStatus._BAD_REQUEST);
     }
 
     String status = request.getStartsAt().isAfter(today) ? "SCHEDULED" : "ACTIVE";
