@@ -17,13 +17,14 @@ public class AdminProductService {
   private final AdminProductMapper adminProductMapper;
 
   public ProductPageResponseDTO searchProducts(
-      String keyword, Long categoryId, String sortBy, int page, int size) {
+      String keyword, Long categoryId, Integer hotDealId, String sortBy, int page, int size) {
     String normalizedKeyword = normalizeKeyword(keyword);
     int offset = (page - 1) * size;
     List<ProductSearchResponseDTO> list =
         adminProductMapper.searchProductsForHotDeal(
-            normalizedKeyword, categoryId, sortBy, offset, size);
-    int totalCount = adminProductMapper.countProductsForHotDeal(normalizedKeyword, categoryId);
+            normalizedKeyword, categoryId, hotDealId, sortBy, offset, size);
+    int totalCount =
+        adminProductMapper.countProductsForHotDeal(normalizedKeyword, categoryId, hotDealId);
     int totalPages = (int) Math.ceil((double) totalCount / size);
 
     return ProductPageResponseDTO.builder()

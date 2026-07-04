@@ -31,13 +31,13 @@
         LEFT JOIN categories c ON p.category_id = c.id
         <choose>
             <when test="sortBy == 'EXPIRE_ASC'">
-                o.expire_date ASC
+                ORDER BY o.expire_date ASC
             </when>
             <when test="sortBy == 'STOCK_ASC'">
-                o.stock ASC, o.expire_date ASC
+                ORDER BY o.stock ASC, o.expire_date ASC
             </when>
             <otherwise>
-                p.id DESC
+                ORDER BY p.id DESC
             </otherwise>
         </choose>
         OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
