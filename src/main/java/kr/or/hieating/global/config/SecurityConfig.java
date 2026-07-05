@@ -37,6 +37,7 @@ public class SecurityConfig {
                         "/css/**",
                         "/js/**",
                         "/images/**",
+                        "/ai/**", // TODO: 삭제 해야함 (AI 테스트하기 위해 추가)
                         "/fonts/**") // 추후 코드 병합시 핫딜과 같은 페이지 허용 필요
                     .permitAll()
                     .requestMatchers("/admin/**")
