@@ -64,6 +64,99 @@
         </p>
       </section>
 
+      <section
+        aria-label="인기 식탁 꾸미기"
+        class="popular-table-section container-xl reveal-section"
+      >
+        <div class="section-heading-row">
+          <h2 class="section-title">인기 <strong>식탁 꾸미기</strong></h2>
+          <a class="section-more-link" th:href="@{/table-decorations}">
+            모두 보기
+            <i class="bi bi-chevron-right" aria-hidden="true"></i>
+          </a>
+        </div>
+
+        <p class="section-empty" th:if="${#lists.isEmpty(popularTableDecorPosts)}">
+          아직 등록된 식탁이 없습니다.
+        </p>
+
+        <div class="popular-table-grid" th:if="${!#lists.isEmpty(popularTableDecorPosts)}">
+          <a
+            class="popular-table-card"
+            th:each="post, stat : ${popularTableDecorPosts}"
+            href="#home-table-decor-preview"
+            data-home-table-decor-trigger
+            th:attr="data-image-src=${#strings.isEmpty(post.imageSrc) ? '/images/logo-hi-eating.png' : post.imageSrc},
+              data-image-alt=|${post.userName}님의 식탁|,
+              data-owner=|${post.userName}님의 식탁|,
+              data-created-at=${#temporals.format(post.createdAt, 'yyyy.MM.dd')},
+              data-like-count=${post.likeCount}"
+          >
+            <span class="popular-table-card__rank" th:text="|Top ${stat.index + 1}|">Top 1</span>
+            <img
+              data-fallback-src="/images/logo-hi-eating.png"
+              th:alt="|${post.userName}님의 식탁|"
+              th:src="${#strings.isEmpty(post.imageSrc) ? '/images/logo-hi-eating.png' : post.imageSrc}"
+            />
+            <span class="popular-table-card__info">
+              <strong th:text="|${post.userName}님의 식탁|">이용자님의 식탁</strong>
+              <span>
+                <i class="bi bi-heart-fill" aria-hidden="true"></i>
+                <span th:text="${post.likeCount}">0</span>
+              </span>
+            </span>
+          </a>
+        </div>
+
+        <div
+          id="home-table-decor-preview"
+          class="table-decor-modal"
+          data-home-table-decor-modal
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="home-table-decor-modal-title"
+          aria-hidden="true"
+          hidden
+        >
+          <button
+            class="table-decor-modal__backdrop"
+            type="button"
+            data-home-table-decor-modal-close
+            aria-label="식탁 미리보기 닫기"
+          ></button>
+          <div class="table-decor-modal__panel">
+            <button
+              class="table-decor-modal__close"
+              type="button"
+              data-home-table-decor-modal-close
+              aria-label="식탁 미리보기 닫기"
+            >
+              <i class="bi bi-x-lg" aria-hidden="true"></i>
+            </button>
+            <div class="table-decor-modal__image">
+              <img
+                data-home-table-decor-modal-image
+                src="/images/logo-hi-eating.png"
+                alt="식탁 미리보기"
+                data-fallback-src="/images/logo-hi-eating.png"
+              />
+            </div>
+            <div class="table-decor-modal__body">
+              <h2 id="home-table-decor-modal-title" data-home-table-decor-modal-owner>
+                이용자님의 식탁
+              </h2>
+              <p>
+                <span data-home-table-decor-modal-date>2026.07.04</span>
+              </p>
+              <span class="table-decor-modal__like">
+                <i class="bi bi-heart-fill" aria-hidden="true"></i>
+                <span data-home-table-decor-modal-like>0</span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section aria-label="원데이 핫딜" class="hot-deal-section container-xl reveal-section">
         <h2 class="section-title">원데이 <strong>핫딜</strong></h2>
 

@@ -1,4 +1,58 @@
 (() => {
+  const tableDecorModal = document.querySelector('[data-home-table-decor-modal]');
+  if (tableDecorModal) {
+    const image = tableDecorModal.querySelector('[data-home-table-decor-modal-image]');
+    const owner = tableDecorModal.querySelector('[data-home-table-decor-modal-owner]');
+    const date = tableDecorModal.querySelector('[data-home-table-decor-modal-date]');
+    const like = tableDecorModal.querySelector('[data-home-table-decor-modal-like]');
+    let lastFocusedElement = null;
+
+    const closeTableDecorModal = () => {
+      tableDecorModal.hidden = true;
+      tableDecorModal.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+
+      if (lastFocusedElement instanceof HTMLElement) {
+        lastFocusedElement.focus();
+      }
+    };
+
+    const openTableDecorModal = (trigger) => {
+      lastFocusedElement = document.activeElement;
+
+      image.src = trigger.dataset.imageSrc || window.__IMAGE_FALLBACK_SRC__;
+      image.alt = trigger.dataset.imageAlt || '\uc2dd\ud0c1 \ubbf8\ub9ac\ubcf4\uae30';
+      owner.textContent = trigger.dataset.owner || '\uc774\uc6a9\uc790\ub2d8\uc758 \uc2dd\ud0c1';
+      date.textContent = trigger.dataset.createdAt || '';
+      like.textContent = trigger.dataset.likeCount || '0';
+
+      tableDecorModal.hidden = false;
+      tableDecorModal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      tableDecorModal.querySelector('[data-home-table-decor-modal-close]')?.focus();
+    };
+
+    document.addEventListener('click', (event) => {
+      const trigger = event.target.closest('[data-home-table-decor-trigger]');
+      if (!trigger) {
+        return;
+      }
+
+      event.preventDefault();
+      openTableDecorModal(trigger);
+    });
+
+    tableDecorModal.querySelectorAll('[data-home-table-decor-modal-close]').forEach((button) => {
+      button.addEventListener('click', closeTableDecorModal);
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && !tableDecorModal.hidden) {
+        closeTableDecorModal();
+      }
+    });
+  }
+
   const revealSections = document.querySelectorAll('.reveal-section');
   if ('IntersectionObserver' in window) {
     const revealObserver = new IntersectionObserver(
@@ -68,7 +122,9 @@
       icon.className = paused ? 'bi bi-play-fill' : 'bi bi-pause-fill';
       toggleButton.setAttribute(
         'aria-label',
-        paused ? '자동 슬라이드 재생' : '자동 슬라이드 일시정지',
+        paused
+          ? '\uc790\ub3d9 \uc2ac\ub77c\uc774\ub4dc \uc7ac\uc0dd'
+          : '\uc790\ub3d9 \uc2ac\ub77c\uc774\ub4dc \uc77c\uc2dc\uc815\uc9c0',
       );
     };
 

@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+  <body>
+    <section
+      th:fragment="content"
+      class="table-decor-page"
+      th:attr="data-table-decor-authenticated=${tableDecorAuthenticated},
+        data-table-decor-page=${postPage.page},
+        data-table-decor-total-pages=${postPage.totalPages}"
+    >
+      <div class="table-decor-shell">
+        <header class="table-decor-hero">
+          <div class="table-decor-profile-avatar" aria-hidden="true">
+            <i class="bi bi-cube"></i>
+          </div>
+          <div>
+            <p class="table-decor-kicker">
+              <i class="bi bi-cube" aria-hidden="true"></i>
+              Table Styling
+            </p>
+            <h1>모두의 식탁 꾸미기</h1>
+            <div class="table-decor-profile-stats">
+              <span>게시물 <strong th:text="${postPage.totalCount}">0</strong></span>
+              <span>3D Table Feed</span>
+            </div>
+          </div>
+          <a
+            class="table-decor-create-link"
+            th:href="@{/table-builder}"
+            data-table-decor-login-required
+          >
+            <i aria-hidden="true" class="bi bi-badge-3d"></i>
+            내 식탁 꾸미러 가기
+          </a>
+        </header>
+
+        <p class="table-decor-empty" th:if="${!postPage.hasPosts()}">
+          아직 등록된 식탁이 없습니다. 첫 번째 식탁을 꾸며보세요.
+        </p>
+
+        <div class="table-decor-feed" data-table-decor-feed th:if="${postPage.hasPosts()}">
+          <article class="table-post-card" th:each="post : ${postPage.posts}">
+            <header class="table-post-card__header">
+              <strong th:text="|${post.userName}님의 식탁|">이용자님의 식탁</strong>
+              <span th:text="${#temporals.format(post.createdAt, 'yyyy.MM.dd')}">2026.07.04</span>
+            </header>
+            <div class="table-post-card__media">
+              <button
+                class="table-post-card__image"
+                type="button"
+                data-table-decor-trigger
+                th:attr="data-post-id=${post.postId},
+                  data-image-src=${#strings.isEmpty(post.imageSrc) ? '/images/logo-hi-eating.png' : post.imageSrc},
+                  data-image-alt=|${post.userName}님의 식탁|,
+                  data-owner=|${post.userName}님의 식탁|,
+                  data-created-at=${#temporals.format(post.createdAt, 'yyyy.MM.dd')},
+                  data-like-count=${post.likeCount},
+                  data-liked=${post.liked}"
+              >
+                <img
+                  data-fallback-src="/images/logo-hi-eating.png"
+                  th:alt="|${post.userName}님의 식탁|"
+                  th:src="${#strings.isEmpty(post.imageSrc) ? '/images/logo-hi-eating.png' : post.imageSrc}"
+                />
+              </button>
+            </div>
+            <div class="table-post-card__actions">
+              <button
+                class="table-post-card__like"
+                type="button"
+                aria-label="식탁 좋아요"
+                data-table-decor-like
+                th:classappend="${post.liked} ? ' is-active'"
+                th:attr="data-post-id=${post.postId}, aria-pressed=${post.liked}"
+              >
+                <i aria-hidden="true" class="bi bi-heart-fill"></i>
+                <span data-table-decor-like-count th:text="${post.likeCount}">0</span>
+              </button>
+            </div>
+          </article>
+        </div>
+
+        <div class="table-decor-loader" data-table-decor-loader hidden>
+          식탁을 불러오는 중입니다.
+        </div>
+        <div data-table-decor-sentinel></div>
+
+        <div
+          id="table-decor-preview"
+          class="table-decor-modal"
+          data-table-decor-modal
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="table-decor-modal-title"
+          aria-hidden="true"
+          hidden
+        >
+          <button
+            class="table-decor-modal__backdrop"
+            type="button"
+            data-table-decor-modal-close
+            aria-label="식탁 미리보기 닫기"
+          ></button>
+          <div class="table-decor-modal__panel">
+            <button
+              class="table-decor-modal__close"
+              type="button"
+              data-table-decor-modal-close
+              aria-label="식탁 미리보기 닫기"
+            >
+              <i class="bi bi-x-lg" aria-hidden="true"></i>
+            </button>
+            <div class="table-decor-modal__image">
+              <img
+                data-table-decor-modal-image
+                src="/images/logo-hi-eating.png"
+                alt="식탁 미리보기"
+                data-fallback-src="/images/logo-hi-eating.png"
+              />
+            </div>
+            <div class="table-decor-modal__body">
+              <h2 id="table-decor-modal-title" data-table-decor-modal-owner>이용자님의 식탁</h2>
+              <p>
+                <span data-table-decor-modal-date>2026.07.04</span>
+              </p>
+              <button
+                class="table-decor-modal__like"
+                type="button"
+                aria-label="식탁 좋아요"
+                data-table-decor-modal-like-button
+                data-table-decor-like
+                aria-pressed="false"
+              >
+                <i class="bi bi-heart-fill" aria-hidden="true"></i>
+                <span data-table-decor-like-count data-table-decor-modal-like>0</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="table-decor-auth-modal"
+          data-table-decor-auth-modal
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="table-decor-auth-title"
+          aria-hidden="true"
+          hidden
+        >
+          <button
+            class="table-decor-auth-modal__backdrop"
+            type="button"
+            data-table-decor-auth-close
+            aria-label="로그인 안내 닫기"
+          ></button>
+          <div class="table-decor-auth-modal__panel">
+            <button
+              class="table-decor-auth-modal__close"
+              type="button"
+              data-table-decor-auth-close
+              aria-label="로그인 안내 닫기"
+            >
+              <i class="bi bi-x-lg" aria-hidden="true"></i>
+            </button>
+            <strong id="table-decor-auth-title">로그인이 필요합니다</strong>
+            <p data-table-decor-auth-message>
+              식탁 꾸미기 기능은 로그인한 사용자만 이용할 수 있습니다.
+            </p>
+            <div>
+              <a th:href="@{/login}">로그인하기</a>
+              <button type="button" data-table-decor-auth-close>닫기</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </body>
+</html>

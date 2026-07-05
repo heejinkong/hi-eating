@@ -17,6 +17,33 @@
   text-align: center;
 }
 
+.section-heading-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 28px;
+}
+
+.section-heading-row .section-title {
+  margin-bottom: 0;
+}
+
+.section-more-link {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  color: #5f5751;
+  font-size: 14px;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.section-more-link:hover,
+.section-more-link:focus-visible {
+  color: var(--color-brand-strong);
+}
+
 .section-empty {
   margin: 0;
   padding: 40px;
@@ -116,9 +143,205 @@
   right: max(20px, calc((100vw - 1220px) / 2));
 }
 
+.popular-table-section {
+  max-width: 1120px;
+  margin-top: 86px;
+  margin-bottom: 104px;
+  padding-right: clamp(28px, 4vw, 56px);
+  padding-left: clamp(28px, 4vw, 56px);
+}
+
+.popular-table-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.popular-table-card {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  aspect-ratio: 4 / 5;
+  border-radius: 8px;
+  background: #fff3ed;
+  color: #fff;
+  text-decoration: none;
+  box-shadow: 0 14px 34px rgba(37, 28, 21, 0.08);
+}
+
+.popular-table-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition:
+    filter 180ms ease,
+    transform 220ms ease;
+}
+
+.popular-table-card img[src$='logo-hi-eating.png'] {
+  object-fit: contain;
+  padding: 44px;
+  background: #fff7f1;
+}
+
+.popular-table-card:hover img,
+.popular-table-card:focus-visible img {
+  filter: brightness(0.82);
+  transform: scale(1.035);
+}
+
+.popular-table-card__rank {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 1;
+  border-radius: 999px;
+  background: var(--color-brand, #ff4d1f);
+  padding: 7px 11px;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.popular-table-card__info {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 44px 16px 16px;
+  background: linear-gradient(180deg, transparent, rgba(25, 23, 22, 0.78));
+}
+
+.popular-table-card__info strong {
+  overflow: hidden;
+  font-size: 16px;
+  font-weight: 900;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.popular-table-card__info span {
+  display: inline-flex;
+  flex: 0 0 auto;
+  gap: 5px;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.popular-table-card__info i {
+  color: #ff6b57;
+}
+
+.table-decor-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1050;
+  display: grid;
+  place-items: center;
+  padding: 28px;
+}
+
+.table-decor-modal[hidden] {
+  display: none;
+}
+
+.table-decor-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(18, 24, 20, 0.72);
+}
+
+.table-decor-modal__panel {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  width: min(920px, 100%);
+  max-height: min(86vh, 820px);
+  overflow: hidden;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 30px 90px rgba(10, 18, 13, 0.34);
+}
+
+.table-decor-modal__close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 2;
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(22, 29, 25, 0.78);
+  color: #fff;
+  font-size: 18px;
+}
+
+.table-decor-modal__image {
+  display: grid;
+  min-height: 0;
+  background: #f6f1ed;
+}
+
+.table-decor-modal__image img {
+  display: block;
+  width: 100%;
+  max-height: 68vh;
+  object-fit: contain;
+  background: #f6f1ed;
+}
+
+.table-decor-modal__body {
+  position: relative;
+  padding: 20px 24px 22px;
+}
+
+.table-decor-modal__body h2 {
+  margin: 0;
+  color: #292420;
+  font-size: 22px;
+  font-weight: 900;
+}
+
+.table-decor-modal__body p {
+  display: flex;
+  gap: 10px;
+  margin: 8px 0 0;
+  color: #948982;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.table-decor-modal__like {
+  position: absolute;
+  right: 24px;
+  bottom: 22px;
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  border: 1px solid #eee8e2;
+  border-radius: 999px;
+  background: #fff;
+  color: #292420;
+  padding: 9px 13px;
+  font-weight: 900;
+}
+
+.table-decor-modal__like i {
+  color: #ff6b57;
+}
+
 .hot-deal-section {
   max-width: 1120px;
-  margin-top: 96px;
+  margin-top: 0;
   margin-bottom: 120px;
   padding-right: clamp(28px, 4vw, 56px);
   padding-left: clamp(28px, 4vw, 56px);
@@ -437,9 +660,15 @@
 
 @media (max-width: 991.98px) {
   .hot-deal-section,
+  .popular-table-section,
   .most-purchased-section {
     padding-right: clamp(20px, 5vw, 36px);
     padding-left: clamp(20px, 5vw, 36px);
+  }
+
+  .popular-table-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
   }
 
   .most-purchased-grid {
@@ -464,6 +693,29 @@
 }
 
 @media (max-width: 575.98px) {
+  .section-heading-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .popular-table-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .table-decor-modal {
+    padding: 16px;
+  }
+
+  .table-decor-modal__body h2 {
+    padding-right: 58px;
+    font-size: 18px;
+  }
+
+  .table-decor-modal__like {
+    position: static;
+    margin-top: 12px;
+  }
+
   .most-purchased-grid {
     grid-template-columns: 1fr;
   }

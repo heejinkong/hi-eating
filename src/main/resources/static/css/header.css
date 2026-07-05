@@ -91,6 +91,7 @@
 }
 
 .nav-category-trigger,
+.nav-table-decor,
 .nav-hotdeal,
 .nav-icon-link {
   min-height: 40px;
@@ -109,6 +110,9 @@
 .nav-category-trigger:active,
 .nav-category-trigger.show,
 .nav-category-trigger:first-child:active,
+.nav-table-decor:hover,
+.nav-table-decor:focus,
+.nav-table-decor:active,
 .nav-hotdeal:hover,
 .nav-hotdeal:focus,
 .nav-hotdeal:active,
@@ -182,14 +186,26 @@
 
 .site-header .nav-hotdeal {
   min-width: 56px;
-  color: #ff3d25;
+  color: #34302d;
+  font-weight: 800;
+}
+
+.site-header .nav-table-decor {
+  min-width: 92px;
+  color: #34302d;
   font-weight: 800;
 }
 
 .site-header .nav-hotdeal:hover,
 .site-header .nav-hotdeal:focus,
 .site-header .nav-hotdeal:active {
-  color: #d92312;
+  color: var(--color-brand-strong);
+}
+
+.site-header .nav-table-decor:hover,
+.site-header .nav-table-decor:focus,
+.site-header .nav-table-decor:active {
+  color: var(--color-brand-strong);
 }
 
 .nav-icon-link {
@@ -231,6 +247,7 @@
   }
 
   .nav-category-trigger,
+  .nav-table-decor,
   .nav-hotdeal {
     font-size: 13px;
   }
