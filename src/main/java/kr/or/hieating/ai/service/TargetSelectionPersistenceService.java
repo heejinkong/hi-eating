@@ -3,7 +3,7 @@ package kr.or.hieating.ai.service;
 import java.util.List;
 import kr.or.hieating.ai.dto.TargetSelectionEvaluationDto;
 import kr.or.hieating.ai.dto.TargetUserDto;
-import kr.or.hieating.ai.mapper.EmailSendLogMapper;
+import kr.or.hieating.ai.mapper.AiTargetEmailSendLogMapper;
 import kr.or.hieating.ai.mapper.TargetSelectionHistoryMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class TargetSelectionPersistenceService {
 
   private final TargetSelectionHistoryMapper historyMapper;
-  private final EmailSendLogMapper emailSendLogMapper;
+  private final AiTargetEmailSendLogMapper emailSendLogMapper;
 
   @Transactional
   public int save(

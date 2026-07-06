@@ -22,6 +22,7 @@ public class TargetSelectionJobProcessor {
 
   private final TargetSelectionJobMapper jobMapper;
   private final TargetUserSelectionAiService selectionService;
+  private final HotDealEmailGenerationService emailGenerationService;
 
   public void processNextJob() {
     TargetSelectionJobDto job = jobMapper.findNextRunnableJob();
@@ -31,6 +32,9 @@ public class TargetSelectionJobProcessor {
 
     try {
       TargetSelectionResult result = selectionService.selectAndSaveTargets(job.hotDealId());
+      if (result.selectedCount() > 0) {
+        emailGenerationService.generateAndSave(job.hotDealId());
+      }
       jobMapper.markCompleted(
           job.id(), result.candidateCount(), result.selectedCount(), result.insertedCount());
       log.info(

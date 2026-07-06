@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.hieating.ai.mapper.HotDealEmailContentMapper">
+
+    <select id="findHotDealInfo" resultType="kr.or.hieating.ai.dto.HotDealEmailInfoRow">
+        SELECT id AS hotDealId, title, description, starts_at AS startsAt, ends_at AS endsAt
+        FROM hot_deals
+        WHERE id = #{hotDealId}
+          AND deleted_at IS NULL
+    </select>
+
+    <select id="findHotDealProducts" resultType="kr.or.hieating.ai.dto.HotDealEmailProductRow">
+        SELECT
+            p.name AS productName,
+            c.name AS categoryName,
+            hdp.original_price AS originalPrice,
+            hdp.hot_deal_price AS hotDealPrice,
+            CASE
+                WHEN hdp.original_price = 0 THEN 0
+                ELSE ROUND((hdp.original_price - hdp.hot_deal_price) * 100 / hdp.original_price)
+            END AS discountRate
+        FROM hot_deal_products hdp
+        INNER JOIN product_options po ON po.id = hdp.product_option_id
+        INNER JOIN products p ON p.id = po.product_id
+        INNER JOIN categories c ON c.id = p.category_id
+        WHERE hdp.hot_deal_id = #{hotDealId}
+        ORDER BY p.name, hdp.product_option_id
+    </select>
+
+    <select id="findGeneratedContent" resultType="kr.or.hieating.ai.dto.GeneratedHotDealEmailDto">
+        SELECT subject, content
+        FROM hot_deal_email_contents
+        WHERE hot_deal_id = #{hotDealId}
+    </select>
+
+    <insert id="upsertGeneratedContent">
+        MERGE INTO hot_deal_email_contents target
+        USING (
+            SELECT #{hotDealId} AS hot_deal_id, #{subject} AS subject, #{content} AS content
+            FROM dual
+        ) source
+        ON (target.hot_deal_id = source.hot_deal_id)
+        WHEN MATCHED THEN UPDATE SET
+            target.subject = source.subject,
+            target.content = source.content,
+            target.generated_at = SYSTIMESTAMP,
+            target.updated_at = SYSTIMESTAMP
+        WHEN NOT MATCHED THEN INSERT (hot_deal_id, subject, content, generated_at)
+        VALUES (source.hot_deal_id, source.subject, source.content, SYSTIMESTAMP)
+    </insert>
+
+    <update id="applyContentToSendLogs">
+        UPDATE email_send_logs
+        SET title = #{subject}, content = #{content}, updated_at = SYSTIMESTAMP
+        WHERE hot_deal_id = #{hotDealId}
+          AND status = 'PENDING'
+    </update>
+
+</mapper>

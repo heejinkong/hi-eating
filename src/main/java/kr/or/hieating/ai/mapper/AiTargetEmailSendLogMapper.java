@@ -6,7 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 @Mapper
-public interface EmailSendLogMapper {
+public interface AiTargetEmailSendLogMapper {
 
   int insertPendingLogs(
       @Param("hotDealId") long hotDealId, @Param("targets") List<TargetUserDto> targets);

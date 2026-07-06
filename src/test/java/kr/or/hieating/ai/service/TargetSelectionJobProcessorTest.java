@@ -15,8 +15,10 @@ class TargetSelectionJobProcessorTest {
   private final TargetSelectionJobMapper jobMapper = mock(TargetSelectionJobMapper.class);
   private final TargetUserSelectionAiService selectionService =
       mock(TargetUserSelectionAiService.class);
+  private final HotDealEmailGenerationService emailGenerationService =
+      mock(HotDealEmailGenerationService.class);
   private final TargetSelectionJobProcessor processor =
-      new TargetSelectionJobProcessor(jobMapper, selectionService);
+      new TargetSelectionJobProcessor(jobMapper, selectionService, emailGenerationService);
 
   @Test
   void completesClaimedJobAfterSelectionSucceeds() {
@@ -28,10 +30,25 @@ class TargetSelectionJobProcessorTest {
 
     processor.processNextJob();
 
+    verify(emailGenerationService).generateAndSave(100L);
     verify(jobMapper).markCompleted(1L, 10, 4, 4);
     verify(jobMapper, never())
         .markFailed(
             org.mockito.ArgumentMatchers.anyLong(), org.mockito.ArgumentMatchers.anyString());
+  }
+
+  @Test
+  void skipsEmailGenerationWhenNoUserIsSelected() {
+    TargetSelectionJobDto job = new TargetSelectionJobDto(3L, 300L, "PENDING", 0, 3);
+    when(jobMapper.findNextRunnableJob()).thenReturn(job);
+    when(jobMapper.claimJob(3L)).thenReturn(1);
+    when(selectionService.selectAndSaveTargets(300L))
+        .thenReturn(new TargetSelectionResult(300L, 10, 0, 0));
+
+    processor.processNextJob();
+
+    verify(emailGenerationService, never()).generateAndSave(300L);
+    verify(jobMapper).markCompleted(3L, 10, 0, 0);
   }
 
   @Test

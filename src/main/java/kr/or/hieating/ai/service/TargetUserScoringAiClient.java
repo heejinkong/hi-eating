@@ -29,7 +29,8 @@ public class TargetUserScoringAiClient {
   private final int retryCount;
 
   public TargetUserScoringAiClient(
-      @Qualifier("emailValidationChatClient") ChatClient chatClient, // 검증용 ChatClient 사용
+      // 사용자 적합도 판정은 temperature 0.2의 검증용 모델을 사용해 결과 편차를 줄인다.
+      @Qualifier("emailValidationChatClient") ChatClient chatClient,
       TargetSelectionPromptBuilder promptBuilder,
       TargetScoreResponseParser responseParser,
       AiProperties properties) {
