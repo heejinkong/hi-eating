@@ -264,7 +264,14 @@ CREATE TABLE EMAIL_SEND_LOGS
     CONSTRAINT PK_EMAIL_SEND_LOGS PRIMARY KEY (ID),
     CONSTRAINT FK_ESL_HOT_DEAL FOREIGN KEY (HOT_DEAL_ID) REFERENCES HOT_DEALS (ID),
     CONSTRAINT FK_ESL_USER FOREIGN KEY (USER_ID) REFERENCES USERS (ID),
-    CONSTRAINT CHK_ESL_STATUS CHECK (STATUS IN ('PENDING', 'SENT', 'FAILED', 'RETRYING')),
+    CONSTRAINT CHK_ESL_STATUS CHECK (STATUS IN ('PENDING',
+                                                'NEEDS_REVIEW',
+                                                'APPROVED',
+                                                'PUBLISHED',
+                                                'SENDING',
+                                                'SENT',
+                                                'RETRYING',
+                                                'FAILED')),
     CONSTRAINT CHK_ESL_RETRY CHECK (RETRY_COUNT >= 0)
 );
 

@@ -1,0 +1,503 @@
+:root {
+  --admin-email-bg: #fbfbfb;
+  --admin-email-text: #191716;
+  --admin-email-muted: #77716d;
+  --admin-email-line: #eee5df;
+  --admin-email-brand: #e05e2b;
+  --admin-email-brand-strong: #c94c1f;
+  --admin-email-brand-soft: #fff3ed;
+  --admin-email-success: #2f8f46;
+  --admin-email-success-soft: #effaf1;
+  --admin-email-warning: #b7791f;
+  --admin-email-warning-soft: #fff8e7;
+  --admin-email-danger: #d64545;
+  --admin-email-danger-soft: #fff1f1;
+}
+
+body {
+  font-family: var(--font-family-base, 'Inter', 'Noto Sans KR', sans-serif);
+  background: var(--admin-email-bg);
+  color: var(--admin-email-text);
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+.admin-email-main {
+  padding: 2.5rem;
+  width: 100%;
+}
+
+.admin-email-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.admin-email-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-bottom: 0.7rem;
+  color: var(--admin-email-brand);
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.admin-email-header h1 {
+  margin: 0 0 0.5rem;
+  font-size: 1.65rem;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
+.admin-email-header p {
+  margin: 0;
+  color: var(--admin-email-muted);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.admin-email-header-actions,
+.admin-email-editor-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.admin-email-primary-button,
+.admin-email-secondary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  min-height: 40px;
+  padding: 0 1rem;
+  border-radius: 8px;
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+
+.admin-email-primary-button {
+  border: 0;
+  background: var(--admin-email-brand);
+  color: #ffffff;
+}
+
+.admin-email-primary-button:hover,
+.admin-email-primary-button:focus-visible {
+  background: var(--admin-email-brand-strong);
+}
+
+.admin-email-secondary-button {
+  border: 1px solid var(--admin-email-line);
+  background: #ffffff;
+  color: var(--admin-email-text);
+  text-decoration: none;
+}
+
+.admin-email-secondary-button:hover,
+.admin-email-secondary-button:focus-visible {
+  border-color: #dcd3cc;
+  background: #fbfaf8;
+}
+
+.admin-email-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  width: 100%;
+}
+
+.admin-email-metric-card,
+.admin-email-card {
+  border: 1px solid var(--admin-email-line);
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.01);
+}
+
+.admin-email-metric-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.15rem;
+}
+
+.admin-email-metric-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 42px;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  font-size: 1.25rem;
+}
+
+.admin-email-metric-icon.is-success {
+  background: var(--admin-email-success-soft);
+  color: var(--admin-email-success);
+}
+
+.admin-email-metric-icon.is-warning {
+  background: var(--admin-email-warning-soft);
+  color: var(--admin-email-warning);
+}
+
+.admin-email-metric-icon.is-brand {
+  background: var(--admin-email-brand-soft);
+  color: var(--admin-email-brand);
+}
+
+.admin-email-metric-icon.is-muted {
+  background: #f4f1ef;
+  color: var(--admin-email-muted);
+}
+
+.admin-email-metric-card strong {
+  display: block;
+  margin-bottom: 0.2rem;
+  font-size: 1.35rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.admin-email-metric-card span:last-child {
+  color: var(--admin-email-muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.admin-email-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(420px, 0.65fr);
+  gap: 1.5rem;
+  width: 100%;
+  align-items: start;
+}
+
+.admin-email-card {
+  min-width: 0;
+  padding: 1.5rem;
+}
+
+.admin-email-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.admin-email-card-header h2 {
+  margin: 0 0 0.35rem;
+  color: var(--admin-email-text);
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+.admin-email-card-header p {
+  margin: 0;
+  color: var(--admin-email-muted);
+  font-size: 0.84rem;
+  font-weight: 600;
+}
+
+.admin-email-filter-group {
+  display: inline-flex;
+  gap: 0.35rem;
+  padding: 0.25rem;
+  border: 1px solid var(--admin-email-line);
+  border-radius: 10px;
+  background: #fbfaf8;
+}
+
+.admin-email-filter-group button {
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--admin-email-muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+  padding: 0.45rem 0.7rem;
+}
+
+.admin-email-filter-group button.is-active {
+  background: #ffffff;
+  color: var(--admin-email-brand);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.admin-email-table-wrap {
+  overflow-x: auto;
+}
+
+.admin-email-table {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: separate;
+  border-spacing: 0 0.55rem;
+}
+
+.admin-email-table th {
+  padding: 0 0.85rem 0.4rem;
+  color: var(--admin-email-muted);
+  font-size: 0.76rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.admin-email-table td {
+  padding: 0.85rem;
+  border-top: 1px solid var(--admin-email-line);
+  border-bottom: 1px solid var(--admin-email-line);
+  background: #ffffff;
+  color: var(--admin-email-text);
+  font-size: 0.86rem;
+  font-weight: 700;
+  vertical-align: middle;
+}
+
+.admin-email-table td:first-child {
+  border-left: 1px solid var(--admin-email-line);
+  border-radius: 10px 0 0 10px;
+}
+
+.admin-email-table td:last-child {
+  border-right: 1px solid var(--admin-email-line);
+  border-radius: 0 10px 10px 0;
+}
+
+.admin-email-table tr.is-selected td {
+  border-color: #ffd8ca;
+  background: #fffaf7;
+}
+
+.admin-email-table tbody tr {
+  cursor: pointer;
+}
+
+.admin-email-table input {
+  cursor: pointer;
+}
+
+.admin-email-table strong,
+.admin-email-table span {
+  display: block;
+}
+
+.admin-email-table td span {
+  margin-top: 0.22rem;
+  color: var(--admin-email-muted);
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.admin-email-reason {
+  color: var(--admin-email-warning) !important;
+}
+
+.admin-email-row-link {
+  display: inline-block;
+  color: inherit;
+  text-decoration: none;
+}
+
+.admin-email-row-link:hover,
+.admin-email-row-link:focus-visible {
+  color: var(--admin-email-brand);
+  outline: none;
+}
+
+.admin-email-status {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  min-height: 28px;
+  padding: 0 0.65rem;
+  border-radius: 999px;
+  font-size: 0.72rem !important;
+  font-weight: 900 !important;
+  white-space: nowrap;
+}
+
+.admin-email-status.is-warning {
+  background: var(--admin-email-warning-soft);
+  color: var(--admin-email-warning) !important;
+}
+
+.admin-email-status.is-danger {
+  background: var(--admin-email-danger-soft);
+  color: var(--admin-email-danger) !important;
+}
+
+.admin-email-status.is-success {
+  background: var(--admin-email-success-soft);
+  color: var(--admin-email-success) !important;
+}
+
+.admin-email-status.is-brand {
+  background: var(--admin-email-brand-soft);
+  color: var(--admin-email-brand) !important;
+}
+
+.admin-email-status.is-muted {
+  background: #f4f1ef;
+  color: var(--admin-email-muted) !important;
+}
+
+.admin-email-editor {
+  display: grid;
+  gap: 1rem;
+}
+
+.admin-email-editor-message {
+  margin: 0;
+  padding: 0.75rem 0.9rem;
+  border-radius: 10px;
+  background: #fbfaf8;
+  color: var(--admin-email-muted);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.admin-email-editor-message.is-success {
+  background: var(--admin-email-success-soft);
+  color: var(--admin-email-success);
+}
+
+.admin-email-editor-message.is-danger {
+  background: var(--admin-email-danger-soft);
+  color: var(--admin-email-danger);
+}
+
+.admin-email-editor label {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.admin-email-editor label > span {
+  color: var(--admin-email-muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.admin-email-editor input,
+.admin-email-editor textarea {
+  width: 100%;
+  border: 1px solid var(--admin-email-line);
+  border-radius: 10px;
+  background: #ffffff;
+  color: var(--admin-email-text);
+  font: inherit;
+  font-size: 0.86rem;
+  font-weight: 700;
+  padding: 0.8rem 0.9rem;
+}
+
+.admin-email-editor textarea {
+  resize: vertical;
+  line-height: 1.65;
+}
+
+.admin-email-editor input:focus,
+.admin-email-editor textarea:focus {
+  border-color: var(--admin-email-brand);
+  box-shadow: 0 0 0 3px rgba(224, 94, 43, 0.12);
+  outline: none;
+}
+
+.admin-email-editor input[readonly],
+.admin-email-editor textarea[readonly] {
+  background: #fbfaf8;
+}
+
+.admin-email-primary-button:disabled,
+.admin-email-secondary-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.admin-email-empty {
+  margin: 0;
+  padding: 3rem 1rem;
+  border: 1px dashed var(--admin-email-line);
+  border-radius: 12px;
+  background: #fbfaf8;
+  color: var(--admin-email-muted);
+  font-size: 0.9rem;
+  font-weight: 800;
+  text-align: center;
+}
+
+.admin-email-validation-note {
+  display: flex;
+  gap: 0.8rem;
+  padding: 1rem;
+  border-radius: 12px;
+  background: var(--admin-email-warning-soft);
+  color: var(--admin-email-warning);
+}
+
+.admin-email-validation-note i {
+  font-size: 1.15rem;
+}
+
+.admin-email-validation-note strong {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-size: 0.84rem;
+  font-weight: 900;
+}
+
+.admin-email-validation-note p {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 1.55;
+}
+
+.admin-email-editor-actions {
+  justify-content: flex-end;
+}
+
+@media (max-width: 1199.98px) {
+  .admin-email-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-email-workspace {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .admin-email-main {
+    padding: 1.5rem;
+  }
+
+  .admin-email-header,
+  .admin-email-card-header {
+    flex-direction: column;
+  }
+
+  .admin-email-header-actions,
+  .admin-email-editor-actions {
+    width: 100%;
+  }
+
+  .admin-email-primary-button,
+  .admin-email-secondary-button {
+    flex: 1 1 auto;
+  }
+
+  .admin-email-summary {
+    grid-template-columns: 1fr;
+  }
+}

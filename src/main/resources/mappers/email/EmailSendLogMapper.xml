@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.hieating.email.mapper.EmailSendLogMapper">
+
+  <resultMap id="EmailDraftResultMap" type="kr.or.hieating.email.dto.EmailDraftDto">
+    <id property="id" column="id"/>
+    <result property="hotDealId" column="hot_deal_id"/>
+    <result property="userId" column="user_id"/>
+    <result property="recipientName" column="recipient_name"/>
+    <result property="recipientEmail" column="recipient_email"/>
+    <result property="hotDealTitle" column="hot_deal_title"/>
+    <result property="subject" column="subject"/>
+    <result property="content" column="content"/>
+    <result property="validationStatus" column="validation_status"/>
+    <result property="validationReason" column="validation_reason"/>
+    <result property="sendStatus" column="send_status"/>
+    <result property="publishStatus" column="publish_status"/>
+    <result property="publishErrorMessage" column="publish_error_message"/>
+    <result property="publishedAt" column="published_at"/>
+    <result property="createdAt" column="created_at"/>
+    <result property="updatedAt" column="updated_at"/>
+  </resultMap>
+
+  <sql id="EmailDraftColumns">
+    SELECT
+      esl.id,
+      esl.hot_deal_id,
+      esl.user_id,
+      NVL(u.name, esl.recipient_email) AS recipient_name,
+      esl.recipient_email,
+      NVL(hd.title, '-') AS hot_deal_title,
+      esl.title AS subject,
+      esl.content,
+      CASE
+        WHEN esl.status = 'NEEDS_REVIEW' THEN 'FAIL'
+        WHEN esl.status IN ('APPROVED', 'PUBLISHED', 'SENDING', 'SENT', 'RETRYING') THEN 'PASS'
+        ELSE 'PENDING'
+      END AS validation_status,
+      CASE
+        WHEN esl.status = 'NEEDS_REVIEW' THEN esl.failure_reason
+        ELSE NULL
+      END AS validation_reason,
+      esl.status AS send_status,
+      CASE
+        WHEN esl.status = 'APPROVED' THEN 'READY'
+        WHEN esl.status = 'PUBLISHED' THEN 'PUBLISHED'
+        WHEN esl.status = 'SENDING' THEN 'SENDING'
+        WHEN esl.status = 'SENT' THEN 'SENT'
+        WHEN esl.status = 'RETRYING' THEN 'RETRYING'
+        WHEN esl.status = 'FAILED' THEN 'FAILED'
+        ELSE 'PENDING'
+      END AS publish_status,
+      CASE
+        WHEN esl.status = 'FAILED' THEN esl.failure_reason
+        ELSE NULL
+      END AS publish_error_message,
+      CASE
+        WHEN esl.status IN ('PUBLISHED', 'SENDING', 'SENT', 'RETRYING') THEN esl.updated_at
+        ELSE NULL
+      END AS published_at,
+      esl.created_at,
+      esl.updated_at
+    FROM email_send_logs esl
+    LEFT JOIN users u ON u.id = esl.user_id
+    LEFT JOIN hot_deals hd ON hd.id = esl.hot_deal_id
+  </sql>
+
+  <select id="findAll" resultMap="EmailDraftResultMap">
+    <include refid="EmailDraftColumns"/>
+    ORDER BY esl.created_at DESC, esl.id DESC
+  </select>
+
+  <select id="findReviewRequiredDrafts" resultMap="EmailDraftResultMap">
+    <include refid="EmailDraftColumns"/>
+    WHERE esl.status = 'NEEDS_REVIEW'
+    ORDER BY esl.created_at DESC, esl.id DESC
+  </select>
+
+  <select id="findPublishReadyDrafts" resultMap="EmailDraftResultMap">
+    <include refid="EmailDraftColumns"/>
+    WHERE esl.status = 'APPROVED'
+    ORDER BY esl.created_at ASC, esl.id ASC
+  </select>
+
+  <select id="findById" resultMap="EmailDraftResultMap">
+    <include refid="EmailDraftColumns"/>
+    WHERE esl.id = #{id}
+  </select>
+
+  <update id="updateContentAndApprove">
+    UPDATE email_send_logs
+    SET title = #{subject},
+        content = #{content},
+        status = 'APPROVED',
+        failure_reason = NULL,
+        updated_at = SYSTIMESTAMP
+    WHERE id = #{id}
+      AND status = 'NEEDS_REVIEW'
+  </update>
+
+  <update id="updateStatus">
+    UPDATE email_send_logs
+    SET status = #{status},
+        failure_reason = #{failureReason},
+        updated_at = SYSTIMESTAMP
+    WHERE id = #{id}
+  </update>
+</mapper>

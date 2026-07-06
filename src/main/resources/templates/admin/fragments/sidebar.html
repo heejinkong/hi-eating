@@ -61,7 +61,22 @@
           </a>
         </li>
 
-        <!-- 4. 관리자 계정 -->
+        <!-- 4. 이메일 관리 -->
+        <li class="nav-item">
+          <a
+            class="nav-link py-2 px-3 text-dark d-flex align-items-center gap-3"
+            href="/admin/emails"
+            th:style="${activeMenu == 'emails'} ? 'background: linear-gradient(90deg, #ff6b6b 0%, #ff8e53 100%); color: #ffffff !important; font-weight: 700; border-radius: 8px; box-shadow: 0 4px 10px rgba(255, 107, 107, 0.2);' : 'font-weight: 600; border-radius: 8px;'"
+          >
+            <i
+              class="bi bi-envelope-paper-heart"
+              th:style="${activeMenu == 'emails'} ? 'color: #ffffff !important;' : 'color: var(--text-muted);'"
+            ></i>
+            이메일 관리
+          </a>
+        </li>
+
+        <!-- 5. 관리자 계정 -->
         <li class="nav-item">
           <a
             class="nav-link py-2 px-3 text-dark d-flex align-items-center gap-3"
