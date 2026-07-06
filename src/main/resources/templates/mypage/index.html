@@ -13,12 +13,13 @@
 
         <section aria-label="마이페이지 요약" class="mypage-summary row g-2 g-lg-3 mb-5">
           <article class="col-4 col-lg-2" th:each="card : ${summaryCards}">
-            <div
+            <a
               class="summary-card h-100 d-flex flex-column align-items-center justify-content-center gap-2 border rounded-3 shadow-sm bg-white"
+              th:href="${card.href}"
             >
               <span th:text="${card.label}"></span>
               <strong th:text="${card.count}"></strong>
-            </div>
+            </a>
           </article>
 
           <article class="col-12 col-lg-6">

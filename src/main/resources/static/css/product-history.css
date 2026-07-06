@@ -1,0 +1,30 @@
+.product-history-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.product-history-link:hover,
+.product-history-link:focus-visible {
+  color: var(--color-brand, #ff4d1f);
+}
+
+.product-history-img[src$='logo-hi-eating.png'] {
+  object-fit: contain !important;
+  padding: 1.5rem;
+  background: #fff7f1;
+}
+
+.pagination {
+  --bs-pagination-active-bg: var(--color-brand, #ff4d1f);
+  --bs-pagination-active-border-color: var(--color-brand, #ff4d1f);
+  --bs-pagination-color: #5f5751;
+}
+
+.page-link {
+  display: inline-flex;
+  width: 2.375rem;
+  height: 2.375rem;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}

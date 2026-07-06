@@ -6,6 +6,8 @@ import java.util.Optional;
 import kr.or.hieating.purchase.dto.ProductPurchaseTargetDto;
 import kr.or.hieating.purchase.dto.PurchaseCreateCommand;
 import kr.or.hieating.purchase.dto.PurchaseOptionAllocationDto;
+import kr.or.hieating.purchase.dto.PurchaseProductListPageResponseDto;
+import kr.or.hieating.purchase.dto.PurchaseProductListSearchCondition;
 import kr.or.hieating.purchase.dto.PurchaseProductOptionStockDto;
 import kr.or.hieating.purchase.dto.RecentPurchaseProductDto;
 import kr.or.hieating.purchase.exception.PurchaseException;
@@ -30,6 +32,20 @@ public class PurchaseService {
     return purchaseMapper
         .findLatestPurchaseProductByUserId(userId)
         .map(this::resolveProductImageUrl);
+  }
+
+  public PurchaseProductListPageResponseDto findPurchaseProducts(
+      PurchaseProductListSearchCondition condition) {
+    int totalCount = purchaseMapper.countPurchasesByUserId(condition.getUserId());
+    int totalPages = Math.max((int) Math.ceil((double) totalCount / condition.getSize()), 1);
+    var products = purchaseMapper.findPurchaseProducts(condition);
+
+    products.forEach(
+        product ->
+            product.setPictureLocation(imageUrlResolver.resolve(product.getPictureLocation())));
+
+    return new PurchaseProductListPageResponseDto(
+        products, condition.getPage(), condition.getSize(), totalCount, totalPages);
   }
 
   private RecentPurchaseProductDto resolveProductImageUrl(RecentPurchaseProductDto product) {

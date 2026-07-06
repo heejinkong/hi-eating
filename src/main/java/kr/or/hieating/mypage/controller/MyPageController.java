@@ -151,9 +151,9 @@ public class MyPageController {
     model.addAttribute(
         "summaryCards",
         List.of(
-            Map.of("label", "주문 상품", "count", purchaseCount),
-            Map.of("label", "관심 상품", "count", favoriteCount),
-            Map.of("label", "최근 본 상품", "count", visitCount)));
+            Map.of("label", "주문 상품", "count", purchaseCount, "href", "/orders"),
+            Map.of("label", "관심 상품", "count", favoriteCount, "href", "/favorites"),
+            Map.of("label", "최근 본 상품", "count", visitCount, "href", "/visits")));
     model.addAttribute("recentPurchaseProduct", recentPurchaseProduct);
     model.addAttribute("productImageUrls", productImageUrls);
     model.addAttribute("recommendedProducts", recommendedProducts);

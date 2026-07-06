@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+  <body>
+    <section th:fragment="content" class="py-5 bg-white">
+      <div class="container-xxl">
+        <header
+          class="d-flex flex-column flex-md-row align-items-md-end justify-content-between gap-3 border-bottom pb-4 mb-4"
+        >
+          <div>
+            <p class="mb-1 small fw-bold text-danger text-uppercase">Recently Viewed</p>
+            <h1 class="mb-0 fw-bold">최근 본 상품</h1>
+            <p class="mb-0 mt-2 text-body-secondary">
+              총 <strong class="text-body" th:text="${productPage.totalCount}">0</strong>개의 상품
+            </p>
+          </div>
+          <a
+            class="btn btn-link link-secondary fw-bold p-0 text-decoration-none"
+            th:href="@{/mypage}"
+          >
+            <i class="bi bi-chevron-left" aria-hidden="true"></i>
+            마이페이지
+          </a>
+        </header>
+
+        <p
+          class="border rounded-3 py-5 px-3 text-center fw-bold text-body-secondary"
+          th:hidden="${productPage.hasProducts()}"
+        >
+          최근 본 상품이 없습니다.
+        </p>
+
+        <div
+          class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-4"
+          th:hidden="${!productPage.hasProducts()}"
+        >
+          <article class="col" th:each="product : ${productPage.products}">
+            <div class="h-100">
+              <div class="position-relative">
+                <a
+                  class="ratio ratio-1x1 d-block overflow-hidden rounded-3 bg-body-tertiary"
+                  th:href="@{/product/{id}(id=${product.productId})}"
+                >
+                  <img
+                    class="product-history-img w-100 h-100 object-fit-cover"
+                    th:src="${#strings.isEmpty(product.pictureLocation) ? '/images/logo-hi-eating.png' : product.pictureLocation}"
+                    th:alt="${product.productName}"
+                    data-fallback-src="/images/logo-hi-eating.png"
+                  />
+                </a>
+                <span
+                  class="badge text-bg-danger position-absolute top-0 start-0 m-2"
+                  th:if="${product.discountRate > 0}"
+                  th:text="|${product.discountRate}%|"
+                  >20%</span
+                >
+              </div>
+
+              <p
+                class="d-flex align-items-center gap-1 mb-1 mt-3 small fw-bold text-body-secondary"
+              >
+                <i class="bi bi-clock" aria-hidden="true"></i>
+                <span th:text="${product.formattedVisitedAt()}">2026.07.06</span>
+              </p>
+              <a
+                class="product-history-link d-block fw-bold"
+                th:href="@{/product/{id}(id=${product.productId})}"
+                th:text="${product.productName}"
+              >
+                상품명
+              </a>
+              <div class="d-flex align-items-baseline gap-2 mt-2">
+                <span
+                  class="fw-bold text-danger"
+                  th:if="${product.discountRate > 0}"
+                  th:text="|${product.discountRate}%|"
+                  >20%</span
+                >
+                <strong
+                  class="fs-5"
+                  th:text="${#numbers.formatInteger(product.salePrice != null ? product.salePrice : product.price, 0, 'COMMA')} + '원'"
+                >
+                  9,900원
+                </strong>
+              </div>
+              <del
+                class="d-block small text-body-tertiary"
+                th:if="${product.discountRate > 0}"
+                th:text="${#numbers.formatInteger(product.price, 0, 'COMMA')} + '원'"
+                >12,000원</del
+              >
+            </div>
+          </article>
+        </div>
+
+        <nav class="mt-5" th:if="${productPage.totalPages > 1}" aria-label="최근 본 상품 페이지">
+          <ul class="pagination justify-content-center gap-2 mb-0">
+            <li class="page-item" th:classappend="${!productPage.hasPreviousBlock()} ? ' disabled'">
+              <a
+                class="page-link rounded-circle"
+                aria-label="이전 페이지 구간"
+                th:href="@{/visits(page=${productPage.previousBlockPage()})}"
+              >
+                <i class="bi bi-chevron-double-left" aria-hidden="true"></i>
+              </a>
+            </li>
+            <li class="page-item" th:classappend="${!productPage.hasPrevious()} ? ' disabled'">
+              <a
+                class="page-link rounded-circle"
+                th:href="@{/visits(page=${productPage.page - 1})}"
+              >
+                <i class="bi bi-chevron-left" aria-hidden="true"></i>
+              </a>
+            </li>
+            <li
+              class="page-item"
+              th:each="pageNumber : ${#numbers.sequence(productPage.startPage(), productPage.endPage())}"
+              th:classappend="${pageNumber == productPage.page} ? ' active'"
+            >
+              <a
+                class="page-link rounded-circle"
+                th:text="${pageNumber}"
+                th:href="@{/visits(page=${pageNumber})}"
+              >
+                1
+              </a>
+            </li>
+            <li class="page-item" th:classappend="${!productPage.hasNext()} ? ' disabled'">
+              <a
+                class="page-link rounded-circle"
+                th:href="@{/visits(page=${productPage.page + 1})}"
+              >
+                <i class="bi bi-chevron-right" aria-hidden="true"></i>
+              </a>
+            </li>
+            <li class="page-item" th:classappend="${!productPage.hasNextBlock()} ? ' disabled'">
+              <a
+                class="page-link rounded-circle"
+                aria-label="다음 페이지 구간"
+                th:href="@{/visits(page=${productPage.nextBlockPage()})}"
+              >
+                <i class="bi bi-chevron-double-right" aria-hidden="true"></i>
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </section>
+  </body>
+</html>

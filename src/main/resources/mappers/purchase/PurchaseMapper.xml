@@ -56,6 +56,30 @@
     FETCH FIRST 1 ROWS ONLY
   </select>
 
+  <select id="findPurchaseProducts" resultType="kr.or.hieating.purchase.dto.PurchaseProductListItemResponseDto">
+    SELECT
+      pc.id AS purchaseId,
+      pc.product_id AS productId,
+      p.name AS productName,
+      p.status AS productStatus,
+      pc.quantity,
+      pc.purchase_price AS purchasePrice,
+      pc.created_at AS purchasedAt,
+      pp.picture_saved_location AS pictureLocation
+    FROM purchases pc
+    JOIN products p
+      ON p.id = pc.product_id
+    LEFT JOIN product_pictures pp
+      ON pp.id = (
+        SELECT MIN(pp2.id)
+        FROM product_pictures pp2
+        WHERE pp2.product_id = p.id
+      )
+    WHERE pc.user_id = #{userId}
+    ORDER BY pc.created_at DESC, pc.id DESC
+    OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
+  </select>
+
   <select id="findProductOptionsForPurchase" resultType="kr.or.hieating.purchase.dto.PurchaseProductOptionStockDto">
     SELECT
       id AS productOptionId,

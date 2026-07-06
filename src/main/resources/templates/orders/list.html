@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+  <body>
+    <section th:fragment="content" class="py-5 bg-white">
+      <div class="container-xxl">
+        <header
+          class="d-flex flex-column flex-md-row align-items-md-end justify-content-between gap-3 border-bottom pb-4 mb-4"
+        >
+          <div>
+            <p class="mb-1 small fw-bold text-danger text-uppercase">Orders</p>
+            <h1 class="mb-0 fw-bold">주문 상품</h1>
+            <p class="mb-0 mt-2 text-body-secondary">
+              총 <strong class="text-body" th:text="${productPage.totalCount}">0</strong>개의 상품
+            </p>
+          </div>
+          <a
+            class="btn btn-link link-secondary fw-bold p-0 text-decoration-none"
+            th:href="@{/mypage}"
+          >
+            <i class="bi bi-chevron-left" aria-hidden="true"></i>
+            마이페이지
+          </a>
+        </header>
+
+        <p
+          class="border rounded-3 py-5 px-3 text-center fw-bold text-body-secondary"
+          th:hidden="${productPage.hasProducts()}"
+        >
+          주문한 상품이 없습니다.
+        </p>
+
+        <div class="vstack gap-3" th:hidden="${!productPage.hasProducts()}">
+          <article
+            class="card border rounded-3 shadow-sm"
+            th:each="product : ${productPage.products}"
+          >
+            <div class="row g-0 align-items-center">
+              <div class="col-12 col-sm-3 col-lg-2 p-3">
+                <a
+                  class="ratio ratio-1x1 d-block overflow-hidden rounded-3 bg-body-tertiary"
+                  th:href="@{/product/{id}(id=${product.productId})}"
+                >
+                  <img
+                    class="product-history-img w-100 h-100 object-fit-cover"
+                    th:src="${#strings.isEmpty(product.pictureLocation) ? '/images/logo-hi-eating.png' : product.pictureLocation}"
+                    th:alt="${product.productName}"
+                    data-fallback-src="/images/logo-hi-eating.png"
+                  />
+                </a>
+              </div>
+
+              <div class="col-12 col-sm p-3 ps-sm-0">
+                <div class="d-flex flex-wrap gap-2 mb-2">
+                  <span
+                    class="badge rounded-pill text-bg-light"
+                    th:text="${product.formattedPurchasedAt()}"
+                    >2026.07.06</span
+                  >
+                  <span class="badge rounded-pill text-bg-light" th:text="${product.statusLabel()}"
+                    >판매중</span
+                  >
+                </div>
+                <a
+                  class="product-history-link d-block fw-bold fs-5"
+                  th:href="@{/product/{id}(id=${product.productId})}"
+                  th:text="${product.productName}"
+                >
+                  상품명
+                </a>
+                <dl class="d-flex flex-wrap gap-3 gap-md-4 mb-0 mt-3">
+                  <div class="d-flex align-items-baseline gap-2">
+                    <dt class="small text-body-secondary">수량</dt>
+                    <dd class="mb-0 fw-bold" th:text="${product.formattedQuantity()}">1개</dd>
+                  </div>
+                  <div class="d-flex align-items-baseline gap-2">
+                    <dt class="small text-body-secondary">결제금액</dt>
+                    <dd class="mb-0 fw-bold" th:text="${product.formattedTotalPrice()}">
+                      10,000원
+                    </dd>
+                  </div>
+                </dl>
+              </div>
+
+              <div class="col-12 col-sm-auto p-3 pt-sm-3">
+                <a
+                  class="btn btn-outline-danger fw-bold w-100"
+                  th:href="@{/review/new(purchaseId=${product.purchaseId})}"
+                >
+                  후기 작성
+                </a>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <nav class="mt-5" th:if="${productPage.totalPages > 1}" aria-label="주문 상품 페이지">
+          <ul class="pagination justify-content-center gap-2 mb-0">
+            <li class="page-item" th:classappend="${!productPage.hasPreviousBlock()} ? ' disabled'">
+              <a
+                class="page-link rounded-circle"
+                aria-label="이전 페이지 구간"
+                th:href="@{/orders(page=${productPage.previousBlockPage()})}"
+              >
+                <i class="bi bi-chevron-double-left" aria-hidden="true"></i>
+              </a>
+            </li>
+            <li class="page-item" th:classappend="${!productPage.hasPrevious()} ? ' disabled'">
+              <a
+                class="page-link rounded-circle"
+                th:href="@{/orders(page=${productPage.page - 1})}"
+              >
+                <i class="bi bi-chevron-left" aria-hidden="true"></i>
+              </a>
+            </li>
+            <li
+              class="page-item"
+              th:each="pageNumber : ${#numbers.sequence(productPage.startPage(), productPage.endPage())}"
+              th:classappend="${pageNumber == productPage.page} ? ' active'"
+            >
+              <a
+                class="page-link rounded-circle"
+                th:text="${pageNumber}"
+                th:href="@{/orders(page=${pageNumber})}"
+              >
+                1
+              </a>
+            </li>
+            <li class="page-item" th:classappend="${!productPage.hasNext()} ? ' disabled'">
+              <a
+                class="page-link rounded-circle"
+                th:href="@{/orders(page=${productPage.page + 1})}"
+              >
+                <i class="bi bi-chevron-right" aria-hidden="true"></i>
+              </a>
+            </li>
+            <li class="page-item" th:classappend="${!productPage.hasNextBlock()} ? ' disabled'">
+              <a
+                class="page-link rounded-circle"
+                aria-label="다음 페이지 구간"
+                th:href="@{/orders(page=${productPage.nextBlockPage()})}"
+              >
+                <i class="bi bi-chevron-double-right" aria-hidden="true"></i>
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </section>
+  </body>
+</html>

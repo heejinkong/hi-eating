@@ -11,6 +11,63 @@
     WHERE user_id = #{userId}
   </select>
 
+  <select id="findVisitProducts" resultType="kr.or.hieating.visit.dto.VisitProductListItemResponseDto">
+    SELECT
+      p.id AS productId,
+      p.name AS productName,
+      p.price AS price,
+      deal_stat.sale_price AS salePrice,
+      NVL(deal_stat.discount_rate, 0) AS discountRate,
+      p.view_count AS viewCount,
+      NVL(purchase_stat.total_quantity, 0) AS totalQuantity,
+      pp.picture_saved_location AS pictureLocation,
+      NVL(v.updated_at, v.created_at) AS visitedAt
+    FROM visits v
+    JOIN products p
+      ON p.id = v.product_id
+    LEFT JOIN (
+      SELECT
+        pc.product_id,
+        SUM(pc.quantity) AS total_quantity
+      FROM purchases pc
+      GROUP BY pc.product_id
+    ) purchase_stat ON purchase_stat.product_id = p.id
+    LEFT JOIN product_pictures pp
+      ON pp.id = (
+        SELECT MIN(pp2.id)
+        FROM product_pictures pp2
+        WHERE pp2.product_id = p.id
+      )
+    LEFT JOIN (
+      SELECT
+        po.product_id,
+        MIN(hp.hot_deal_price)
+          KEEP (
+            DENSE_RANK FIRST ORDER BY
+              hp.hot_deal_price ASC,
+              FLOOR((hp.original_price - hp.hot_deal_price) / NULLIF(hp.original_price, 0) * 100) DESC NULLS LAST,
+              hp.product_option_id ASC
+          ) AS sale_price,
+        MIN(FLOOR((hp.original_price - hp.hot_deal_price) / NULLIF(hp.original_price, 0) * 100))
+          KEEP (
+            DENSE_RANK FIRST ORDER BY
+              hp.hot_deal_price ASC,
+              FLOOR((hp.original_price - hp.hot_deal_price) / NULLIF(hp.original_price, 0) * 100) DESC NULLS LAST,
+              hp.product_option_id ASC
+          ) AS discount_rate
+      FROM hot_deals h
+        JOIN hot_deal_products hp ON hp.hot_deal_id = h.id
+        JOIN product_options po ON po.id = hp.product_option_id
+      WHERE h.status = 'ACTIVE'
+        AND h.deleted_at IS NULL
+        AND SYSTIMESTAMP BETWEEN h.starts_at AND h.ends_at
+      GROUP BY po.product_id
+    ) deal_stat ON deal_stat.product_id = p.id
+    WHERE v.user_id = #{userId}
+    ORDER BY NVL(v.updated_at, v.created_at) DESC, p.id DESC
+    OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
+  </select>
+
   <update id="upsertVisit">
     MERGE INTO visits v
     USING (
