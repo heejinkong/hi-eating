@@ -94,7 +94,6 @@ public class MyBatisEmailDraftRepository implements EmailDraftRepository {
   }
 
   private EmailDraftDto findRequired(Long id) {
-    return findById(id)
-        .orElseThrow(() -> new IllegalArgumentException("이메일 발송 후보를 찾을 수 없습니다."));
+    return findById(id).orElseThrow(() -> new IllegalArgumentException("이메일 발송 후보를 찾을 수 없습니다."));
   }
 }

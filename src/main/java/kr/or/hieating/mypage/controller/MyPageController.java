@@ -3,23 +3,22 @@ package kr.or.hieating.mypage.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import kr.or.hieating.auth.domain.Users;
 import kr.or.hieating.auth.mapper.AuthMapper;
 import kr.or.hieating.auth.security.HiEatingUserPrincipal;
 import kr.or.hieating.favorite.service.FavoriteService;
 import kr.or.hieating.global.apiPayload.code.status.ErrorStatus;
 import kr.or.hieating.global.apiPayload.exception.GeneralException;
-import kr.or.hieating.product.domain.Product;
 import kr.or.hieating.purchase.dto.RecentPurchaseProductDto;
 import kr.or.hieating.purchase.service.PurchaseService;
 import kr.or.hieating.utils.UserResolver;
 import kr.or.hieating.visit.service.VisitService;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -35,9 +34,10 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @RequiredArgsConstructor
 public class MyPageController {
 
+  private static final Logger log = LoggerFactory.getLogger(MyPageController.class);
   private static final DateTimeFormatter BIRTH_TEXT_FORMATTER =
       DateTimeFormatter.ofPattern("yyyy년MM월dd일");
-  private static final Set<String> EDITABLE_GENDERS = Set.of("MALE", "FEMALE");
+  private static final java.util.Set<String> EDITABLE_GENDERS = java.util.Set.of("MALE", "FEMALE");
   private final FavoriteService favoriteService;
   private final PurchaseService purchaseService;
   private final VisitService visitService;
@@ -47,102 +47,12 @@ public class MyPageController {
   @GetMapping("/mypage")
   public String myPage(Model model) {
     Long userId = userResolver.requireCurrentUserId();
-    List<Product> recommendedProducts =
-        List.of(
-            new Product(
-                1L,
-                8L,
-                "청정 목장 무항생제 우유 900ml",
-                "하루를 채워주는 산뜻한 선택",
-                3900,
-                2239,
-                "ON_SALE",
-                LocalDateTime.now().minusDays(8),
-                null),
-            new Product(
-                2L,
-                6L,
-                "[1Table] 한우 나주곰탕 400g",
-                "담백 깔끔한 맑은 국물",
-                5760,
-                831,
-                "ON_SALE",
-                LocalDateTime.now().minusDays(10),
-                null),
-            new Product(
-                3L,
-                6L,
-                "350분만에 6일 패키지 도시락",
-                "시간이 없다 싶을 때",
-                6000,
-                721,
-                "ON_SALE",
-                LocalDateTime.now().minusDays(12),
-                null),
-            new Product(
-                4L,
-                6L,
-                "느리게 우려낸 한우 우거지탕 800g",
-                "부드럽게 녹아드는 한우의 맛",
-                13000,
-                459,
-                "ON_SALE",
-                LocalDateTime.now().minusDays(15),
-                null),
-            new Product(
-                5L,
-                7L,
-                "[비비드키친] 저당 닭가슴살 샐러드 3종 125g",
-                "단백질 챙긴 가벼운 식사",
-                3900,
-                1064,
-                "ON_SALE",
-                LocalDateTime.now().minusDays(18),
-                null),
-            new Product(
-                6L,
-                8L,
-                "그릭요거트 플레인 500g",
-                "산뜻하게 채우는 아침",
-                7200,
-                642,
-                "ON_SALE",
-                LocalDateTime.now().minusDays(20),
-                null),
-            new Product(
-                7L,
-                7L,
-                "저당 프로틴 그래놀라 300g",
-                "바삭하게 챙기는 단백질",
-                8900,
-                517,
-                "ON_SALE",
-                LocalDateTime.now().minusDays(22),
-                null));
-    Set<Long> favoriteProductIds =
-        favoriteService.findFavoriteProductIds(
-            userId, recommendedProducts.stream().map(Product::id).toList());
+
     int purchaseCount = purchaseService.countPurchases(userId);
     int favoriteCount = favoriteService.countFavorites(userId);
     int visitCount = visitService.countVisits(userId);
     RecentPurchaseProductDto recentPurchaseProduct =
         purchaseService.findLatestPurchaseProduct(userId).orElse(null);
-    Map<Long, String> productImageUrls =
-        Map.of(
-            1L,
-            "https://images.unsplash.com/photo-1563636619-e9143da7973b?auto=format&fit=crop&w=320&q=80",
-            2L,
-            "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=320&q=80",
-            3L,
-            "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=320&q=80",
-            4L,
-            "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?auto=format&fit=crop&w=320&q=80",
-            5L,
-            "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=320&q=80",
-            6L,
-            "https://images.unsplash.com/photo-1488477181946-6428a0291777?auto=format&fit=crop&w=320&q=80",
-            7L,
-            "https://images.unsplash.com/photo-1517093157656-b9eccef91cb1?auto=format&fit=crop&w=320&q=80");
 
     model.addAttribute("contentTemplate", "mypage/index");
     model.addAttribute("contentFragment", "content");
@@ -155,9 +65,6 @@ public class MyPageController {
             Map.of("label", "관심 상품", "count", favoriteCount, "href", "/favorites"),
             Map.of("label", "최근 본 상품", "count", visitCount, "href", "/visits")));
     model.addAttribute("recentPurchaseProduct", recentPurchaseProduct);
-    model.addAttribute("productImageUrls", productImageUrls);
-    model.addAttribute("recommendedProducts", recommendedProducts);
-    model.addAttribute("favoriteProductIds", favoriteProductIds);
     return "layout/base";
   }
 

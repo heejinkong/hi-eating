@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.hieating.recommendation.mapper.RecommendationMapper">
+
+  <select id="findPurchasedProductIds" resultType="java.lang.Long">
+    SELECT DISTINCT product_id
+    FROM purchases
+    WHERE user_id = #{userId}
+  </select>
+
+  <select id="findFavoriteProductIds" resultType="java.lang.Long">
+    SELECT DISTINCT product_id
+    FROM favorites
+    WHERE user_id = #{userId}
+  </select>
+
+  <select id="findVisitedProductIds" resultType="java.lang.Long">
+    SELECT DISTINCT product_id
+    FROM visits
+    WHERE user_id = #{userId}
+  </select>
+
+  <select id="findHighRatedReviewProductIds" resultType="java.lang.Long">
+    SELECT DISTINCT product_id
+    FROM reviews
+    WHERE user_id = #{userId}
+      AND rating >= #{minRating}
+      AND deleted_at IS NULL
+  </select>
+
+</mapper>

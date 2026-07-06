@@ -233,6 +233,44 @@
   display: none;
 }
 
+.recommend-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 200px;
+  color: var(--color-muted, #77716d);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.recommend-loading.is-hidden {
+  display: none;
+}
+
+.recommend-loading-dots span {
+  animation: blink 1.4s infinite both;
+}
+
+.recommend-loading-dots span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.recommend-loading-dots span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes blink {
+  0%,
+  80%,
+  100% {
+    opacity: 0;
+  }
+  40% {
+    opacity: 1;
+  }
+}
+
 .recommend-card {
   flex: 0 0 calc((100% - 48px) / 5);
   min-width: 0;

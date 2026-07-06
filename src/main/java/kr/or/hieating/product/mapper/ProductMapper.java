@@ -2,6 +2,7 @@ package kr.or.hieating.product.mapper;
 
 import java.util.List;
 import java.util.Optional;
+import kr.or.hieating.product.domain.Product;
 import kr.or.hieating.product.domain.ProductOption;
 import kr.or.hieating.product.dto.MostPurchasedProductResponseDto;
 import kr.or.hieating.product.dto.ProductDetailRowDto;
@@ -24,4 +25,10 @@ public interface ProductMapper {
   List<ProductListItemResponseDto> findProductsByCategory(ProductListSearchCondition condition);
 
   int countProductsByCategory(ProductListSearchCondition condition);
+
+  Optional<Product> findById(@Param("productId") Long productId);
+
+  Optional<Product> findByIdIgnoreStatus(@Param("productId") Long productId);
+
+  List<Product> findAllActiveProducts();
 }

@@ -221,4 +221,51 @@
     SELECT COUNT(*)
     <include refid="productListBase" />
   </select>
+
+  <select id="findById" resultType="Product">
+    SELECT
+      p.id,
+      p.category_id AS categoryId,
+      p.name,
+      p.description,
+      p.price,
+      p.view_count AS viewCount,
+      p.status,
+      p.created_at AS createdAt,
+      p.updated_at AS updatedAt
+    FROM products p
+    WHERE p.id = #{productId}
+      AND p.status = 'ON_SALE'
+  </select>
+
+  <select id="findByIdIgnoreStatus" resultType="Product">
+    SELECT
+      p.id,
+      p.category_id AS categoryId,
+      p.name,
+      p.description,
+      p.price,
+      p.view_count AS viewCount,
+      p.status,
+      p.created_at AS createdAt,
+      p.updated_at AS updatedAt
+    FROM products p
+    WHERE p.id = #{productId}
+  </select>
+
+  <select id="findAllActiveProducts" resultType="Product">
+    SELECT
+      p.id,
+      p.category_id AS categoryId,
+      p.name,
+      p.description,
+      p.price,
+      p.view_count AS viewCount,
+      p.status,
+      p.created_at AS createdAt,
+      p.updated_at AS updatedAt
+    FROM products p
+    WHERE p.status = 'ON_SALE'
+    ORDER BY p.id ASC
+  </select>
 </mapper>
