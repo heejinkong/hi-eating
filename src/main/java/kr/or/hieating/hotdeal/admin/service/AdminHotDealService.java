@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import kr.or.hieating.ai.service.TargetSelectionJobRegistrar;
 import kr.or.hieating.global.apiPayload.code.status.ErrorStatus;
 import kr.or.hieating.global.apiPayload.exception.GeneralException;
 import kr.or.hieating.hotdeal.admin.dto.HotDealCreateRequestDTO;
@@ -16,6 +17,7 @@ import kr.or.hieating.hotdeal.domain.HotDealProducts;
 import kr.or.hieating.hotdeal.domain.HotDeals;
 import kr.or.hieating.utils.UserResolver;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +28,10 @@ public class AdminHotDealService {
 
   private final AdminHotDealMapper adminHotDealMapper;
   private final UserResolver userResolver;
+
+  // AI 비활성화 시에도 핫딜 등록이 가능하도록 선택적으로 Bean을 조회한다.
+  // AI 활성화 시에는 핫딜과 Job을 같은 트랜잭션에 저장해 Job 유실을 방지한다.
+  private final ObjectProvider<TargetSelectionJobRegistrar> targetSelectionJobRegistrar;
 
   @Transactional
   public List<HotDealResponseDTO> getExistingHotDeals() {
@@ -88,6 +94,8 @@ public class AdminHotDealService {
       adminHotDealMapper.insertHotDealProduct(child);
     }
 
+    // 원격 AI 호출은 Scheduler가 수행하며, 여기서는 처리할 DB Job만 등록한다.
+    targetSelectionJobRegistrar.ifAvailable(registrar -> registrar.register(hotDealId));
     return hotDealId;
   }
 

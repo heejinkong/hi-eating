@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.hieating.ai.mapper.TargetSelectionJobMapper">
+
+    <insert id="insertPendingJob">
+        INSERT INTO ai_target_selection_jobs (
+            hot_deal_id,
+            status,
+            max_retry_count
+        )
+        SELECT
+            #{hotDealId},
+            'PENDING',
+            #{maxRetryCount}
+        FROM dual
+        WHERE NOT EXISTS (
+            SELECT 1
+            FROM ai_target_selection_jobs
+            WHERE hot_deal_id = #{hotDealId}
+        )
+    </insert>
+
+    <select id="findNextRunnableJob" resultType="kr.or.hieating.ai.dto.TargetSelectionJobDto">
+        SELECT id, hot_deal_id AS hotDealId, status, retry_count AS retryCount,
+               max_retry_count AS maxRetryCount
+        FROM (
+            SELECT id, hot_deal_id, status, retry_count, max_retry_count
+            FROM ai_target_selection_jobs
+            WHERE status = 'PENDING'
+               OR (
+                    status = 'RETRY_WAIT'
+                    AND (next_retry_at IS NULL OR next_retry_at &lt;= SYSTIMESTAMP)
+               )
+            ORDER BY created_at, id
+        )
+        WHERE ROWNUM = 1
+    </select>
+
+    <select id="findJobByHotDealId" resultType="kr.or.hieating.ai.dto.TargetSelectionJobDto">
+        SELECT id, hot_deal_id AS hotDealId, status, retry_count AS retryCount,
+               max_retry_count AS maxRetryCount
+        FROM ai_target_selection_jobs
+        WHERE hot_deal_id = #{hotDealId}
+    </select>
+
+    <update id="claimJob">
+        UPDATE ai_target_selection_jobs
+        SET status = 'PROCESSING',
+            started_at = SYSTIMESTAMP,
+            failure_reason = NULL,
+            next_retry_at = NULL,
+            updated_at = SYSTIMESTAMP
+        WHERE id = #{jobId}
+          AND (
+              status = 'PENDING'
+              OR (
+                  status = 'RETRY_WAIT'
+                  AND (next_retry_at IS NULL OR next_retry_at &lt;= SYSTIMESTAMP)
+              )
+          )
+    </update>
+
+    <update id="markCompleted">
+        UPDATE ai_target_selection_jobs
+        SET status = 'COMPLETED',
+            candidate_count = #{candidateCount},
+            selected_count = #{selectedCount},
+            inserted_count = #{insertedCount},
+            completed_at = SYSTIMESTAMP,
+            failure_reason = NULL,
+            next_retry_at = NULL,
+            updated_at = SYSTIMESTAMP
+        WHERE id = #{jobId}
+          AND status = 'PROCESSING'
+    </update>
+
+    <update id="markFailed">
+        UPDATE ai_target_selection_jobs
+        SET retry_count = retry_count + 1,
+            status = CASE
+                WHEN retry_count + 1 &lt;= max_retry_count THEN 'RETRY_WAIT'
+                ELSE 'FAILED'
+            END,
+            next_retry_at = CASE
+                WHEN retry_count + 1 &lt;= max_retry_count
+                THEN SYSTIMESTAMP
+                     + NUMTODSINTERVAL(
+                         LEAST(30 * POWER(2, retry_count), 600),
+                         'SECOND'
+                     )
+                ELSE NULL
+            END,
+            failure_reason = #{failureReason},
+            updated_at = SYSTIMESTAMP
+        WHERE id = #{jobId}
+          AND status = 'PROCESSING'
+    </update>
+
+    <update id="recoverInterruptedJobs">
+        UPDATE ai_target_selection_jobs
+        SET status = CASE
+                WHEN retry_count + 1 &lt;= max_retry_count THEN 'RETRY_WAIT'
+                ELSE 'FAILED'
+            END,
+            retry_count = retry_count + 1,
+            next_retry_at = CASE
+                WHEN retry_count + 1 &lt;= max_retry_count THEN SYSTIMESTAMP
+                ELSE NULL
+            END,
+            failure_reason = '애플리케이션 재시작으로 중단된 작업',
+            updated_at = SYSTIMESTAMP
+        WHERE status = 'PROCESSING'
+          AND (
+              started_at IS NULL
+              OR started_at &lt;= SYSTIMESTAMP - NUMTODSINTERVAL(10, 'MINUTE')
+          )
+    </update>
+
+</mapper>

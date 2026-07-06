@@ -23,7 +23,8 @@ class AiConfigTest {
                 "validation-model",
                 0.2,
                 Duration.ofSeconds(3),
-                Duration.ofSeconds(120)));
+                Duration.ofSeconds(120)),
+            new AiProperties.TargetSelection(80, 30, 6, 1, 3));
     AiConfig config = new AiConfig();
 
     ChatClient generationClient = config.emailGenerationChatClient(properties);

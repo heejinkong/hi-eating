@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.hieating.ai.mapper.TargetSelectionHistoryMapper">
+
+    <insert id="upsertEvaluations">
+        MERGE INTO hot_deal_target_selections target
+        USING (
+            <foreach collection="evaluations" item="evaluation" separator=" UNION ALL ">
+                SELECT
+                    #{hotDealId} AS hot_deal_id,
+                    #{evaluation.userId} AS user_id,
+                    #{evaluation.score} AS ai_score,
+                    #{evaluation.reason} AS selection_reason,
+                    #{evaluation.decision} AS decision
+                FROM dual
+            </foreach>
+        ) source
+        ON (
+            target.hot_deal_id = source.hot_deal_id
+            AND target.user_id = source.user_id
+        )
+        WHEN MATCHED THEN UPDATE SET
+            target.ai_score = source.ai_score,
+            target.selection_reason = source.selection_reason,
+            target.decision = source.decision,
+            target.evaluated_at = SYSTIMESTAMP,
+            target.updated_at = SYSTIMESTAMP
+        WHEN NOT MATCHED THEN INSERT (
+            hot_deal_id,
+            user_id,
+            ai_score,
+            selection_reason,
+            decision,
+            evaluated_at
+        ) VALUES (
+            source.hot_deal_id,
+            source.user_id,
+            source.ai_score,
+            source.selection_reason,
+            source.decision,
+            SYSTIMESTAMP
+        )
+    </insert>
+
+</mapper>

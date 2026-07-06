@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.hieating.ai.mapper.EmailSendLogMapper">
+
+    <insert id="insertPendingLogs">
+        INSERT INTO email_send_logs (
+            hot_deal_id,
+            user_id,
+            recipient_email,
+            title,
+            content,
+            status,
+            retry_count
+        )
+        SELECT
+            #{hotDealId},
+            target.user_id,
+            target.recipient_email,
+            'PENDING_TITLE',
+            NULL,
+            'PENDING',
+            0
+        FROM (
+            <foreach collection="targets" item="target" separator=" UNION ALL ">
+                SELECT
+                    #{target.userId} AS user_id,
+                    #{target.email} AS recipient_email
+                FROM dual
+            </foreach>
+        ) target
+        WHERE NOT EXISTS (
+            SELECT 1
+            FROM email_send_logs existing
+            WHERE existing.hot_deal_id = #{hotDealId}
+              AND existing.user_id = target.user_id
+        )
+    </insert>
+
+</mapper>

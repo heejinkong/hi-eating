@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.hieating.ai.mapper.HotDealTargetMapper">
+
+    <select id="findCategoryIdsByHotDealId" resultType="long">
+        SELECT DISTINCT p.category_id
+        FROM hot_deal_products hdp
+        INNER JOIN product_options po ON po.id = hdp.product_option_id
+        INNER JOIN products p ON p.id = po.product_id
+        WHERE hdp.hot_deal_id = #{hotDealId}
+        ORDER BY p.category_id
+    </select>
+
+    <select id="findCandidateUserIds" resultType="long">
+        SELECT u.id
+        FROM users u
+        WHERE u.deleted_at IS NULL
+          AND (
+            EXISTS (
+                SELECT 1
+                FROM purchases pu
+                INNER JOIN products p ON p.id = pu.product_id
+                WHERE pu.user_id = u.id
+                  AND pu.created_at &gt;= ADD_MONTHS(SYSTIMESTAMP, -#{recentMonths})
+                  AND p.category_id IN
+                  <foreach collection="categoryIds" item="categoryId" open="(" separator="," close=")">
+                      #{categoryId}
+                  </foreach>
+            )
+            OR EXISTS (
+                SELECT 1
+                FROM reviews r
+                INNER JOIN products p ON p.id = r.product_id
+                WHERE r.user_id = u.id
+                  AND r.deleted_at IS NULL
+                  AND r.created_at &gt;= ADD_MONTHS(SYSTIMESTAMP, -#{recentMonths})
+                  AND p.category_id IN
+                  <foreach collection="categoryIds" item="categoryId" open="(" separator="," close=")">
+                      #{categoryId}
+                  </foreach>
+            )
+            OR EXISTS (
+                SELECT 1
+                FROM favorites f
+                INNER JOIN products p ON p.id = f.product_id
+                WHERE f.user_id = u.id
+                  AND p.category_id IN
+                  <foreach collection="categoryIds" item="categoryId" open="(" separator="," close=")">
+                      #{categoryId}
+                  </foreach>
+            )
+          )
+        ORDER BY u.id
+    </select>
+
+    <select id="findUserProfilesByIds" resultType="kr.or.hieating.ai.dto.UserProfileRow">
+        SELECT
+            u.id AS userId,
+            u.email,
+            u.gender,
+            u.birth,
+            (
+                SELECT LISTAGG(DISTINCT c.name, ',') WITHIN GROUP (ORDER BY c.name)
+                FROM purchases pu
+                INNER JOIN products p ON p.id = pu.product_id
+                INNER JOIN categories c ON c.id = p.category_id
+                WHERE pu.user_id = u.id
+                  AND pu.created_at &gt;= ADD_MONTHS(SYSTIMESTAMP, -#{recentMonths})
+            ) AS purchaseCategories,
+            (
+                SELECT COUNT(*)
+                FROM purchases pu
+                INNER JOIN products p ON p.id = pu.product_id
+                WHERE pu.user_id = u.id
+                  AND pu.created_at &gt;= ADD_MONTHS(SYSTIMESTAMP, -#{recentMonths})
+                  AND p.category_id IN
+                  <foreach collection="categoryIds" item="categoryId" open="(" separator="," close=")">
+                      #{categoryId}
+                  </foreach>
+            ) AS purchaseCount,
+            (
+                SELECT LISTAGG(DISTINCT c.name, ',') WITHIN GROUP (ORDER BY c.name)
+                FROM reviews r
+                INNER JOIN products p ON p.id = r.product_id
+                INNER JOIN categories c ON c.id = p.category_id
+                WHERE r.user_id = u.id
+                  AND r.deleted_at IS NULL
+                  AND r.created_at &gt;= ADD_MONTHS(SYSTIMESTAMP, -#{recentMonths})
+            ) AS reviewCategories,
+            (
+                SELECT COUNT(*)
+                FROM reviews r
+                WHERE r.user_id = u.id
+                  AND r.deleted_at IS NULL
+                  AND r.created_at &gt;= ADD_MONTHS(SYSTIMESTAMP, -#{recentMonths})
+            ) AS reviewCount,
+            (
+                SELECT LISTAGG(DISTINCT c.name, ',') WITHIN GROUP (ORDER BY c.name)
+                FROM favorites f
+                INNER JOIN products p ON p.id = f.product_id
+                INNER JOIN categories c ON c.id = p.category_id
+                WHERE f.user_id = u.id
+            ) AS favoriteCategories,
+            (
+                SELECT COUNT(*)
+                FROM favorites f
+                WHERE f.user_id = u.id
+            ) AS favoriteCount,
+            (
+                SELECT AVG(r.rating)
+                FROM reviews r
+                WHERE r.user_id = u.id
+                  AND r.deleted_at IS NULL
+                  AND r.created_at &gt;= ADD_MONTHS(SYSTIMESTAMP, -#{recentMonths})
+            ) AS averageRating
+        FROM users u
+        WHERE u.deleted_at IS NULL
+          AND u.id IN
+          <foreach collection="userIds" item="userId" open="(" separator="," close=")">
+              #{userId}
+          </foreach>
+        ORDER BY u.id
+    </select>
+
+    <select id="findHotDealInfo" resultType="kr.or.hieating.ai.dto.HotDealInfoRow">
+        SELECT
+            h.id AS hotDealId,
+            h.title,
+            h.description,
+            (
+                SELECT LISTAGG(DISTINCT c.name, ',') WITHIN GROUP (ORDER BY c.name)
+                FROM hot_deal_products hdp
+                INNER JOIN product_options po ON po.id = hdp.product_option_id
+                INNER JOIN products p ON p.id = po.product_id
+                INNER JOIN categories c ON c.id = p.category_id
+                WHERE hdp.hot_deal_id = h.id
+            ) AS categoryNames
+        FROM hot_deals h
+        WHERE h.id = #{hotDealId}
+          AND h.deleted_at IS NULL
+    </select>
+
+    <select id="findHotDealProducts" resultType="kr.or.hieating.ai.dto.HotDealProductInfoDto">
+        SELECT
+            p.name AS productName,
+            hdp.original_price AS originalPrice,
+            hdp.hot_deal_price AS hotDealPrice
+        FROM hot_deal_products hdp
+        INNER JOIN product_options po ON po.id = hdp.product_option_id
+        INNER JOIN products p ON p.id = po.product_id
+        WHERE hdp.hot_deal_id = #{hotDealId}
+        ORDER BY p.name, hdp.product_option_id
+    </select>
+
+</mapper>
