@@ -92,11 +92,20 @@
         WHERE hot_deal_id = #{hotDealId}
     </select>
 
-    <select id="countSendLogsByStatus" resultType="int">
+    <select id="countSendLogsByValidationOutcome" resultType="int">
         SELECT COUNT(*)
         FROM email_send_logs
         WHERE hot_deal_id = #{hotDealId}
-          AND status = #{status}
+          AND (
+              (
+                  #{validationStatus} = 'PASS'
+                  AND status IN ('APPROVED', 'PUBLISHED', 'SENDING', 'SENT', 'RETRYING', 'FAILED')
+              )
+              OR (
+                  #{validationStatus} = 'FAIL'
+                  AND status = 'NEEDS_REVIEW'
+              )
+          )
     </select>
 
 </mapper>

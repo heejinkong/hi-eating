@@ -33,7 +33,6 @@ public class HotDealEmailPersistenceService {
   @Transactional
   public int applyValidation(long hotDealId, EmailQualityValidationResult result) {
     String status = result.isPass() ? "PASS" : "FAIL";
-    String sendLogStatus = result.isPass() ? "APPROVED" : "NEEDS_REVIEW";
     String reason = result.reason();
     if (contentMapper.updateValidationResult(hotDealId, status, reason) != 1) {
       throw new IllegalStateException("검증 결과를 저장할 이메일 콘텐츠가 없습니다. hotDealId=" + hotDealId);
@@ -41,11 +40,11 @@ public class HotDealEmailPersistenceService {
     contentMapper.applyValidationToSendLogs(hotDealId, status, reason);
 
     int totalCount = contentMapper.countSendLogs(hotDealId);
-    int appliedCount = contentMapper.countSendLogsByStatus(hotDealId, sendLogStatus);
+    int appliedCount = contentMapper.countSendLogsByValidationOutcome(hotDealId, status);
     if (totalCount == 0 || appliedCount != totalCount) {
       throw new IllegalStateException(
-          "이메일 검증 결과가 발송 로그 전체에 반영되지 않았습니다. hotDealId=%d, expectedStatus=%s, applied=%d, total=%d"
-              .formatted(hotDealId, sendLogStatus, appliedCount, totalCount));
+          "이메일 검증 결과가 발송 로그 전체에 반영되지 않았습니다. hotDealId=%d, expectedValidation=%s, applied=%d, total=%d"
+              .formatted(hotDealId, status, appliedCount, totalCount));
     }
     return appliedCount;
   }
