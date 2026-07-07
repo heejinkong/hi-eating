@@ -58,6 +58,10 @@ public class AuthController {
     model.addAttribute("contentTemplate", contentTemplate);
     model.addAttribute("contentFragment", "content");
     model.addAttribute("pageStylesheet", "auth");
+    // 로그인 페이지에 마스코트 JS 추가
+    if ("auth/login".equals(contentTemplate)) {
+      model.addAttribute("pageScript", "auth-login");
+    }
   }
 
   private void setSignupPage(Model model) {

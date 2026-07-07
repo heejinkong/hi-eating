@@ -13,6 +13,224 @@
   max-width: 560px;
 }
 
+.auth-login-shell {
+  width: min(1080px, 100%);
+  margin: 0 auto;
+}
+
+.auth-login-visual {
+  display: none;
+}
+
+/* 로그인 페이지 Lottie 마스코트 컨테이너 */
+/* 이 파일은 1440x2560 캔버스에 고양이 3마리가 세로 배열 → 첫 번째만 클리핑 */
+.auth-mascot-lottie {
+  width: 100%;
+  height: 280px;
+  overflow: hidden;
+  transition:
+    filter 0.4s ease,
+    transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform-origin: bottom center;
+}
+
+.auth-mascot-lottie svg {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* idle: 살랑살랑 */
+[data-mascot-state='idle'].auth-mascot-lottie {
+  animation: mascot-idle 3s ease-in-out infinite;
+}
+
+/* curious: 고개 갸웃 (아이디) */
+[data-mascot-state='curious'].auth-mascot-lottie {
+  animation: mascot-curious 2s ease-in-out infinite;
+  filter: drop-shadow(0 8px 20px rgba(60, 120, 255, 0.3));
+}
+
+/* covering: 아래로 숨기 (비밀번호) */
+[data-mascot-state='covering'].auth-mascot-lottie {
+  animation: mascot-covering 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  filter: drop-shadow(0 4px 12px rgba(180, 40, 80, 0.25));
+}
+
+.auth-signup-shell {
+  width: min(1240px, 100%);
+  margin: 0 auto;
+}
+
+.auth-signup-mascot {
+  display: none;
+}
+
+/* Lottie 컨테이너 기본 크기 (미디어쿼리 외부 기본값) */
+/* 파일이 1440x2560이라 첫 번째 고양이만 보이도록 클리핑 */
+.mascot-lottie-wrap {
+  width: 100%;
+  height: 300px;
+  overflow: hidden;
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.mascot-lottie-player {
+  width: 100%;
+  height: 280px;
+  overflow: hidden;
+  transition:
+    filter 0.4s ease,
+    transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform-origin: bottom center;
+}
+
+/* SVG 비율 유지: height는 100%로 컨테이너에 맞게 전체 압축 */
+.mascot-lottie-player svg {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* ── 상태별 keyframes ── */
+
+/* idle: 살랑살랑 호흡 */
+@keyframes mascot-idle {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-12px);
+  }
+  70% {
+    transform: translateY(-6px);
+  }
+}
+
+/* greeting: 신나는 바운스 + 좌우 흔들기 */
+@keyframes mascot-greeting {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  10% {
+    transform: translateY(-18px) rotate(-12deg);
+  }
+  25% {
+    transform: translateY(-8px) rotate(14deg);
+  }
+  40% {
+    transform: translateY(-22px) rotate(-10deg);
+  }
+  55% {
+    transform: translateY(-10px) rotate(12deg);
+  }
+  70% {
+    transform: translateY(-20px) rotate(-8deg);
+  }
+  85% {
+    transform: translateY(-6px) rotate(6deg);
+  }
+}
+
+/* curious: 오른쪽으로 기울어지며 한동안 홀드 */
+@keyframes mascot-curious {
+  0%,
+  100% {
+    transform: rotate(0deg) translateY(0);
+  }
+  20%,
+  60% {
+    transform: rotate(18deg) translateY(-8px);
+  }
+  80% {
+    transform: rotate(10deg) translateY(-4px);
+  }
+}
+
+/* covering: 아래로 슬라이드해서 완전히 숨기기 (overflow:hidden으로 클리핑) */
+@keyframes mascot-covering {
+  0% {
+    transform: translateY(0);
+  }
+  30% {
+    transform: translateY(120px);
+  }
+  100% {
+    transform: translateY(110px);
+  }
+}
+
+/* peeking: 조금만 내려가서 살짝 보이기 + 기웃 */
+@keyframes mascot-peeking {
+  0%,
+  100% {
+    transform: translateY(55px) rotate(0deg);
+  }
+  30% {
+    transform: translateY(40px) rotate(7deg);
+  }
+  65% {
+    transform: translateY(50px) rotate(-4deg);
+  }
+}
+
+/* thinking: 왼쪽으로 느리게 기울며 고민 */
+@keyframes mascot-thinking {
+  0%,
+  100% {
+    transform: rotate(0deg) translateY(0);
+  }
+  30%,
+  65% {
+    transform: rotate(-16deg) translateY(-5px);
+  }
+}
+
+/* ── 상태별 플레이어 스타일 ── */
+
+/* idle */
+[data-mascot-state='idle'] .mascot-lottie-player {
+  animation: mascot-idle 3s ease-in-out infinite;
+}
+
+/* greeting */
+[data-mascot-state='greeting'] .mascot-lottie-player {
+  animation: mascot-greeting 0.9s ease-in-out infinite;
+  filter: drop-shadow(0 10px 20px rgba(255, 160, 40, 0.4));
+}
+
+/* curious */
+[data-mascot-state='curious'] .mascot-lottie-player {
+  animation: mascot-curious 2.5s ease-in-out infinite;
+  filter: drop-shadow(0 8px 18px rgba(60, 120, 255, 0.32));
+}
+
+/* covering */
+[data-mascot-state='covering'] .mascot-lottie-wrap {
+  overflow: hidden;
+}
+[data-mascot-state='covering'] .mascot-lottie-player {
+  animation: mascot-covering 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  filter: drop-shadow(0 4px 14px rgba(180, 40, 80, 0.3));
+}
+
+/* peeking */
+[data-mascot-state='peeking'] .mascot-lottie-wrap {
+  overflow: hidden;
+}
+[data-mascot-state='peeking'] .mascot-lottie-player {
+  animation: mascot-peeking 2s ease-in-out infinite;
+  filter: drop-shadow(0 4px 14px rgba(100, 60, 200, 0.3));
+}
+
+/* thinking */
+[data-mascot-state='thinking'] .mascot-lottie-player {
+  animation: mascot-thinking 2.5s ease-in-out infinite;
+  filter: drop-shadow(0 8px 16px rgba(40, 180, 120, 0.28));
+}
+
 .auth-panel-wide {
   max-width: 920px;
 }
@@ -100,11 +318,13 @@
 .auth-check,
 .auth-radio {
   display: inline-flex;
+  flex: 0 0 auto;
   align-items: center;
   gap: 10px;
   color: #30343a;
   font-size: 18px;
   font-weight: 700;
+  white-space: nowrap;
   cursor: pointer;
 }
 
@@ -124,6 +344,7 @@
 .auth-check span,
 .auth-radio span {
   display: inline-grid;
+  flex: 0 0 28px;
   place-items: center;
   width: 28px;
   height: 28px;
@@ -147,6 +368,14 @@
   border-radius: 50%;
   background: #ffffff;
   content: '';
+}
+
+.auth-radio-text {
+  display: inline-block;
+  min-width: 2.2em;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
 }
 
 .auth-check input:checked + span,
@@ -379,6 +608,144 @@ fieldset.signup-row .signup-label {
 .auth-modal-button:hover,
 .auth-modal-button:focus-visible {
   background: var(--color-brand-strong);
+}
+
+@media (min-width: 992px) {
+  .auth-login-page {
+    padding-top: 64px;
+  }
+
+  .auth-login-shell {
+    display: grid;
+    grid-template-columns: minmax(380px, 500px) minmax(360px, 1fr);
+    gap: clamp(52px, 7vw, 104px);
+    align-items: center;
+  }
+
+  .auth-login-page .auth-panel-narrow {
+    max-width: none;
+  }
+
+  .auth-login-page .auth-title-block {
+    margin-bottom: 52px;
+    text-align: left;
+  }
+
+  .auth-login-page .auth-title-block p {
+    max-width: 360px;
+  }
+
+  .auth-login-visual {
+    display: flex;
+    min-height: 560px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 18px 0 0;
+  }
+
+  .auth-mascot-message {
+    align-self: flex-start;
+    margin: 0 0 14px 28px;
+    color: #31261f;
+  }
+
+  .auth-mascot-message span {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--color-brand);
+    font-size: 14px;
+    font-weight: 900;
+  }
+
+  .auth-mascot-message strong {
+    display: block;
+    font-size: 28px;
+    font-weight: 900;
+    line-height: 1.25;
+  }
+
+  .auth-mascot-image {
+    display: block;
+    width: min(430px, 92%);
+    height: auto;
+  }
+}
+
+@media (min-width: 1200px) {
+  .auth-signup-page {
+    padding-top: 56px;
+  }
+
+  .auth-signup-page .auth-panel-wide {
+    max-width: none;
+  }
+
+  .auth-signup-shell {
+    display: grid;
+    grid-template-columns: minmax(760px, 900px) minmax(250px, 300px);
+    gap: clamp(28px, 4vw, 56px);
+    align-items: start;
+  }
+
+  /* 마스코트: 스크롤해도 중앙에 고정 */
+  .auth-signup-mascot {
+    position: sticky;
+    top: calc(var(--header-sticky-offset, 0px) + 24px);
+    align-self: flex-start;
+    display: block;
+    padding-top: 70px;
+  }
+
+  .auth-signup-mascot-message {
+    position: relative;
+    z-index: 2;
+    margin: 0 0 10px;
+    color: #31261f;
+    text-align: center;
+  }
+
+  .auth-signup-mascot-message span {
+    display: block;
+    margin-bottom: 7px;
+    color: var(--color-brand);
+    font-size: 13px;
+    font-weight: 900;
+  }
+
+  .auth-signup-mascot-message strong {
+    display: block;
+    min-height: 52px;
+    font-size: 22px;
+    font-weight: 900;
+    line-height: 1.28;
+  }
+
+  .auth-signup-mascot-figure {
+    position: relative;
+    width: min(280px, 100%);
+    margin: 0 auto;
+  }
+
+  /* PNG 이미지는 숨기고 Lottie가 메인 캐릭터 역할 */
+  .auth-signup-mascot-image {
+    display: none;
+  }
+
+  /* Lottie 래퍼: 피겨 영역 전체 사용 */
+  .mascot-lottie-wrap {
+    position: relative;
+    width: 100%;
+    height: 280px;
+    filter: drop-shadow(0 22px 24px rgba(89, 52, 28, 0.13));
+    transition: filter 300ms ease;
+  }
+
+  .mascot-lottie-player {
+    display: block;
+    width: 100%;
+    height: 280px;
+  }
 }
 
 @media (max-width: 768px) {

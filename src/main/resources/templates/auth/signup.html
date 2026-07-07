@@ -2,213 +2,228 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
   <body>
     <section class="auth-page auth-signup-page" th:fragment="content">
-      <div class="auth-panel auth-panel-wide">
-        <h1 class="auth-section-title">회원 가입!</h1>
+      <div class="auth-signup-shell">
+        <div class="auth-panel auth-panel-wide">
+          <h1 class="auth-section-title">회원 가입</h1>
 
-        <form class="signup-form" th:action="@{/signup}" method="post">
-          <p
-            class="auth-alert auth-alert-danger"
-            th:if="${signupError != null}"
-            th:text="${signupError}"
-          >
-            회원가입 정보를 확인해 주세요.
-          </p>
+          <form class="signup-form" th:action="@{/signup}" method="post">
+            <p
+              class="auth-alert auth-alert-danger"
+              th:if="${signupError != null}"
+              th:text="${signupError}"
+            >
+              회원가입 정보를 확인해 주세요.
+            </p>
 
-          <div class="signup-row">
-            <label class="signup-label" for="signup-name">이름</label>
-            <div class="signup-control">
-              <input
-                class="auth-input"
-                id="signup-name"
-                name="name"
-                type="text"
-                autocomplete="name"
-                placeholder="이름을 입력해주세요"
-                th:value="${signupRequest != null ? signupRequest.name : ''}"
-                required
-              />
-              <p class="signup-help">* 한글은 10자, 영문은 20자 이내로 입력해 주세요</p>
-            </div>
-          </div>
-
-          <div class="signup-row">
-            <label class="signup-label" for="signup-email-local">이메일</label>
-            <div class="signup-control">
-              <div class="signup-email-line">
-                <input
-                  class="auth-input signup-email-local"
-                  id="signup-email-local"
-                  name="emailLocal"
-                  type="text"
-                  autocomplete="email"
-                  placeholder="이메일"
-                  th:value="${signupRequest != null ? signupRequest.emailLocal : ''}"
-                  required
-                />
-                <span class="signup-at">@</span>
-                <select
-                  class="auth-input signup-email-domain"
-                  id="signup-email-domain"
-                  name="emailDomain"
-                  aria-label="이메일 도메인"
-                >
-                  <option value="">직접입력</option>
-                  <option
-                    value="gmail.com"
-                    th:selected="${signupRequest != null && signupRequest.emailDomain == 'gmail.com'}"
-                  >
-                    gmail.com
-                  </option>
-                  <option
-                    value="naver.com"
-                    th:selected="${signupRequest != null && signupRequest.emailDomain == 'naver.com'}"
-                  >
-                    naver.com
-                  </option>
-                  <option
-                    value="daum.net"
-                    th:selected="${signupRequest != null && signupRequest.emailDomain == 'daum.net'}"
-                  >
-                    daum.net
-                  </option>
-                  <option
-                    value="kakao.com"
-                    th:selected="${signupRequest != null && signupRequest.emailDomain == 'kakao.com'}"
-                  >
-                    kakao.com
-                  </option>
-                </select>
-                <button
-                  class="auth-outline-button"
-                  id="signup-email-check-button"
-                  type="button"
-                  th:data-check-url="@{/signup/email-check}"
-                >
-                  중복확인
-                </button>
-              </div>
-              <p class="signup-notice">
-                * 맞춤상품 추천 및 Hpoint 서비스 이용을 위해 생년월일과 성별을 정확히 입력해 주세요.
-              </p>
-            </div>
-          </div>
-
-          <div class="signup-row">
-            <label class="signup-label" for="signup-password">비밀번호</label>
-            <div class="signup-control">
-              <input
-                class="auth-input"
-                id="signup-password"
-                name="password"
-                type="password"
-                autocomplete="new-password"
-                placeholder="비밀번호를 입력해주세요"
-                required
-              />
-              <p class="signup-help">
-                * 영문, 대소문자, 숫자, 특수문자 중 3개 이상을 조합하여 8자 이상 입력해 주세요
-              </p>
-            </div>
-          </div>
-
-          <div class="signup-row">
-            <label class="signup-label" for="signup-password-confirm">비밀번호 확인</label>
-            <div class="signup-control">
-              <input
-                class="auth-input"
-                id="signup-password-confirm"
-                name="passwordConfirm"
-                type="password"
-                autocomplete="new-password"
-                placeholder="비밀번호를 다시 입력해주세요"
-                required
-              />
-            </div>
-          </div>
-
-          <div class="signup-row">
-            <label class="signup-label" for="signup-birth">생년월일</label>
-            <div class="signup-control">
-              <div class="signup-date-wrap">
+            <div class="signup-row">
+              <label class="signup-label" for="signup-name">이름</label>
+              <div class="signup-control">
                 <input
                   class="auth-input"
-                  id="signup-birth"
-                  name="birth"
+                  id="signup-name"
+                  name="name"
                   type="text"
-                  inputmode="numeric"
-                  autocomplete="bday"
-                  placeholder="예: 20010415"
-                  th:value="${signupRequest != null ? signupRequest.birth : ''}"
+                  autocomplete="name"
+                  placeholder="이름을 입력해주세요"
+                  th:value="${signupRequest != null ? signupRequest.name : ''}"
                   required
                 />
-                <i class="bi bi-calendar3" aria-hidden="true"></i>
+                <p class="signup-help">* 한글은 10자, 영문은 20자 이내로 입력해 주세요</p>
               </div>
             </div>
-          </div>
 
-          <fieldset class="signup-row signup-gender-row">
-            <legend class="signup-label">성별</legend>
-            <div class="signup-control signup-radio-group">
-              <label class="auth-radio">
+            <div class="signup-row">
+              <label class="signup-label" for="signup-email-local">이메일</label>
+              <div class="signup-control">
+                <div class="signup-email-line">
+                  <input
+                    class="auth-input signup-email-local"
+                    id="signup-email-local"
+                    name="emailLocal"
+                    type="text"
+                    autocomplete="email"
+                    placeholder="이메일"
+                    th:value="${signupRequest != null ? signupRequest.emailLocal : ''}"
+                    required
+                  />
+                  <span class="signup-at">@</span>
+                  <select
+                    class="auth-input signup-email-domain"
+                    id="signup-email-domain"
+                    name="emailDomain"
+                    aria-label="이메일 도메인"
+                  >
+                    <option value="">직접입력</option>
+                    <option
+                      value="gmail.com"
+                      th:selected="${signupRequest != null && signupRequest.emailDomain == 'gmail.com'}"
+                    >
+                      gmail.com
+                    </option>
+                    <option
+                      value="naver.com"
+                      th:selected="${signupRequest != null && signupRequest.emailDomain == 'naver.com'}"
+                    >
+                      naver.com
+                    </option>
+                    <option
+                      value="daum.net"
+                      th:selected="${signupRequest != null && signupRequest.emailDomain == 'daum.net'}"
+                    >
+                      daum.net
+                    </option>
+                    <option
+                      value="kakao.com"
+                      th:selected="${signupRequest != null && signupRequest.emailDomain == 'kakao.com'}"
+                    >
+                      kakao.com
+                    </option>
+                  </select>
+                  <button
+                    class="auth-outline-button"
+                    id="signup-email-check-button"
+                    type="button"
+                    th:data-check-url="@{/signup/email-check}"
+                  >
+                    중복확인
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="signup-row">
+              <label class="signup-label" for="signup-password">비밀번호</label>
+              <div class="signup-control">
                 <input
-                  type="radio"
-                  name="gender"
-                  value="MALE"
-                  th:checked="${signupRequest != null && signupRequest.gender == 'MALE'}"
+                  class="auth-input"
+                  id="signup-password"
+                  name="password"
+                  type="password"
+                  autocomplete="new-password"
+                  placeholder="비밀번호를 입력해주세요"
                   required
                 />
-                <span aria-hidden="true"></span>
-                남성
-              </label>
-              <label class="auth-radio">
-                <input
-                  type="radio"
-                  name="gender"
-                  value="FEMALE"
-                  th:checked="${signupRequest != null && signupRequest.gender == 'FEMALE'}"
-                />
-                <span aria-hidden="true"></span>
-                여성
-              </label>
-            </div>
-          </fieldset>
-
-          <div class="signup-actions">
-            <button class="auth-primary-button" type="submit">회원 가입!</button>
-          </div>
-        </form>
-
-        <div
-          class="modal fade auth-modal"
-          id="signup-email-check-modal"
-          tabindex="-1"
-          aria-labelledby="signup-email-check-modal-title"
-          aria-hidden="true"
-        >
-          <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h2 class="modal-title" id="signup-email-check-modal-title">이메일 중복확인</h2>
-                <button
-                  type="button"
-                  class="btn-close"
-                  data-bs-dismiss="modal"
-                  aria-label="닫기"
-                ></button>
-              </div>
-              <div class="modal-body">
-                <p class="auth-modal-message" id="signup-email-check-modal-message">
-                  이메일을 확인해 주세요.
+                <p class="signup-help">
+                  * 영문, 대소문자, 숫자, 특수문자 중 3개 이상을 조합하여 8자 이상 입력해 주세요
                 </p>
               </div>
-              <div class="modal-footer">
-                <button type="button" class="auth-modal-button" data-bs-dismiss="modal">
-                  확인
-                </button>
+            </div>
+
+            <div class="signup-row">
+              <label class="signup-label" for="signup-password-confirm">비밀번호 확인</label>
+              <div class="signup-control">
+                <input
+                  class="auth-input"
+                  id="signup-password-confirm"
+                  name="passwordConfirm"
+                  type="password"
+                  autocomplete="new-password"
+                  placeholder="비밀번호를 다시 입력해주세요"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="signup-row">
+              <label class="signup-label" for="signup-birth">생년월일</label>
+              <div class="signup-control">
+                <div class="signup-date-wrap">
+                  <input
+                    class="auth-input"
+                    id="signup-birth"
+                    name="birth"
+                    type="text"
+                    inputmode="numeric"
+                    autocomplete="bday"
+                    placeholder="예: 20010415"
+                    th:value="${signupRequest != null ? signupRequest.birth : ''}"
+                    required
+                  />
+                  <i class="bi bi-calendar3" aria-hidden="true"></i>
+                </div>
+              </div>
+            </div>
+
+            <fieldset class="signup-row signup-gender-row">
+              <legend class="signup-label">성별</legend>
+              <div class="signup-control signup-radio-group">
+                <label class="auth-radio">
+                  <input
+                    type="radio"
+                    name="gender"
+                    value="MALE"
+                    th:checked="${signupRequest != null && signupRequest.gender == 'MALE'}"
+                    required
+                  />
+                  <span aria-hidden="true"></span>
+                  <strong class="auth-radio-text">남성</strong>
+                </label>
+                <label class="auth-radio">
+                  <input
+                    type="radio"
+                    name="gender"
+                    value="FEMALE"
+                    th:checked="${signupRequest != null && signupRequest.gender == 'FEMALE'}"
+                  />
+                  <span aria-hidden="true"></span>
+                  <strong class="auth-radio-text">여성</strong>
+                </label>
+              </div>
+            </fieldset>
+
+            <div class="signup-actions">
+              <button class="auth-primary-button" type="submit">회원 가입</button>
+            </div>
+          </form>
+
+          <div
+            class="modal fade auth-modal"
+            id="signup-email-check-modal"
+            tabindex="-1"
+            aria-labelledby="signup-email-check-modal-title"
+            aria-hidden="true"
+          >
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h2 class="modal-title" id="signup-email-check-modal-title">이메일 중복확인</h2>
+                  <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="닫기"
+                  ></button>
+                </div>
+                <div class="modal-body">
+                  <p class="auth-modal-message" id="signup-email-check-modal-message">
+                    이메일을 확인해 주세요.
+                  </p>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="auth-modal-button" data-bs-dismiss="modal">
+                    확인
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         </div>
+
+        <aside class="auth-signup-mascot" data-signup-mascot aria-label="하이이팅 가입 도우미">
+          <div class="auth-signup-mascot-figure">
+            <img
+              alt="HI-Eating 마스코트 나비"
+              class="auth-signup-mascot-image"
+              th:src="@{/images/nabi-mascot.png}"
+            />
+            <div class="mascot-lottie-wrap" aria-hidden="true">
+              <div id="mascot-lottie" class="mascot-lottie-player"></div>
+            </div>
+            <p class="auth-signup-mascot-message">
+              <strong data-signup-mascot-message>가입 정보를 차근차근 알려주세요</strong>
+            </p>
+          </div>
+        </aside>
       </div>
     </section>
   </body>

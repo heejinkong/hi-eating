@@ -2,54 +2,60 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
   <body>
     <section class="auth-page auth-login-page" th:fragment="content">
-      <div class="auth-panel auth-panel-narrow">
-        <div class="auth-title-block">
-          <h1>로그인</h1>
-          <p>로그인을 하시면 다양한 혜택을 누리실 수 있습니다.</p>
-        </div>
-
-        <form class="auth-form" th:action="@{/login}" method="post">
-          <p class="auth-alert auth-alert-danger" th:if="${param.error}">
-            아이디 또는 비밀번호를 확인해 주세요.
-          </p>
-          <p class="auth-alert auth-alert-success" th:if="${param.logout}">로그아웃되었습니다.</p>
-
-          <div class="auth-field-stack">
-            <label class="visually-hidden" for="login-username">아이디</label>
-            <input
-              class="auth-input"
-              id="login-username"
-              name="username"
-              type="text"
-              autocomplete="username"
-              placeholder="아이디"
-              required
-            />
-
-            <label class="visually-hidden" for="login-password">비밀번호</label>
-            <input
-              class="auth-input"
-              id="login-password"
-              name="password"
-              type="password"
-              autocomplete="current-password"
-              placeholder="비밀번호"
-              required
-            />
+      <div class="auth-login-shell">
+        <div class="auth-panel auth-panel-narrow">
+          <div class="auth-title-block">
+            <h1>로그인</h1>
+            <p>로그인을 하시면 다양한 혜택을 누리실 수 있습니다.</p>
           </div>
 
-          <label class="auth-check">
-            <input type="checkbox" name="rememberId" />
-            <span aria-hidden="true"></span>
-            <strong>아이디 저장</strong>
-          </label>
+          <form class="auth-form" th:action="@{/login}" method="post">
+            <p class="auth-alert auth-alert-danger" th:if="${param.error}">
+              아이디 또는 비밀번호를 확인해 주세요.
+            </p>
+            <p class="auth-alert auth-alert-success" th:if="${param.logout}">로그아웃되었습니다.</p>
 
-          <button class="auth-primary-button" type="submit">로그인</button>
+            <div class="auth-field-stack">
+              <label class="visually-hidden" for="login-username">아이디</label>
+              <input
+                class="auth-input"
+                id="login-username"
+                name="username"
+                type="text"
+                autocomplete="username"
+                placeholder="아이디"
+                required
+              />
 
-          <a class="auth-secondary-link" th:href="@{/signup}">회원가입</a>
-        </form>
+              <label class="visually-hidden" for="login-password">비밀번호</label>
+              <input
+                class="auth-input"
+                id="login-password"
+                name="password"
+                type="password"
+                autocomplete="current-password"
+                placeholder="비밀번호"
+                required
+              />
+            </div>
 
-        <div class="auth-bottom-line" aria-hidden="true"></div>
+            <label class="auth-check">
+              <input type="checkbox" name="rememberId" />
+              <span aria-hidden="true"></span>
+              <strong>아이디 저장</strong>
+            </label>
+
+            <button class="auth-primary-button" type="submit">로그인</button>
+
+            <a class="auth-secondary-link" th:href="@{/signup}">회원가입</a>
+          </form>
+
+          <div class="auth-bottom-line" aria-hidden="true"></div>
+        </div>
+
+        <aside class="auth-login-visual" aria-label="하이이팅 마스코트 나비">
+          <div id="login-mascot-lottie" class="auth-mascot-lottie" data-login-mascot></div>
+        </aside>
       </div>
     </section>
   </body>
