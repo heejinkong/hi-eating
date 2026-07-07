@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+  <body>
+    <div th:fragment="content" class="admin-layout">
+      <aside th:replace="~{admin/fragments/sidebar :: adminSidebar('chats')}"></aside>
+
+      <main
+        class="main-container admin-chat-main"
+        th:data-rooms-url="@{/admin/api/chats/rooms}"
+        th:data-room-url-prefix="@{/admin/api/chats/rooms}"
+        th:data-status-url="@{/admin/api/chats/status}"
+        th:data-ws-url="@{/ws/chat}"
+      >
+        <div class="admin-chat-header">
+          <div>
+            <h1>상담 채팅</h1>
+            <p>내게 배정된 실시간 상담을 확인하고 답변합니다.</p>
+          </div>
+          <div class="admin-chat-header-actions">
+            <label class="admin-chat-presence" for="admin-chat-status-select">
+              <span>상태</span>
+              <select id="admin-chat-status-select" aria-label="상담 상태">
+                <option value="ONLINE">온라인</option>
+                <option value="AWAY">자리비움</option>
+              </select>
+            </label>
+            <button type="button" class="admin-chat-refresh" id="admin-chat-refresh">
+              <i class="bi bi-arrow-clockwise" aria-hidden="true"></i>
+              새로고침
+            </button>
+          </div>
+        </div>
+
+        <section class="admin-chat-shell">
+          <aside class="admin-chat-room-panel" aria-label="상담방 목록">
+            <div class="admin-chat-panel-title">
+              <strong>내 담당 상담</strong>
+              <span id="admin-chat-room-count">0</span>
+            </div>
+            <div class="admin-chat-room-list" id="admin-chat-rooms"></div>
+          </aside>
+
+          <section class="admin-chat-conversation" aria-label="상담 내용">
+            <header class="admin-chat-conversation-header">
+              <div>
+                <strong id="admin-chat-user-name">상담방을 선택하세요</strong>
+                <span id="admin-chat-user-email">사용자 문의가 이곳에 표시됩니다.</span>
+              </div>
+              <span class="admin-chat-status" id="admin-chat-status">연결 준비 중</span>
+            </header>
+
+            <div class="admin-chat-messages" id="admin-chat-messages">
+              <p class="admin-chat-empty">왼쪽에서 상담방을 선택하세요.</p>
+            </div>
+
+            <form class="admin-chat-form" id="admin-chat-form">
+              <textarea
+                id="admin-chat-input"
+                maxlength="1000"
+                rows="1"
+                placeholder="답변을 입력하세요"
+                aria-label="관리자 답변"
+              ></textarea>
+              <button type="submit" aria-label="답변 보내기">
+                <i class="bi bi-send-fill" aria-hidden="true"></i>
+              </button>
+            </form>
+          </section>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

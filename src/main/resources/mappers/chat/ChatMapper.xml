@@ -1,0 +1,339 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.or.hieating.chat.mapper.ChatMapper">
+
+  <sql id="roomSummaryColumns">
+    r.id AS room_id,
+    r.user_id AS user_id,
+    u.name AS user_name,
+    u.email AS user_email,
+    r.assigned_admin_id AS assigned_admin_id,
+    au.name AS assigned_admin_name,
+    NVL(ap.status, 'OFFLINE') AS assigned_admin_status,
+    r.status,
+    r.user_unread_count,
+    r.admin_unread_count,
+    r.last_message_at,
+    r.created_at,
+    r.updated_at,
+    lm.content AS last_message_content,
+    lm.sender_type AS last_sender_type
+  </sql>
+
+  <select id="findRoomByUserId" resultType="kr.or.hieating.chat.dto.ChatRoomSummaryDto">
+    SELECT
+      <include refid="roomSummaryColumns" />
+    FROM chat_rooms r
+    JOIN users u
+      ON u.id = r.user_id
+    LEFT JOIN users au
+      ON au.id = r.assigned_admin_id
+    LEFT JOIN chat_admin_presences ap
+      ON ap.admin_id = r.assigned_admin_id
+    LEFT JOIN (
+      SELECT room_id, content, sender_type
+      FROM (
+        SELECT room_id, content, sender_type,
+               ROW_NUMBER() OVER (PARTITION BY room_id ORDER BY created_at DESC, id DESC) rn
+        FROM chat_messages
+      )
+      WHERE rn = 1
+    ) lm ON lm.room_id = r.id
+    WHERE r.user_id = #{userId}
+      AND u.deleted_at IS NULL
+  </select>
+
+  <select id="findRoomById" resultType="kr.or.hieating.chat.dto.ChatRoomSummaryDto">
+    SELECT
+      <include refid="roomSummaryColumns" />
+    FROM chat_rooms r
+    JOIN users u
+      ON u.id = r.user_id
+    LEFT JOIN users au
+      ON au.id = r.assigned_admin_id
+    LEFT JOIN chat_admin_presences ap
+      ON ap.admin_id = r.assigned_admin_id
+    LEFT JOIN (
+      SELECT room_id, content, sender_type
+      FROM (
+        SELECT room_id, content, sender_type,
+               ROW_NUMBER() OVER (PARTITION BY room_id ORDER BY created_at DESC, id DESC) rn
+        FROM chat_messages
+      )
+      WHERE rn = 1
+    ) lm ON lm.room_id = r.id
+    WHERE r.id = #{roomId}
+      AND u.deleted_at IS NULL
+  </select>
+
+  <select id="findRoomsByAdminId" resultType="kr.or.hieating.chat.dto.ChatRoomSummaryDto">
+    SELECT
+      <include refid="roomSummaryColumns" />
+    FROM chat_rooms r
+    JOIN users u
+      ON u.id = r.user_id
+    LEFT JOIN users au
+      ON au.id = r.assigned_admin_id
+    LEFT JOIN chat_admin_presences ap
+      ON ap.admin_id = r.assigned_admin_id
+    LEFT JOIN (
+      SELECT room_id, content, sender_type
+      FROM (
+        SELECT room_id, content, sender_type,
+               ROW_NUMBER() OVER (PARTITION BY room_id ORDER BY created_at DESC, id DESC) rn
+        FROM chat_messages
+      )
+      WHERE rn = 1
+    ) lm ON lm.room_id = r.id
+    WHERE u.deleted_at IS NULL
+      AND r.assigned_admin_id = #{adminId}
+    ORDER BY
+      r.admin_unread_count DESC,
+      NVL(r.last_message_at, r.created_at) DESC,
+      r.id DESC
+  </select>
+
+  <select id="findAssignableAdminId" resultType="long">
+    SELECT admin_id
+    FROM (
+      SELECT
+        u.id AS admin_id,
+        NVL(p.status, 'OFFLINE') AS status,
+        p.last_user_message_at
+      FROM users u
+      JOIN user_auth ua
+        ON ua.user_id = u.id
+       AND ua.auth = 'ROLE_ADMIN'
+      LEFT JOIN chat_admin_presences p
+        ON p.admin_id = u.id
+      WHERE u.deleted_at IS NULL
+      ORDER BY
+        CASE NVL(p.status, 'OFFLINE')
+          WHEN 'ONLINE' THEN 0
+          WHEN 'AWAY' THEN 1
+          ELSE 2
+        END ASC,
+        p.last_user_message_at ASC NULLS FIRST,
+        u.id ASC
+    )
+    WHERE ROWNUM = 1
+  </select>
+
+  <select id="findAdminPresenceStatus" resultType="String">
+    SELECT NVL(MAX(status), 'OFFLINE')
+    FROM chat_admin_presences
+    WHERE admin_id = #{adminId}
+  </select>
+
+  <select id="findMessagesByRoomId" resultType="kr.or.hieating.chat.dto.ChatMessageDto">
+    SELECT
+      m.id,
+      m.room_id,
+      m.sender_id,
+      m.sender_type,
+      u.name AS sender_name,
+      m.content,
+      m.created_at
+    FROM chat_messages m
+    JOIN users u
+      ON u.id = m.sender_id
+    WHERE m.room_id = #{roomId}
+    ORDER BY m.created_at ASC, m.id ASC
+  </select>
+
+  <select id="findMessageById" resultType="kr.or.hieating.chat.dto.ChatMessageDto">
+    SELECT
+      m.id,
+      m.room_id,
+      m.sender_id,
+      m.sender_type,
+      u.name AS sender_name,
+      m.content,
+      m.created_at
+    FROM chat_messages m
+    JOIN users u
+      ON u.id = m.sender_id
+    WHERE m.id = #{messageId}
+  </select>
+
+  <insert id="insertRoom" parameterType="kr.or.hieating.chat.dto.ChatRoomCreateCommand"
+          useGeneratedKeys="true" keyProperty="id" keyColumn="ID">
+    INSERT INTO chat_rooms (
+      user_id,
+      created_at,
+      updated_at
+    ) VALUES (
+      #{userId},
+      SYSTIMESTAMP,
+      SYSTIMESTAMP
+    )
+  </insert>
+
+  <insert id="insertMessage" parameterType="kr.or.hieating.chat.dto.ChatMessageCreateCommand"
+          useGeneratedKeys="true" keyProperty="id" keyColumn="ID">
+    INSERT INTO chat_messages (
+      room_id,
+      sender_id,
+      sender_type,
+      content,
+      created_at
+    ) VALUES (
+      #{roomId},
+      #{senderId},
+      #{senderType},
+      #{content},
+      SYSTIMESTAMP
+    )
+  </insert>
+
+  <update id="updateRoomForUserMessage">
+    UPDATE chat_rooms
+    SET
+      status = 'OPEN',
+      admin_unread_count = admin_unread_count + 1,
+      last_message_at = SYSTIMESTAMP,
+      updated_at = SYSTIMESTAMP
+    WHERE id = #{roomId}
+  </update>
+
+  <update id="updateRoomForAdminMessage">
+    UPDATE chat_rooms
+    SET
+      status = 'OPEN',
+      user_unread_count = user_unread_count + 1,
+      admin_unread_count = 0,
+      last_message_at = SYSTIMESTAMP,
+      updated_at = SYSTIMESTAMP
+    WHERE id = #{roomId}
+      AND assigned_admin_id = #{adminId}
+  </update>
+
+  <update id="assignAdminToRoom">
+    UPDATE chat_rooms
+    SET
+      assigned_admin_id = #{adminId},
+      updated_at = SYSTIMESTAMP
+    WHERE id = #{roomId}
+      AND assigned_admin_id IS NULL
+  </update>
+
+  <insert id="markAdminConnected">
+    MERGE INTO chat_admin_presences p
+    USING (SELECT #{adminId} AS admin_id FROM dual) s
+    ON (p.admin_id = s.admin_id)
+    WHEN MATCHED THEN
+      UPDATE SET
+        p.status = 'ONLINE',
+        p.last_connected_at = SYSTIMESTAMP,
+        p.updated_at = SYSTIMESTAMP
+    WHEN NOT MATCHED THEN
+      INSERT (
+        admin_id,
+        status,
+        last_connected_at,
+        created_at,
+        updated_at
+      ) VALUES (
+        s.admin_id,
+        'ONLINE',
+        SYSTIMESTAMP,
+        SYSTIMESTAMP,
+        SYSTIMESTAMP
+      )
+  </insert>
+
+  <insert id="markAdminDisconnected">
+    MERGE INTO chat_admin_presences p
+    USING (SELECT #{adminId} AS admin_id FROM dual) s
+    ON (p.admin_id = s.admin_id)
+    WHEN MATCHED THEN
+      UPDATE SET
+        p.status = 'OFFLINE',
+        p.last_disconnected_at = SYSTIMESTAMP,
+        p.updated_at = SYSTIMESTAMP
+    WHEN NOT MATCHED THEN
+      INSERT (
+        admin_id,
+        status,
+        last_disconnected_at,
+        created_at,
+        updated_at
+      ) VALUES (
+        s.admin_id,
+        'OFFLINE',
+        SYSTIMESTAMP,
+        SYSTIMESTAMP,
+        SYSTIMESTAMP
+      )
+  </insert>
+
+  <insert id="updateAdminPresenceStatus">
+    MERGE INTO chat_admin_presences p
+    USING (
+      SELECT
+        #{adminId} AS admin_id,
+        #{status} AS status
+      FROM dual
+    ) s
+    ON (p.admin_id = s.admin_id)
+    WHEN MATCHED THEN
+      UPDATE SET
+        p.status = s.status,
+        p.updated_at = SYSTIMESTAMP
+    WHEN NOT MATCHED THEN
+      INSERT (
+        admin_id,
+        status,
+        created_at,
+        updated_at
+      ) VALUES (
+        s.admin_id,
+        s.status,
+        SYSTIMESTAMP,
+        SYSTIMESTAMP
+      )
+  </insert>
+
+  <insert id="recordAdminUserMessageReceived">
+    MERGE INTO chat_admin_presences p
+    USING (SELECT #{adminId} AS admin_id FROM dual) s
+    ON (p.admin_id = s.admin_id)
+    WHEN MATCHED THEN
+      UPDATE SET
+        p.last_user_message_at = SYSTIMESTAMP,
+        p.updated_at = SYSTIMESTAMP
+    WHEN NOT MATCHED THEN
+      INSERT (
+        admin_id,
+        status,
+        last_user_message_at,
+        created_at,
+        updated_at
+      ) VALUES (
+        s.admin_id,
+        'OFFLINE',
+        SYSTIMESTAMP,
+        SYSTIMESTAMP,
+        SYSTIMESTAMP
+      )
+  </insert>
+
+  <update id="markUserRead">
+    UPDATE chat_rooms
+    SET
+      user_unread_count = 0,
+      updated_at = SYSTIMESTAMP
+    WHERE id = #{roomId}
+  </update>
+
+  <update id="markAdminRead">
+    UPDATE chat_rooms
+    SET
+      admin_unread_count = 0,
+      updated_at = SYSTIMESTAMP
+    WHERE id = #{roomId}
+  </update>
+</mapper>

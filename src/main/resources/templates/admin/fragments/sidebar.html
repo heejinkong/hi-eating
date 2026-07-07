@@ -90,6 +90,19 @@
             관리자 계정
           </a>
         </li>
+        <li class="nav-item">
+          <a
+            class="nav-link py-2 px-3 text-dark d-flex align-items-center gap-3"
+            href="/admin/chats"
+            th:style="${activeMenu == 'chats'} ? 'background: linear-gradient(90deg, #ff6b6b 0%, #ff8e53 100%); color: #ffffff !important; font-weight: 700; border-radius: 8px; box-shadow: 0 4px 10px rgba(255, 107, 107, 0.2);' : 'font-weight: 600; border-radius: 8px;'"
+          >
+            <i
+              class="bi bi-chat-dots-fill"
+              th:style="${activeMenu == 'chats'} ? 'color: #ffffff !important;' : 'color: var(--text-muted);'"
+            ></i>
+            상담 채팅
+          </a>
+        </li>
       </ul>
     </div>
 
