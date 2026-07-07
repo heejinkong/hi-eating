@@ -102,15 +102,18 @@
                 <span class="add-title">새 프로모션 만들기 <span class="text-danger">*</span></span>
                 <span class="add-desc">신규 프로모션 등록 폼을 엽니다.</span>
               </div>
-              <!-- 숨겨진 파일 인풋 -->
-              <input
-                type="file"
-                id="bannerFileInput"
-                style="display: none"
-                accept="image/*"
-                onchange="handleBannerImageSelect(this)"
-              />
             </div>
+            <!--
+              기존 배너의 이미지 교체 시 input.click() 이벤트가
+              신규 등록 버튼까지 버블링하지 않도록 클릭 영역 밖에 둡니다.
+            -->
+            <input
+              type="file"
+              id="bannerFileInput"
+              style="display: none"
+              accept="image/*"
+              onchange="handleBannerImageSelect(this)"
+            />
           </div>
 
           <!-- 오른쪽 영역 : 프로모션 배너 링크 -->
