@@ -49,6 +49,7 @@ public class EmailEventRabbitConfig {
     RabbitTemplate rabbitTemplate = new RabbitTemplate();
     configurer.configure(rabbitTemplate, connectionFactory);
     rabbitTemplate.setMessageConverter(emailEventMessageConverter);
+    rabbitTemplate.setMandatory(true);
     return rabbitTemplate;
   }
 }
