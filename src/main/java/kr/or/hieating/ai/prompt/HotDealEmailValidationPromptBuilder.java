@@ -24,7 +24,10 @@ public class HotDealEmailValidationPromptBuilder {
       - productInfoValid: 상품명과 상품 정보가 원본 데이터와 일치하는가
       - discountRateValid: 가격과 할인율이 원본 데이터와 정확히 일치하는가
       - exaggerationFree: 입력에 없는 효능, 무료배송, 재고, 최저가 등 과장 표현이 없는가
-      - lengthValid: 제목은 80자 이하이고 본문은 100자 이상 2000자 이하인가
+      - lengthValid: 제목은 80자 이하이고 HTML 태그를 제외한 실제 본문은 100자 이상 2000자 이하인가
+
+      이메일 본문은 HTML 템플릿입니다. HTML 태그와 링크 자체는 검증 대상에서 제외하고,
+      화면에 표시되는 한국어 문구와 상품명·가격·할인율의 정확성을 검증하세요.
 
       하나라도 충족하지 못하면 해당 값은 false입니다.
       issues에는 실패한 항목의 구체적인 이유만 작성하세요. 모두 통과하면 빈 배열을 작성하세요.

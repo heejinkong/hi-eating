@@ -4,15 +4,29 @@
 <mapper namespace="kr.or.hieating.ai.mapper.HotDealEmailContentMapper">
 
     <select id="findHotDealInfo" resultType="kr.or.hieating.ai.dto.HotDealEmailInfoRow">
-        SELECT id AS hotDealId, title, description, starts_at AS startsAt, ends_at AS endsAt
-        FROM hot_deals
-        WHERE id = #{hotDealId}
-          AND deleted_at IS NULL
+        SELECT
+            h.id AS hotDealId,
+            h.title,
+            h.description,
+            h.starts_at AS startsAt,
+            h.ends_at AS endsAt,
+            (
+                SELECT pp.picture_saved_location
+                FROM hot_deal_products hdp
+                INNER JOIN product_options po ON po.id = hdp.product_option_id
+                INNER JOIN product_pictures pp ON pp.product_id = po.product_id
+                WHERE hdp.hot_deal_id = h.id
+                ORDER BY po.product_id, pp.display_order, pp.id
+                FETCH FIRST 1 ROWS ONLY
+            ) AS heroImageLocation
+        FROM hot_deals h
+        WHERE h.id = #{hotDealId}
+          AND h.deleted_at IS NULL
     </select>
 
     <select id="findHotDealProducts" resultType="kr.or.hieating.ai.dto.HotDealEmailProductRow">
         SELECT
-            p.name AS productName,
+            REGEXP_REPLACE(p.name, '^\[[^가-힣]*\][[:space:]]*', '') AS productName,
             c.name AS categoryName,
             hdp.original_price AS originalPrice,
             hdp.hot_deal_price AS hotDealPrice,

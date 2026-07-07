@@ -7,4 +7,5 @@ public record HotDealEmailInfoRow(
     String title,
     String description,
     LocalDateTime startsAt,
-    LocalDateTime endsAt) {}
+    LocalDateTime endsAt,
+    String heroImageLocation) {}
