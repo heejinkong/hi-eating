@@ -23,6 +23,7 @@ public class TargetSelectionJobProcessor {
   private final TargetSelectionJobMapper jobMapper;
   private final TargetUserSelectionAiService selectionService;
   private final HotDealEmailGenerationService emailGenerationService;
+  private final HotDealEmailQualityValidationService emailQualityValidationService;
 
   public void processNextJob() {
     TargetSelectionJobDto job = jobMapper.findNextRunnableJob();
@@ -33,7 +34,8 @@ public class TargetSelectionJobProcessor {
     try {
       TargetSelectionResult result = selectionService.selectAndSaveTargets(job.hotDealId());
       if (result.selectedCount() > 0) {
-        emailGenerationService.generateAndSave(job.hotDealId());
+        var email = emailGenerationService.generateAndSave(job.hotDealId());
+        emailQualityValidationService.validateAndApply(job.hotDealId(), email);
       }
       jobMapper.markCompleted(
           job.id(), result.candidateCount(), result.selectedCount(), result.insertedCount());

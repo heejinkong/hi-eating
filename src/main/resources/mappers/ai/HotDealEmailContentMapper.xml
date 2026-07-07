@@ -44,6 +44,9 @@
         WHEN MATCHED THEN UPDATE SET
             target.subject = source.subject,
             target.content = source.content,
+            target.validation_status = 'PENDING',
+            target.validation_reason = NULL,
+            target.validated_at = NULL,
             target.generated_at = SYSTIMESTAMP,
             target.updated_at = SYSTIMESTAMP
         WHEN NOT MATCHED THEN INSERT (hot_deal_id, subject, content, generated_at)
@@ -53,6 +56,24 @@
     <update id="applyContentToSendLogs">
         UPDATE email_send_logs
         SET title = #{subject}, content = #{content}, updated_at = SYSTIMESTAMP
+        WHERE hot_deal_id = #{hotDealId}
+          AND status = 'PENDING'
+    </update>
+
+    <update id="updateValidationResult">
+        UPDATE hot_deal_email_contents
+        SET validation_status = #{status},
+            validation_reason = #{reason},
+            validated_at = SYSTIMESTAMP,
+            updated_at = SYSTIMESTAMP
+        WHERE hot_deal_id = #{hotDealId}
+    </update>
+
+    <update id="applyValidationToSendLogs">
+        UPDATE email_send_logs
+        SET status = CASE WHEN #{status} = 'PASS' THEN 'APPROVED' ELSE 'NEEDS_REVIEW' END,
+            failure_reason = CASE WHEN #{status} = 'PASS' THEN NULL ELSE #{reason} END,
+            updated_at = SYSTIMESTAMP
         WHERE hot_deal_id = #{hotDealId}
           AND status = 'PENDING'
     </update>

@@ -25,4 +25,14 @@ public interface HotDealEmailContentMapper {
       @Param("hotDealId") long hotDealId,
       @Param("subject") String subject,
       @Param("content") String content);
+
+  int updateValidationResult(
+      @Param("hotDealId") long hotDealId,
+      @Param("status") String status,
+      @Param("reason") String reason);
+
+  int applyValidationToSendLogs(
+      @Param("hotDealId") long hotDealId,
+      @Param("status") String status,
+      @Param("reason") String reason);
 }
