@@ -38,6 +38,7 @@
       defer
       th:if="${pageScript != null}"
       th:src="@{/js/{script}.js(script=${pageScript})}"
+      th:type="${pageScriptType != null ? pageScriptType : 'text/javascript'}"
     ></script>
     <!-- 사이드바 접기/열기 스크립트 -->
     <script>

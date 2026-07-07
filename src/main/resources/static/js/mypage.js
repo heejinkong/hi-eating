@@ -45,9 +45,14 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   fetch('/api/recommendation/products')
-    .then((res) => res.json())
+    .then((res) => {
+      if (!res.ok) {
+        throw new Error('Failed to load recommendations.');
+      }
+      return res.json();
+    })
     .then((data) => {
-      renderProducts(data.products);
+      renderProducts(data.result?.products || []);
       initCarousel();
     })
     .catch(() => {

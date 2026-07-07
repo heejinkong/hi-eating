@@ -91,6 +91,7 @@ public class ProductEmbeddingService implements CommandLineRunner {
       log.debug("상품 {} 임베딩 갱신 완료", productId);
     } catch (Exception e) {
       log.error("상품 {} 임베딩 갱신 실패: {}", productId, e.getMessage(), e);
+      throw new IllegalStateException("상품 " + productId + " 임베딩 갱신 실패", e);
     }
   }
 

@@ -3,15 +3,12 @@ package kr.or.hieating.mypage.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import kr.or.hieating.auth.domain.Users;
-import kr.or.hieating.auth.mapper.AuthMapper;
 import kr.or.hieating.auth.security.HiEatingUserPrincipal;
 import kr.or.hieating.favorite.service.FavoriteService;
-import kr.or.hieating.global.apiPayload.code.status.ErrorStatus;
-import kr.or.hieating.global.apiPayload.exception.GeneralException;
+import kr.or.hieating.mypage.service.MyPageService;
 import kr.or.hieating.purchase.dto.RecentPurchaseProductDto;
 import kr.or.hieating.purchase.service.PurchaseService;
 import kr.or.hieating.utils.UserResolver;
@@ -35,14 +32,11 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class MyPageController {
 
   private static final Logger log = LoggerFactory.getLogger(MyPageController.class);
-  private static final DateTimeFormatter BIRTH_TEXT_FORMATTER =
-      DateTimeFormatter.ofPattern("yyyy년MM월dd일");
-  private static final java.util.Set<String> EDITABLE_GENDERS = java.util.Set.of("MALE", "FEMALE");
   private final FavoriteService favoriteService;
   private final PurchaseService purchaseService;
   private final VisitService visitService;
   private final UserResolver userResolver;
-  private final AuthMapper authMapper;
+  private final MyPageService myPageService;
 
   @GetMapping("/mypage")
   public String myPage(Model model) {
@@ -70,7 +64,7 @@ public class MyPageController {
 
   @GetMapping("/mypage/edit")
   public String editMember(Model model) {
-    Users member = findCurrentMember();
+    Users member = myPageService.findCurrentMemberOrNull();
     if (member == null) {
       return "redirect:/login";
     }
@@ -87,20 +81,13 @@ public class MyPageController {
       @RequestParam(name = "gender", required = false) String gender,
       Model model,
       RedirectAttributes redirectAttributes) {
-    Users member = findCurrentMember();
+    Users member = myPageService.findCurrentMemberOrNull();
     if (member == null) {
       return "redirect:/login";
     }
 
     try {
-      String normalizedName = validateAndNormalizeName(name);
-      validateMemberEdit(birth, gender);
-
-      int updated = authMapper.updateUserProfile(member.getId(), normalizedName, birth, gender);
-      if (updated == 0) {
-        throw new IllegalArgumentException("회원 정보를 수정할 수 없습니다.");
-      }
-
+      String normalizedName = myPageService.updateCurrentMemberProfile(name, birth, gender);
       redirectAttributes.addFlashAttribute("editMessage", "회원 정보가 수정되었습니다.");
       refreshCurrentPrincipalName(normalizedName);
       return "redirect:/mypage/edit";
@@ -116,15 +103,7 @@ public class MyPageController {
 
   @PostMapping("/mypage/withdraw")
   public String withdrawMember(HttpServletRequest request) {
-    Users member = findCurrentMember();
-    if (member == null) {
-      throw new GeneralException(ErrorStatus.MEMBER_NOT_FOUND);
-    }
-
-    int withdrawn = authMapper.withdrawUser(member.getId());
-    if (withdrawn == 0) {
-      throw new GeneralException(ErrorStatus.MEMBER_WITHDRAW_FAILED);
-    }
+    myPageService.withdrawCurrentMember();
 
     SecurityContextHolder.clearContext();
     HttpSession session = request.getSession(false);
@@ -142,42 +121,6 @@ public class MyPageController {
     model.addAttribute("pageScript", "member-edit");
 
     model.addAttribute("member", member);
-  }
-
-  private Users findCurrentMember() {
-    Long userId = userResolver.currentUserIdOrNull();
-    if (userId == null) {
-      return null;
-    }
-
-    return authMapper.findById(userId);
-  }
-
-  private String validateAndNormalizeName(String name) {
-    if (name == null || name.trim().isEmpty()) {
-      throw new IllegalArgumentException("이름을 입력해 주세요.");
-    }
-
-    String normalizedName = name.trim();
-    if (normalizedName.length() > 100) {
-      throw new IllegalArgumentException("이름은 100자 이하로 입력해 주세요.");
-    }
-
-    return normalizedName;
-  }
-
-  private void validateMemberEdit(LocalDate birth, String gender) {
-    if (birth == null) {
-      throw new IllegalArgumentException("생년월일을 입력해 주세요.");
-    }
-
-    if (birth.isAfter(LocalDate.now())) {
-      throw new IllegalArgumentException("생년월일은 오늘 이후 날짜를 입력할 수 없습니다.");
-    }
-
-    if (!EDITABLE_GENDERS.contains(gender)) {
-      throw new IllegalArgumentException("성별 값을 확인해 주세요.");
-    }
   }
 
   private void refreshCurrentPrincipalName(String name) {

@@ -24,6 +24,7 @@ public class AdminPromotionController {
     model.addAttribute("contentFragment", "content");
     model.addAttribute("pageStylesheet", "admin-promotion");
     model.addAttribute("pageScript", "admin-promotion");
+    model.addAttribute("pageScriptType", "module");
 
     return "layout/admin-base";
   }
