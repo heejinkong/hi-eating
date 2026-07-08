@@ -51,7 +51,7 @@
 }
 
 .summary-card span {
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 700;
 }
 
@@ -68,7 +68,7 @@
 
 .deal-card p {
   color: var(--color-muted, #77716d);
-  font-size: 14px;
+  font-size: 15px;
 }
 
 .deal-button {
@@ -77,7 +77,7 @@
   border-radius: 4px;
   background: var(--color-brand, #ff4d1f);
   color: #ffffff;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 800;
 }
 
@@ -103,7 +103,7 @@
 
 .table-builder-entry-card p {
   color: var(--color-muted, #77716d);
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 700;
 }
 
@@ -113,7 +113,7 @@
   border-radius: 8px;
   background: var(--color-brand, #ff4d1f);
   color: #ffffff;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 900;
 }
 
@@ -134,7 +134,7 @@
 .section-heading a,
 .section-heading span {
   color: var(--color-brand, #ff4d1f);
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 700;
 }
 
@@ -175,18 +175,18 @@
 }
 
 .order-product-info span {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 800;
 }
 
 .order-product-info h2 {
-  font-size: 15px;
+  font-size: 16px;
   line-height: 1.35;
 }
 
 .order-product-info p {
   color: var(--color-muted, #77716d);
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .order-product-info strong {
@@ -288,7 +288,7 @@
 .product-subtitle,
 .delivery-message {
   color: var(--color-muted, #77716d);
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1.45;
 }
 
@@ -296,7 +296,7 @@
   min-height: 40px;
   margin: 4px 0 10px;
   color: var(--color-ink, #191716);
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.42;
   font-weight: 800;
 }

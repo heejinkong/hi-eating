@@ -34,7 +34,7 @@
   gap: 4px;
   align-items: center;
   color: #5f5751;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 900;
   text-decoration: none;
 }
@@ -495,11 +495,13 @@
 }
 
 .hot-deal-section {
-  width: 100vw;
+  width: 100%;
   max-width: none;
-  margin: 0 0 148px calc(50% - 50vw);
+  margin: 0 0 148px;
   padding: clamp(70px, 8vw, 104px) max(28px, calc((100vw - 1180px) / 2)) clamp(76px, 8vw, 108px);
   background: #ff714f;
+  box-shadow: 0 0 0 100vmax #ff714f;
+  clip-path: inset(0 -100vmax);
 }
 
 .hot-deal-section .section-title {
@@ -582,7 +584,7 @@
   overflow: hidden;
   margin: 0 0 10px;
   color: #51453f;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 900;
   text-decoration: none;
   text-overflow: ellipsis;
@@ -613,7 +615,7 @@
   border-radius: 6px;
   background: #fff;
   color: #888;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 700;
 }
 
@@ -642,14 +644,14 @@
   background: rgba(32, 32, 32, 0.72);
   color: #fff;
   padding: 5px 9px;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 800;
 }
 
 .hot-deal-card__name,
 .hot-deal-card__discount {
   margin: 0;
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 800;
   line-height: 1.35;
 }
@@ -672,7 +674,7 @@
 .hot-deal-card__discount {
   margin-top: 8px;
   color: #ff3158;
-  font-size: 14px;
+  font-size: 15px;
   text-align: center;
 }
 
@@ -691,14 +693,14 @@
   align-items: center;
   justify-content: center;
   color: #4d423e;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
   text-align: center;
 }
 
 .hot-deal-card__timer {
   color: #1f1f1f;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 900;
 }
 
@@ -818,7 +820,7 @@
   background: #ff3d25;
   color: #fff;
   padding: 7px 10px;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 900;
 }
 
@@ -846,7 +848,7 @@
 .product-card__name {
   margin: 12px 0 6px;
   color: var(--color-ink);
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 700;
 }
 
@@ -871,7 +873,7 @@
   align-items: baseline;
   margin: 0;
   color: #222;
-  font-size: 16px;
+  font-size: 17px;
 }
 
 .product-card__price .discount-rate {
@@ -887,13 +889,13 @@
   display: block;
   margin-top: 2px;
   color: #aaa09a;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .product-card__quantity {
   margin: 6px 0 0;
   color: #aaa09a;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
 }
 

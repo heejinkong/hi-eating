@@ -47,7 +47,7 @@
   gap: 8px;
   margin: 0 0 12px;
   color: #fff;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 900;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -77,10 +77,9 @@
 }
 
 .hotdeal-hero__description {
-  max-width: 390px;
   margin: 14px 0 24px;
   color: rgba(255, 255, 255, 0.9);
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 700;
   line-height: 1.65;
 }
@@ -93,7 +92,7 @@
 
 .hotdeal-hero__timer span {
   color: rgba(255, 255, 255, 0.78);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 800;
 }
 
@@ -146,7 +145,7 @@
   color: #4c423c;
   padding: 0 16px;
   text-decoration: none;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 800;
 }
 
@@ -181,7 +180,7 @@
   background: #fff;
   color: #342d28;
   padding: 10px 12px;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 700;
 }
 
@@ -249,7 +248,7 @@
   border-radius: 6px;
   color: #fff;
   padding: 6px 8px;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 900;
 }
 
@@ -269,7 +268,7 @@
   overflow: hidden;
   margin: 12px 0 5px;
   color: var(--color-brand-strong, #e83d12);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 900;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -278,7 +277,7 @@
 .hotdeal-product-card__name {
   display: block;
   color: #292420;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 800;
   line-height: 1.45;
   text-decoration: none;
@@ -293,13 +292,13 @@
 
 .hotdeal-product-card__price span {
   color: #f33221;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 900;
 }
 
 .hotdeal-product-card__price strong {
   color: #201c19;
-  font-size: 18px;
+  font-size: 19px;
   font-weight: 900;
 }
 
@@ -307,7 +306,7 @@
   display: block;
   margin-top: 2px;
   color: #afa7a0;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 @media (max-width: 991.98px) {

@@ -150,7 +150,7 @@
 
 .product-stock {
   color: var(--color-muted, #77716d);
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 800;
 }
 
@@ -158,7 +158,7 @@
   max-width: 440px;
   padding: 12px 14px;
   border-radius: 6px;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 900;
 }
 
@@ -208,7 +208,7 @@
   border-right: 1px solid var(--color-line, #eee5df);
   border-left: 1px solid var(--color-line, #eee5df);
   color: var(--color-ink, #191716);
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 900;
   text-align: center;
 }
@@ -230,7 +230,7 @@
   border-radius: 6px;
   background: var(--color-brand, #ff4d1f);
   color: #ffffff;
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 900;
 }
 
@@ -261,7 +261,7 @@
   border-radius: 8px 8px 0 0;
   color: var(--color-muted, #77716d);
   background: #ffffff;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 900;
 }
 
@@ -301,7 +301,7 @@
 .product-description-html li,
 .review-content {
   color: var(--color-ink, #191716);
-  font-size: 15px;
+  font-size: 16px;
   line-height: 1.8;
 }
 
@@ -324,19 +324,19 @@
 
 .review-tab-header h2 {
   color: var(--color-ink, #191716);
-  font-size: 18px;
+  font-size: 19px;
   font-weight: 900;
 }
 
 .review-tab-header h2 span {
   color: var(--color-muted, #77716d);
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 800;
 }
 
 .review-write-link {
   color: var(--color-ink, #191716);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 900;
   text-decoration: none;
 }
@@ -366,19 +366,19 @@
 
 .review-meta time {
   color: var(--color-muted, #77716d);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
 }
 
 .review-writer {
   color: var(--color-ink, #191716);
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 900;
 }
 
 .review-stars {
   color: var(--color-brand, #ff4d1f);
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 900;
   letter-spacing: 0;
 }
@@ -397,7 +397,7 @@
 .review-error {
   padding: 34px 32px;
   color: var(--color-muted, #77716d);
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 800;
   text-align: center;
 }
@@ -422,7 +422,7 @@
   border-radius: 6px;
   background: #ffffff;
   color: var(--color-ink, #191716);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 900;
 }
 

@@ -25,7 +25,7 @@
 .filter-panel h2 {
   margin: 0 0 16px;
   color: #24201d;
-  font-size: 17px;
+  font-size: 18px;
   font-weight: 800;
 }
 
@@ -56,7 +56,7 @@
 
 .category-filter small {
   color: #aaa19b;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
 }
 
@@ -64,7 +64,7 @@
   display: block;
   margin: 18px 0 8px;
   color: #5f5751;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 800;
 }
 
@@ -84,7 +84,7 @@
   background: #fff;
   color: #2d2925;
   padding: 10px 12px;
-  font-size: 14px;
+  font-size: 15px;
 }
 
 .filter-actions {
@@ -101,7 +101,7 @@
   justify-content: center;
   min-height: 40px;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 800;
   text-decoration: none;
 }
@@ -130,7 +130,7 @@
 .product-list-kicker {
   margin: 0 0 6px;
   color: var(--color-brand-strong, #e83d12);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 900;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -139,14 +139,14 @@
 .product-list-header h1 {
   margin: 0;
   color: #211d1a;
-  font-size: 26px;
+  font-size: 28px;
   font-weight: 900;
 }
 
 .product-list-count {
   margin: 8px 0 0;
   color: #8d837b;
-  font-size: 14px;
+  font-size: 15px;
 }
 
 .product-list-count strong {
@@ -212,7 +212,7 @@
   background: #ff3d25;
   color: #fff;
   padding: 6px 8px;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 900;
 }
 
@@ -220,7 +220,7 @@
   display: block;
   margin-top: 13px;
   color: #292420;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 700;
   line-height: 1.45;
   text-decoration: none;
@@ -235,13 +235,13 @@
 
 .discount-rate {
   color: #f33221;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 900;
 }
 
 .catalog-product-card__price strong {
   color: #201c19;
-  font-size: 17px;
+  font-size: 18px;
   font-weight: 900;
 }
 
@@ -249,7 +249,7 @@
   display: block;
   margin-top: 2px;
   color: #afa7a0;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .product-pagination {
@@ -269,7 +269,7 @@
   border-radius: 50%;
   color: #5f5751;
   text-decoration: none;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 800;
 }
 

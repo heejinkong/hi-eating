@@ -29,7 +29,7 @@
   gap: 8px;
   margin: 0 0 8px;
   color: var(--color-brand-strong, #e83d12);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 900;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -53,7 +53,7 @@
   gap: 18px;
   margin-top: 14px;
   color: #5f5751;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 700;
 }
 
@@ -144,7 +144,7 @@
 .table-post-card__header strong {
   overflow: hidden;
   color: var(--color-ink, #191716);
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 900;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -153,7 +153,7 @@
 .table-post-card__header span {
   flex: 0 0 auto;
   color: #948982;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 800;
 }
 
@@ -205,7 +205,7 @@
   color: #292420;
   box-shadow: none;
   padding: 0;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 900;
   transition:
     transform 180ms ease,
@@ -247,7 +247,7 @@
 .table-post-card__owner {
   margin: 0;
   color: #292420;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 800;
   line-height: 1.45;
 }
@@ -257,7 +257,7 @@
   justify-content: flex-start;
   margin: 8px 0 0;
   color: #948982;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 800;
 }
 

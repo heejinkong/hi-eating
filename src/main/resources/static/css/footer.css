@@ -30,7 +30,7 @@
 }
 
 .footer-customer strong {
-  color: #8a8600;
+  color: var(--color-brand, #ff4d1f);
   font-size: 34px;
   line-height: 1.1;
   font-weight: 800;

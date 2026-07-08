@@ -21,7 +21,7 @@
 .favorite-kicker {
   margin: 0 0 6px;
   color: var(--color-brand-strong, #e83d12);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 900;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -37,7 +37,7 @@
 .favorite-count {
   margin: 8px 0 0;
   color: #8d837b;
-  font-size: 14px;
+  font-size: 15px;
 }
 
 .favorite-count strong {
@@ -55,7 +55,7 @@
   background: #fff;
   color: #2d2925;
   padding: 10px 12px;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 700;
 }
 
@@ -117,7 +117,7 @@
   background: #ff3d25;
   color: #fff;
   padding: 6px 8px;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 900;
 }
 
@@ -125,7 +125,7 @@
   display: block;
   margin-top: 13px;
   color: #292420;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 800;
   line-height: 1.45;
   text-decoration: none;
@@ -140,13 +140,13 @@
 
 .favorite-product-card__price span {
   color: #f33221;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 900;
 }
 
 .favorite-product-card__price strong {
   color: #201c19;
-  font-size: 18px;
+  font-size: 19px;
   font-weight: 900;
 }
 
@@ -154,7 +154,7 @@
   display: block;
   margin-top: 2px;
   color: #afa7a0;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .favorite-pagination {
@@ -174,7 +174,7 @@
   border-radius: 50%;
   color: #5f5751;
   text-decoration: none;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 800;
 }
 
