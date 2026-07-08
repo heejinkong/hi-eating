@@ -1,14 +1,17 @@
 package kr.or.hieating.chat.service;
 
 import java.util.List;
+import java.util.Objects;
 import kr.or.hieating.chat.dto.ChatMessageCreateCommand;
 import kr.or.hieating.chat.dto.ChatMessageDto;
+import kr.or.hieating.chat.dto.ChatMessagePageResponseDto;
 import kr.or.hieating.chat.dto.ChatRoomCreateCommand;
 import kr.or.hieating.chat.dto.ChatRoomResponseDto;
 import kr.or.hieating.chat.dto.ChatRoomSummaryDto;
 import kr.or.hieating.chat.dto.ChatWebSocketEvent;
 import kr.or.hieating.chat.mapper.ChatMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,13 +29,20 @@ public class ChatService {
 
   private final ChatMapper chatMapper;
 
+  @Value("${chat.message-history-limit:50}")
+  private int messageHistoryLimit;
+
   @Transactional
   public ChatRoomResponseDto getUserRoom(long userId) {
     ChatRoomSummaryDto room = findOrCreateRoom(userId);
     chatMapper.markUserRead(room.getRoomId());
     ChatRoomSummaryDto updatedRoom = requireRoom(room.getRoomId());
+    ChatMessagePageResponseDto messagePage = findRecentMessages(updatedRoom.getRoomId());
     return new ChatRoomResponseDto(
-        updatedRoom, chatMapper.findMessagesByRoomId(updatedRoom.getRoomId()));
+        updatedRoom,
+        messagePage.messages(),
+        messagePage.hasMoreMessages(),
+        messagePage.oldestMessageId());
   }
 
   @Transactional(readOnly = true)
@@ -45,7 +55,28 @@ public class ChatService {
     ChatRoomSummaryDto room = requireAssignedRoom(adminId, roomId);
     chatMapper.markAdminRead(roomId);
     ChatRoomSummaryDto updatedRoom = requireRoom(roomId);
-    return new ChatRoomResponseDto(updatedRoom, chatMapper.findMessagesByRoomId(room.getRoomId()));
+    ChatMessagePageResponseDto messagePage = findRecentMessages(room.getRoomId());
+    return new ChatRoomResponseDto(
+        updatedRoom,
+        messagePage.messages(),
+        messagePage.hasMoreMessages(),
+        messagePage.oldestMessageId());
+  }
+
+  @Transactional(readOnly = true)
+  public ChatMessagePageResponseDto findUserMessagesBefore(long userId, long beforeMessageId) {
+    ChatRoomSummaryDto room =
+        chatMapper
+            .findRoomByUserId(userId)
+            .orElseThrow(() -> new IllegalArgumentException("Chat room not found."));
+    return findMessagesBefore(room.getRoomId(), beforeMessageId);
+  }
+
+  @Transactional(readOnly = true)
+  public ChatMessagePageResponseDto findAdminMessagesBefore(
+      long adminId, long roomId, long beforeMessageId) {
+    requireAssignedRoom(adminId, roomId);
+    return findMessagesBefore(roomId, beforeMessageId);
   }
 
   @Transactional
@@ -158,6 +189,41 @@ public class ChatService {
     return chatMapper
         .findMessageById(command.getId())
         .orElseThrow(() -> new IllegalStateException("Failed to load chat message."));
+  }
+
+  private ChatMessagePageResponseDto findRecentMessages(long roomId) {
+    int limit = normalizedMessageHistoryLimit();
+    return toMessagePage(chatMapper.findRecentMessagesByRoomId(roomId, limit + 1), limit);
+  }
+
+  private ChatMessagePageResponseDto findMessagesBefore(long roomId, long beforeMessageId) {
+    if (beforeMessageId <= 0) {
+      throw new IllegalArgumentException("Message cursor is required.");
+    }
+
+    int limit = normalizedMessageHistoryLimit();
+    return toMessagePage(
+        chatMapper.findMessagesBeforeByRoomId(roomId, beforeMessageId, limit + 1), limit);
+  }
+
+  private ChatMessagePageResponseDto toMessagePage(
+      List<ChatMessageDto> fetchedMessages, int limit) {
+    boolean hasMoreMessages = fetchedMessages.size() > limit;
+    List<ChatMessageDto> messages =
+        hasMoreMessages
+            ? fetchedMessages.subList(fetchedMessages.size() - limit, fetchedMessages.size())
+            : fetchedMessages;
+    Long oldestMessageId =
+        messages.stream()
+            .map(ChatMessageDto::getId)
+            .filter(Objects::nonNull)
+            .findFirst()
+            .orElse(null);
+    return new ChatMessagePageResponseDto(messages, hasMoreMessages, oldestMessageId);
+  }
+
+  private int normalizedMessageHistoryLimit() {
+    return Math.max(1, messageHistoryLimit);
   }
 
   private String normalizeContent(String rawContent) {

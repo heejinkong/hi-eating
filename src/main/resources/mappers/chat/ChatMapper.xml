@@ -19,8 +19,20 @@
     r.last_message_at,
     r.created_at,
     r.updated_at,
-    lm.content AS last_message_content,
-    lm.sender_type AS last_sender_type
+    (
+      SELECT DBMS_LOB.SUBSTR(m.content, 1000, 1)
+      FROM chat_messages m
+      WHERE m.room_id = r.id
+      ORDER BY m.created_at DESC, m.id DESC
+      FETCH FIRST 1 ROW ONLY
+    ) AS last_message_content,
+    (
+      SELECT m.sender_type
+      FROM chat_messages m
+      WHERE m.room_id = r.id
+      ORDER BY m.created_at DESC, m.id DESC
+      FETCH FIRST 1 ROW ONLY
+    ) AS last_sender_type
   </sql>
 
   <select id="findRoomByUserId" resultType="kr.or.hieating.chat.dto.ChatRoomSummaryDto">
@@ -33,15 +45,6 @@
       ON au.id = r.assigned_admin_id
     LEFT JOIN chat_admin_presences ap
       ON ap.admin_id = r.assigned_admin_id
-    LEFT JOIN (
-      SELECT room_id, content, sender_type
-      FROM (
-        SELECT room_id, content, sender_type,
-               ROW_NUMBER() OVER (PARTITION BY room_id ORDER BY created_at DESC, id DESC) rn
-        FROM chat_messages
-      )
-      WHERE rn = 1
-    ) lm ON lm.room_id = r.id
     WHERE r.user_id = #{userId}
       AND u.deleted_at IS NULL
   </select>
@@ -56,15 +59,6 @@
       ON au.id = r.assigned_admin_id
     LEFT JOIN chat_admin_presences ap
       ON ap.admin_id = r.assigned_admin_id
-    LEFT JOIN (
-      SELECT room_id, content, sender_type
-      FROM (
-        SELECT room_id, content, sender_type,
-               ROW_NUMBER() OVER (PARTITION BY room_id ORDER BY created_at DESC, id DESC) rn
-        FROM chat_messages
-      )
-      WHERE rn = 1
-    ) lm ON lm.room_id = r.id
     WHERE r.id = #{roomId}
       AND u.deleted_at IS NULL
   </select>
@@ -79,15 +73,6 @@
       ON au.id = r.assigned_admin_id
     LEFT JOIN chat_admin_presences ap
       ON ap.admin_id = r.assigned_admin_id
-    LEFT JOIN (
-      SELECT room_id, content, sender_type
-      FROM (
-        SELECT room_id, content, sender_type,
-               ROW_NUMBER() OVER (PARTITION BY room_id ORDER BY created_at DESC, id DESC) rn
-        FROM chat_messages
-      )
-      WHERE rn = 1
-    ) lm ON lm.room_id = r.id
     WHERE u.deleted_at IS NULL
       AND r.assigned_admin_id = #{adminId}
     ORDER BY
@@ -129,20 +114,53 @@
     WHERE admin_id = #{adminId}
   </select>
 
-  <select id="findMessagesByRoomId" resultType="kr.or.hieating.chat.dto.ChatMessageDto">
-    SELECT
-      m.id,
-      m.room_id,
-      m.sender_id,
-      m.sender_type,
-      u.name AS sender_name,
-      m.content,
-      m.created_at
-    FROM chat_messages m
-    JOIN users u
-      ON u.id = m.sender_id
-    WHERE m.room_id = #{roomId}
-    ORDER BY m.created_at ASC, m.id ASC
+  <select id="findRecentMessagesByRoomId" resultType="kr.or.hieating.chat.dto.ChatMessageDto">
+    SELECT *
+    FROM (
+      SELECT recent_messages.*
+      FROM (
+        SELECT
+          m.id,
+          m.room_id,
+          m.sender_id,
+          m.sender_type,
+          u.name AS sender_name,
+          m.content,
+          m.created_at
+        FROM chat_messages m
+        JOIN users u
+          ON u.id = m.sender_id
+        WHERE m.room_id = #{roomId}
+        ORDER BY m.created_at DESC, m.id DESC
+      ) recent_messages
+      WHERE ROWNUM &lt;= #{limit}
+    )
+    ORDER BY created_at ASC, id ASC
+  </select>
+
+  <select id="findMessagesBeforeByRoomId" resultType="kr.or.hieating.chat.dto.ChatMessageDto">
+    SELECT *
+    FROM (
+      SELECT previous_messages.*
+      FROM (
+        SELECT
+          m.id,
+          m.room_id,
+          m.sender_id,
+          m.sender_type,
+          u.name AS sender_name,
+          m.content,
+          m.created_at
+        FROM chat_messages m
+        JOIN users u
+          ON u.id = m.sender_id
+        WHERE m.room_id = #{roomId}
+          AND m.id &lt; #{beforeMessageId}
+        ORDER BY m.created_at DESC, m.id DESC
+      ) previous_messages
+      WHERE ROWNUM &lt;= #{limit}
+    )
+    ORDER BY created_at ASC, id ASC
   </select>
 
   <select id="findMessageById" resultType="kr.or.hieating.chat.dto.ChatMessageDto">

@@ -3,6 +3,7 @@ package kr.or.hieating.chat.controller;
 import java.util.List;
 import kr.or.hieating.chat.dto.ChatAdminStatusRequestDto;
 import kr.or.hieating.chat.dto.ChatAdminStatusResponseDto;
+import kr.or.hieating.chat.dto.ChatMessagePageResponseDto;
 import kr.or.hieating.chat.dto.ChatRoomResponseDto;
 import kr.or.hieating.chat.dto.ChatRoomSummaryDto;
 import kr.or.hieating.chat.service.ChatService;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -33,6 +35,14 @@ public class AdminChatRestController {
   public ApiResponse<ChatRoomResponseDto> messages(@PathVariable("roomId") long roomId) {
     return ApiResponse.onSuccess(
         chatService.getAdminRoomMessages(userResolver.requireCurrentUserId(), roomId));
+  }
+
+  @GetMapping("/rooms/{roomId}/messages/older")
+  public ApiResponse<ChatMessagePageResponseDto> olderMessages(
+      @PathVariable("roomId") long roomId, @RequestParam("beforeMessageId") long beforeMessageId) {
+    return ApiResponse.onSuccess(
+        chatService.findAdminMessagesBefore(
+            userResolver.requireCurrentUserId(), roomId, beforeMessageId));
   }
 
   @GetMapping("/status")

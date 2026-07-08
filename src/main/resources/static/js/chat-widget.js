@@ -16,6 +16,9 @@
   let socket = null;
   let currentRoomId = null;
   let unreadCount = 0;
+  let hasMoreMessages = false;
+  let oldestMessageId = null;
+  let loadingOlderMessages = false;
 
   const isAuthenticated = () => root.dataset.authenticated === 'true';
 
@@ -65,14 +68,9 @@
     messagesElement.appendChild(empty);
   };
 
-  const appendMessage = (message) => {
+  const createMessageElement = (message) => {
     if (!message) {
-      return;
-    }
-
-    const empty = messagesElement.querySelector('.chat-widget__empty');
-    if (empty) {
-      empty.remove();
+      return null;
     }
 
     const item = document.createElement('article');
@@ -92,12 +90,54 @@
         : formatTime(message.createdAt);
 
     item.append(bubble, meta);
+    return item;
+  };
+
+  const appendMessage = (message) => {
+    const item = createMessageElement(message);
+    if (!item) {
+      return;
+    }
+
+    const empty = messagesElement.querySelector('.chat-widget__empty');
+    if (empty) {
+      empty.remove();
+    }
+
     messagesElement.appendChild(item);
+    if (message.id && (!oldestMessageId || message.id < oldestMessageId)) {
+      oldestMessageId = message.id;
+    }
     scrollToBottom();
   };
 
-  const renderMessages = (messages) => {
+  const prependMessages = (messages) => {
+    if (!messages || messages.length === 0) {
+      return;
+    }
+
+    const previousHeight = messagesElement.scrollHeight;
+    const fragment = document.createDocumentFragment();
+    messages.forEach((message) => {
+      const item = createMessageElement(message);
+      if (item) {
+        fragment.appendChild(item);
+      }
+    });
+
+    messagesElement.prepend(fragment);
+    oldestMessageId = messages[0]?.id || oldestMessageId;
+    messagesElement.scrollTop += messagesElement.scrollHeight - previousHeight;
+  };
+
+  const syncMessagePage = (result) => {
+    hasMoreMessages = Boolean(result?.hasMoreMessages);
+    oldestMessageId = result?.oldestMessageId || result?.messages?.[0]?.id || null;
+  };
+
+  const renderMessages = (messages, result) => {
     messagesElement.replaceChildren();
+    syncMessagePage(result);
     if (!messages || messages.length === 0) {
       renderEmpty();
       return;
@@ -123,8 +163,38 @@
     const result = body.result;
     currentRoomId = result.room.roomId;
     setUnreadCount(result.room.userUnreadCount);
-    renderMessages(result.messages);
+    renderMessages(result.messages, result);
     setStatus('실시간 연결 중');
+  };
+
+  const loadOlderMessages = async () => {
+    if (!currentRoomId || !hasMoreMessages || !oldestMessageId || loadingOlderMessages) {
+      return;
+    }
+
+    loadingOlderMessages = true;
+    try {
+      const url = new URL(`${root.dataset.roomUrl}/messages/older`, window.location.origin);
+      url.searchParams.set('beforeMessageId', oldestMessageId);
+      const response = await fetch(url, {
+        headers: {
+          Accept: 'application/json',
+        },
+      });
+
+      if (!response.ok || response.redirected) {
+        throw new Error('Failed to load older chat messages.');
+      }
+
+      const body = await response.json();
+      const result = body.result;
+      prependMessages(result.messages);
+      syncMessagePage(result);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      loadingOlderMessages = false;
+    }
   };
 
   const connect = () => {
@@ -213,6 +283,12 @@
     if (event.key === 'Enter' && !event.shiftKey && !event.isComposing) {
       event.preventDefault();
       form.requestSubmit();
+    }
+  });
+
+  messagesElement?.addEventListener('scroll', () => {
+    if (messagesElement.scrollTop <= 24) {
+      loadOlderMessages();
     }
   });
 

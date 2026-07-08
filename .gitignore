@@ -39,5 +39,5 @@ out/
 
 ### Local work notes ###
 WORK_LOG.md
-
+load-tests/**
 .omo/

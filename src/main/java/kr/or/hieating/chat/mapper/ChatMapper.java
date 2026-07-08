@@ -22,7 +22,13 @@ public interface ChatMapper {
 
   Optional<String> findAdminPresenceStatus(@Param("adminId") long adminId);
 
-  List<ChatMessageDto> findMessagesByRoomId(@Param("roomId") long roomId);
+  List<ChatMessageDto> findRecentMessagesByRoomId(
+      @Param("roomId") long roomId, @Param("limit") int limit);
+
+  List<ChatMessageDto> findMessagesBeforeByRoomId(
+      @Param("roomId") long roomId,
+      @Param("beforeMessageId") long beforeMessageId,
+      @Param("limit") int limit);
 
   Optional<ChatMessageDto> findMessageById(@Param("messageId") long messageId);
 

@@ -18,6 +18,9 @@ document.addEventListener('DOMContentLoaded', () => {
   let rooms = [];
   let selectedRoomId = null;
   let socket = null;
+  let selectedRoomHasMoreMessages = false;
+  let selectedRoomOldestMessageId = null;
+  let loadingOlderMessages = false;
 
   const setStatus = (message) => {
     statusElement.textContent = message;
@@ -140,8 +143,44 @@ document.addEventListener('DOMContentLoaded', () => {
     messagesElement.appendChild(item);
   };
 
-  const renderMessages = (messages) => {
+  const prependMessages = (messages) => {
+    if (!messages || messages.length === 0) {
+      return;
+    }
+
+    const previousHeight = messagesElement.scrollHeight;
+    const fragment = document.createDocumentFragment();
+    messages.forEach((message) => {
+      const item = document.createElement('article');
+      item.className = `admin-chat-message ${
+        message.senderType === 'ADMIN' ? 'is-admin' : 'is-user'
+      }`;
+
+      const bubble = document.createElement('div');
+      bubble.className = 'admin-chat-bubble';
+      bubble.textContent = message.content || '';
+
+      const meta = document.createElement('span');
+      meta.className = 'admin-chat-meta';
+      meta.textContent = `${message.senderName || ''} 쨌 ${formatTime(message.createdAt)}`;
+
+      item.append(bubble, meta);
+      fragment.appendChild(item);
+    });
+
+    messagesElement.prepend(fragment);
+    selectedRoomOldestMessageId = messages[0]?.id || selectedRoomOldestMessageId;
+    messagesElement.scrollTop += messagesElement.scrollHeight - previousHeight;
+  };
+
+  const syncSelectedRoomMessagePage = (result) => {
+    selectedRoomHasMoreMessages = Boolean(result?.hasMoreMessages);
+    selectedRoomOldestMessageId = result?.oldestMessageId || result?.messages?.[0]?.id || null;
+  };
+
+  const renderMessages = (messages, result) => {
     messagesElement.replaceChildren();
+    syncSelectedRoomMessagePage(result);
     if (!messages || messages.length === 0) {
       const empty = document.createElement('p');
       empty.className = 'admin-chat-empty';
@@ -224,7 +263,7 @@ document.addEventListener('DOMContentLoaded', () => {
       rooms = rooms.map((room) => (room.roomId === updatedRoom.roomId ? updatedRoom : room));
       syncSelectedRoomHeader(updatedRoom);
       renderRooms();
-      renderMessages(result.messages);
+      renderMessages(result.messages, result);
       setStatus('상담 가능');
       input.focus();
     } catch (error) {
@@ -232,6 +271,30 @@ document.addEventListener('DOMContentLoaded', () => {
       setStatus('대화를 불러오지 못했습니다');
     }
   }
+
+  const loadOlderMessages = async () => {
+    if (
+      !selectedRoomId ||
+      !selectedRoomHasMoreMessages ||
+      !selectedRoomOldestMessageId ||
+      loadingOlderMessages
+    ) {
+      return;
+    }
+
+    loadingOlderMessages = true;
+    try {
+      const result = await fetchApi(
+        `${page.dataset.roomUrlPrefix}/${selectedRoomId}/messages/older?beforeMessageId=${selectedRoomOldestMessageId}`,
+      );
+      prependMessages(result.messages);
+      syncSelectedRoomMessagePage(result);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      loadingOlderMessages = false;
+    }
+  };
 
   const upsertRoom = (room) => {
     if (!room) {
@@ -306,6 +369,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault();
       form.requestSubmit();
+    }
+  });
+
+  messagesElement?.addEventListener('scroll', () => {
+    if (messagesElement.scrollTop <= 24) {
+      loadOlderMessages();
     }
   });
 

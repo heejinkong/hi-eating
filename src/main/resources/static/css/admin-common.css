@@ -28,7 +28,11 @@ html {
 }
 
 /* ---- Body ---- */
-body, input, select, textarea, button {
+body,
+input,
+select,
+textarea,
+button {
   font-family: var(--admin-font-family) !important;
   background: var(--admin-bg);
   color: var(--admin-text);
@@ -289,7 +293,9 @@ body, input, select, textarea, button {
   color: #ffffff !important;
   padding: 0 1.1rem !important;
   width: 100% !important;
-  transition: background 0.2s ease, box-shadow 0.2s ease !important;
+  transition:
+    background 0.2s ease,
+    box-shadow 0.2s ease !important;
 }
 
 .admin-common-modal-button:hover {
