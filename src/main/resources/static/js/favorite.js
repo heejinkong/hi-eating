@@ -50,14 +50,16 @@
       return;
     }
 
-    const csrfToken = document.querySelector("meta[name='_csrf']")?.content;
-    const csrfHeader = document.querySelector("meta[name='_csrf_header']")?.content;
+    const csrfToken = (() => {
+      const match = document.cookie.match(/(?:^|;\s*)XSRF-TOKEN=([^;]*)/);
+      return match ? decodeURIComponent(match[1]) : null;
+    })();
     const headers = {
       Accept: 'application/json',
     };
 
-    if (csrfToken && csrfHeader) {
-      headers[csrfHeader] = csrfToken;
+    if (csrfToken) {
+      headers['X-XSRF-TOKEN'] = csrfToken;
     }
 
     button.classList.add('is-loading');

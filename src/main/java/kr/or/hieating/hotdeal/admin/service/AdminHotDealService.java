@@ -38,21 +38,22 @@ public class AdminHotDealService {
   }
 
   @Transactional
-  public int createHotDeal(HotDealCreateRequestDTO request) {
+  public Long createHotDeal(HotDealCreateRequestDTO request) {
 
     LocalDate today = LocalDate.now();
     pricePolicy.validatePeriod(request.getStartsAt(), request.getEndsAt(), today);
 
-    List<Integer> productOptionIds =
+    List<Long> productOptionIds =
         request.getProducts().stream()
             .map(HotDealCreateRequestDTO.ProductItemDTO::getProductOptionId)
+            .map(Integer::longValue)
             .toList();
     if (adminHotDealMapper.countExpiredProductOptions(productOptionIds) > 0) {
       throw new GeneralException(ErrorStatus._BAD_REQUEST);
     }
 
     String status = pricePolicy.determineStatus(request.getStartsAt(), today);
-    int adminUserId = Math.toIntExact(userResolver.requireCurrentUserId());
+    Long adminUserId = userResolver.requireCurrentUserId();
 
     HotDeals hotDeal =
         HotDeals.builder()
@@ -65,7 +66,7 @@ public class AdminHotDealService {
             .build();
 
     adminHotDealMapper.insertHotDeal(hotDeal);
-    int hotDealId = hotDeal.getId();
+    Long hotDealId = hotDeal.getId();
 
     productSyncService.insertCreatedProducts(
         hotDealId, request.getProducts(), request.getDiscountRate());
@@ -76,7 +77,7 @@ public class AdminHotDealService {
   }
 
   @Transactional
-  public void updateHotDeal(int id, HotDealUpdateRequestDTO request) {
+  public void updateHotDeal(Long id, HotDealUpdateRequestDTO request) {
     HotDeals existing = adminHotDealMapper.selectHotDealById(id);
     if (existing == null) {
       throw new GeneralException(ErrorStatus.HOT_DEAL_NOT_FOUND);
@@ -85,9 +86,10 @@ public class AdminHotDealService {
     LocalDate today = LocalDate.now();
     pricePolicy.validatePeriod(request.getStartsAt(), request.getEndsAt(), today);
 
-    List<Integer> requestedProductOptionIds =
+    List<Long> requestedProductOptionIds =
         request.getProducts().stream()
             .map(HotDealUpdateRequestDTO.ProductItemDTO::getProductOptionId)
+            .map(Integer::longValue)
             .toList();
     if (adminHotDealMapper.countUnlinkedExpiredProductOptions(id, requestedProductOptionIds) > 0) {
       throw new GeneralException(ErrorStatus._BAD_REQUEST);
@@ -115,7 +117,7 @@ public class AdminHotDealService {
         id, existingProducts, request.getProducts(), request.getDiscountRate());
   }
 
-  public HotDealDetailResponseDTO getHotDealDetail(int id) {
+  public HotDealDetailResponseDTO getHotDealDetail(Long id) {
     HotDeals hotDeal = adminHotDealMapper.selectHotDealById(id);
     if (hotDeal == null) {
       throw new GeneralException(ErrorStatus.HOT_DEAL_NOT_FOUND);
@@ -144,7 +146,7 @@ public class AdminHotDealService {
   }
 
   @Transactional
-  public void deleteHotDeal(int id) {
+  public void deleteHotDeal(Long id) {
     HotDeals hotDeal = adminHotDealMapper.selectHotDealById(id);
     if (hotDeal == null) {
       throw new GeneralException(ErrorStatus.HOT_DEAL_NOT_FOUND);

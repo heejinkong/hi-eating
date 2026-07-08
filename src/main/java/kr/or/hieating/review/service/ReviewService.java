@@ -120,8 +120,8 @@ public class ReviewService {
 
   private Reviews createEmptyReview(ReviewFormResponseDto reviewForm) {
     Reviews review = new Reviews();
-    review.setProductId(reviewForm.getProductId().intValue());
-    review.setPurchaseId(reviewForm.getPurchaseId().intValue());
+    review.setProductId(reviewForm.getProductId());
+    review.setPurchaseId(reviewForm.getPurchaseId());
     review.setRating(0);
     review.setContent("");
     review.setImgSrc("");

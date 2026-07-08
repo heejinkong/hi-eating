@@ -28,7 +28,7 @@ public class HotDealProductSearchCondition {
     this.page = Math.max(page == null ? 1 : page, 1);
     this.size = normalizeSize(size);
     this.offset = (this.page - 1) * this.size;
-    this.limit = this.size + 1;
+    this.limit = this.size;
   }
 
   private static int normalizeSize(Integer size) {

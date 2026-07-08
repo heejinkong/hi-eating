@@ -1,10 +1,10 @@
 .favorite-page {
   background: #fff;
-  padding: 56px clamp(20px, 5vw, 72px) 96px;
+  padding: 48px clamp(20px, 5vw, 72px) 48px;
 }
 
 .favorite-shell {
-  max-width: 1120px;
+  max-width: 1320px;
   margin: 0 auto;
 }
 
@@ -30,7 +30,6 @@
 .favorite-header h1 {
   margin: 0;
   color: #211d1a;
-  font-size: 30px;
   font-weight: 900;
 }
 

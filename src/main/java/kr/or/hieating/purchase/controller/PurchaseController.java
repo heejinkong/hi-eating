@@ -1,8 +1,8 @@
 package kr.or.hieating.purchase.controller;
 
+import kr.or.hieating.global.apiPayload.exception.GeneralException;
 import kr.or.hieating.purchase.dto.PurchaseProductListPageResponseDto;
 import kr.or.hieating.purchase.dto.PurchaseProductListSearchCondition;
-import kr.or.hieating.purchase.exception.PurchaseException;
 import kr.or.hieating.purchase.service.PurchaseService;
 import kr.or.hieating.utils.UserResolver;
 import lombok.RequiredArgsConstructor;
@@ -52,8 +52,8 @@ public class PurchaseController {
     try {
       purchaseService.purchase(userResolver.requireCurrentUserId(), productId, quantity);
       redirectAttributes.addFlashAttribute("purchaseSuccessMessage", "구매가 완료되었습니다.");
-    } catch (PurchaseException e) {
-      redirectAttributes.addFlashAttribute("purchaseErrorMessage", e.getMessage());
+    } catch (GeneralException e) {
+      redirectAttributes.addFlashAttribute("purchaseErrorMessage", e.getErrorReason().getMessage());
     }
 
     return "redirect:/product/" + productId;

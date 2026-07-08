@@ -23,13 +23,19 @@ document.addEventListener('DOMContentLoaded', () => {
     statusElement.textContent = message;
   };
 
+  const getCsrfToken = () => {
+    const match = document.cookie.match(/(?:^|;\s*)XSRF-TOKEN=([^;]*)/);
+    return match ? decodeURIComponent(match[1]) : '';
+  };
+
   const fetchApi = async (url, options) => {
     const response = await fetch(url, {
+      ...options,
       headers: {
         Accept: 'application/json',
+        'X-XSRF-TOKEN': getCsrfToken(),
         ...(options?.headers || {}),
       },
-      ...options,
     });
 
     const body = await response.json();

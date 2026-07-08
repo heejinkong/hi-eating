@@ -6,9 +6,9 @@ import lombok.Data;
 @Data
 public class HotDealProductsResponseDto {
 
-  private int hotDealId;
-  private int productId;
-  private int productOptionId;
+  private Long hotDealId;
+  private Long productId;
+  private Long productOptionId;
   private String hotDealTitle;
   private String productName;
   private String pictureLocation;

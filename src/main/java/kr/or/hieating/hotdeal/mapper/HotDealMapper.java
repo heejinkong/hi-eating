@@ -16,4 +16,6 @@ public interface HotDealMapper {
 
   List<HotDealProductListItemResponseDto> findHotDealProducts(
       HotDealProductSearchCondition condition);
+
+  int countHotDealProducts(HotDealProductSearchCondition condition);
 }

@@ -12,8 +12,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class HotDealProducts {
 
-  private int hotDealId;
-  private int productOptionId;
+  private Long hotDealId;
+  private Long productOptionId;
   private int originalPrice;
   private int hotDealPrice;
   private LocalDateTime createdAt;

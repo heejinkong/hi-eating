@@ -17,27 +17,27 @@ public class AdminHotDealRestController {
   private final AdminHotDealService adminHotDealService;
 
   @PostMapping
-  public ApiResponse<Integer> createHotDeal(@RequestBody @Valid HotDealCreateRequestDTO request) {
-    int newHotDealId = adminHotDealService.createHotDeal(request);
+  public ApiResponse<Long> createHotDeal(@RequestBody @Valid HotDealCreateRequestDTO request) {
+    Long newHotDealId = adminHotDealService.createHotDeal(request);
     return ApiResponse.onSuccess(newHotDealId);
   }
 
   @PutMapping("/{id}")
   public ApiResponse<Void> updateHotDeal(
-      @PathVariable("id") int id, @RequestBody @Valid HotDealUpdateRequestDTO request) {
+      @PathVariable("id") Long id, @RequestBody @Valid HotDealUpdateRequestDTO request) {
 
     adminHotDealService.updateHotDeal(id, request);
     return ApiResponse.onSuccess(null);
   }
 
   @GetMapping("/{id}")
-  public ApiResponse<HotDealDetailResponseDTO> getHotDealDetail(@PathVariable("id") int id) {
+  public ApiResponse<HotDealDetailResponseDTO> getHotDealDetail(@PathVariable("id") Long id) {
     HotDealDetailResponseDTO detail = adminHotDealService.getHotDealDetail(id);
     return ApiResponse.onSuccess(detail);
   }
 
   @DeleteMapping("/{id}")
-  public ApiResponse<Void> deleteHotDeal(@PathVariable("id") int id) {
+  public ApiResponse<Void> deleteHotDeal(@PathVariable("id") Long id) {
     adminHotDealService.deleteHotDeal(id);
     return ApiResponse.onSuccess(null);
   }

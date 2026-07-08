@@ -43,7 +43,14 @@ public enum ErrorStatus implements BaseErrorCode {
   INVALID_STATISTICS_DATE_RANGE(
       HttpStatus.BAD_REQUEST, "STATISTICS4001", "시작날짜는 끝날짜 이후로 설정할 수 없습니다."),
   MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "MEMBER4001", "회원 정보를 찾을 수 없습니다."),
-  MEMBER_WITHDRAW_FAILED(HttpStatus.BAD_REQUEST, "MEMBER4002", "이미 탈퇴했거나 탈퇴할 수 없는 회원입니다.");
+  MEMBER_WITHDRAW_FAILED(HttpStatus.BAD_REQUEST, "MEMBER4002", "이미 탈퇴했거나 탈퇴할 수 없는 회원입니다."),
+
+  // 구매 관련 에러
+  PURCHASE_INVALID_QUANTITY(HttpStatus.BAD_REQUEST, "PURCHASE4001", "구매 수량은 1개 이상이어야 합니다."),
+  PURCHASE_PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "PURCHASE4002", "존재하지 않는 상품입니다."),
+  PURCHASE_PRODUCT_NOT_ON_SALE(HttpStatus.BAD_REQUEST, "PURCHASE4003", "현재 구매할 수 없는 상품입니다."),
+  PURCHASE_CREATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "PURCHASE5001", "구매 이력을 생성하지 못했습니다."),
+  PURCHASE_OUT_OF_STOCK(HttpStatus.CONFLICT, "PURCHASE4004", "상품 재고가 부족합니다.");
 
   private final HttpStatus httpStatus;
   private final String code;

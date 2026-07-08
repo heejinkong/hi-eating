@@ -36,18 +36,17 @@ public class HotDealService {
 
   public HotDealProductListPageResponseDto findHotDealProducts(
       HotDealProductSearchCondition condition) {
-    List<HotDealProductListItemResponseDto> products = hotDealMapper.findHotDealProducts(condition);
-    boolean hasMore = products.size() > condition.getSize();
+    int totalCount = hotDealMapper.countHotDealProducts(condition);
+    int totalPages = (int) Math.ceil((double) totalCount / condition.getSize());
 
-    if (hasMore) {
-      products = products.subList(0, condition.getSize());
-    }
+    List<HotDealProductListItemResponseDto> products =
+        totalCount == 0 ? List.of() : hotDealMapper.findHotDealProducts(condition);
 
     products.forEach(
         product ->
             product.setPictureLocation(imageUrlResolver.resolve(product.getPictureLocation())));
 
     return new HotDealProductListPageResponseDto(
-        products, condition.getPage(), condition.getSize(), hasMore);
+        products, condition.getPage(), condition.getSize(), totalCount, totalPages);
   }
 }

@@ -62,11 +62,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
+  const getCsrfToken = () => {
+    const match = document.cookie.match(/(?:^|;\s*)XSRF-TOKEN=([^;]*)/);
+    return match ? decodeURIComponent(match[1]) : '';
+  };
+
   const fetchApi = async (url, options) => {
     const response = await fetch(url, {
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
+        'X-XSRF-TOKEN': getCsrfToken(),
         ...(options?.headers || {}),
       },
       ...options,

@@ -8,6 +8,8 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 
 @Configuration
 @EnableWebSecurity
@@ -19,7 +21,17 @@ public class SecurityConfig {
 
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-    http.csrf(AbstractHttpConfigurer::disable)
+    http
+        // CSRF 활성화 (CookieCsrfTokenRepository + X-XSRF-TOKEN 헤더 방식)
+        // - Thymeleaf 폼은 th:action에 의해 _csrf 필드가 자동 생성됨
+        // - JS API 호출 시 XSRF-TOKEN 쿠키 값을 X-XSRF-TOKEN 헤더로 전송
+        .csrf(
+            csrf -> {
+              CsrfTokenRequestAttributeHandler handler = new CsrfTokenRequestAttributeHandler();
+              handler.setCsrfRequestAttributeName(null);
+              csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                  .csrfTokenRequestHandler(handler);
+            })
         .httpBasic(AbstractHttpConfigurer::disable)
         .authorizeHttpRequests(
             authorize ->
@@ -50,7 +62,6 @@ public class SecurityConfig {
                     .hasRole("ADMIN")
                     .anyRequest()
                     .authenticated())
-        // Form 로그인을 활용하는경우 (JWT에는 필요없음)
         .formLogin(
             form ->
                 form.loginPage("/login")
@@ -59,7 +70,11 @@ public class SecurityConfig {
                     .permitAll())
         .logout(
             logout ->
-                logout.logoutUrl("/logout").logoutSuccessUrl("/").invalidateHttpSession(true));
+                logout
+                    .logoutUrl("/logout")
+                    .logoutSuccessUrl("/")
+                    .invalidateHttpSession(true)
+                    .permitAll());
     return http.build();
   }
 }

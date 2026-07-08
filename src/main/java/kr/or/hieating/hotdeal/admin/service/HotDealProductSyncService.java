@@ -21,16 +21,19 @@ public class HotDealProductSyncService {
   private final HotDealPricePolicy pricePolicy;
 
   public void insertCreatedProducts(
-      int hotDealId, List<HotDealCreateRequestDTO.ProductItemDTO> products, int discountRate) {
+      Long hotDealId, List<HotDealCreateRequestDTO.ProductItemDTO> products, int discountRate) {
     for (HotDealCreateRequestDTO.ProductItemDTO item : products) {
       adminHotDealMapper.insertHotDealProduct(
           createHotDealProduct(
-              hotDealId, item.getProductOptionId(), item.getOriginalPrice(), discountRate));
+              hotDealId,
+              item.getProductOptionId().longValue(),
+              item.getOriginalPrice(),
+              discountRate));
     }
   }
 
   public void replaceUpdatedProductsIfChanged(
-      int hotDealId,
+      Long hotDealId,
       List<HotDealDetailResponseDTO.ProductItemDTO> existingProducts,
       List<HotDealUpdateRequestDTO.ProductItemDTO> requestedProducts,
       int discountRate) {
@@ -42,7 +45,10 @@ public class HotDealProductSyncService {
     for (HotDealUpdateRequestDTO.ProductItemDTO item : requestedProducts) {
       adminHotDealMapper.insertHotDealProduct(
           createHotDealProduct(
-              hotDealId, item.getProductOptionId(), item.getOriginalPrice(), discountRate));
+              hotDealId,
+              item.getProductOptionId().longValue(),
+              item.getOriginalPrice(),
+              discountRate));
     }
   }
 
@@ -54,16 +60,15 @@ public class HotDealProductSyncService {
       return false;
     }
 
-    Map<Integer, HotDealDetailResponseDTO.ProductItemDTO> existingMap =
+    Map<Long, HotDealDetailResponseDTO.ProductItemDTO> existingMap =
         existing.stream()
             .collect(
                 Collectors.toMap(
-                    HotDealDetailResponseDTO.ProductItemDTO::getProductOptionId,
-                    Function.identity()));
+                    item -> item.getProductOptionId().longValue(), Function.identity()));
 
     for (HotDealUpdateRequestDTO.ProductItemDTO requestedItem : requested) {
       HotDealDetailResponseDTO.ProductItemDTO existingItem =
-          existingMap.get(requestedItem.getProductOptionId());
+          existingMap.get(requestedItem.getProductOptionId().longValue());
       if (existingItem == null) {
         return false;
       }
@@ -80,7 +85,7 @@ public class HotDealProductSyncService {
   }
 
   private HotDealProducts createHotDealProduct(
-      int hotDealId, int productOptionId, int originalPrice, int discountRate) {
+      Long hotDealId, Long productOptionId, int originalPrice, int discountRate) {
     return HotDealProducts.builder()
         .hotDealId(hotDealId)
         .productOptionId(productOptionId)

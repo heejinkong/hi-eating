@@ -13,10 +13,10 @@ public interface AdminHotDealMapper {
 
   int updateStatusesByPeriod();
 
-  int countExpiredProductOptions(@Param("productOptionIds") List<Integer> productOptionIds);
+  int countExpiredProductOptions(@Param("productOptionIds") List<Long> productOptionIds);
 
   int countUnlinkedExpiredProductOptions(
-      @Param("hotDealId") int hotDealId, @Param("productOptionIds") List<Integer> productOptionIds);
+      @Param("hotDealId") Long hotDealId, @Param("productOptionIds") List<Long> productOptionIds);
 
   List<HotDealResponseDTO> selectManageableHotDeals();
 
@@ -27,12 +27,12 @@ public interface AdminHotDealMapper {
   void updateHotDeal(HotDeals hotDeal);
 
   // 특정 핫딜에 연동된 상품들 삭제 (초기화)
-  void deleteHotDealProductsByHotDealId(int hotDealId);
+  void deleteHotDealProductsByHotDealId(Long hotDealId);
 
-  HotDeals selectHotDealById(int id);
+  HotDeals selectHotDealById(Long id);
 
   List<HotDealDetailResponseDTO.ProductItemDTO> selectHotDealProductsDetailByHotDealId(
-      int hotDealId);
+      Long hotDealId);
 
-  void softDeleteHotDeal(@Param("id") int id);
+  void softDeleteHotDeal(@Param("id") Long id);
 }

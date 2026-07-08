@@ -3,6 +3,8 @@ package kr.or.hieating.purchase.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import kr.or.hieating.global.apiPayload.code.status.ErrorStatus;
+import kr.or.hieating.global.apiPayload.exception.GeneralException;
 import kr.or.hieating.purchase.dto.ProductPurchaseTargetDto;
 import kr.or.hieating.purchase.dto.PurchaseCreateCommand;
 import kr.or.hieating.purchase.dto.PurchaseOptionAllocationDto;
@@ -10,7 +12,6 @@ import kr.or.hieating.purchase.dto.PurchaseProductListPageResponseDto;
 import kr.or.hieating.purchase.dto.PurchaseProductListSearchCondition;
 import kr.or.hieating.purchase.dto.PurchaseProductOptionStockDto;
 import kr.or.hieating.purchase.dto.RecentPurchaseProductDto;
-import kr.or.hieating.purchase.exception.PurchaseException;
 import kr.or.hieating.purchase.mapper.PurchaseMapper;
 import kr.or.hieating.utils.ImageUrlResolver;
 import lombok.RequiredArgsConstructor;
@@ -56,15 +57,15 @@ public class PurchaseService {
   @Transactional
   public Long purchase(Long userId, Long productId, int quantity) {
     if (quantity < 1) {
-      throw new PurchaseException("구매 수량은 1개 이상이어야 합니다.");
+      throw new GeneralException(ErrorStatus.PURCHASE_INVALID_QUANTITY);
     }
 
     ProductPurchaseTargetDto product =
         purchaseMapper
             .findProductForPurchase(productId)
-            .orElseThrow(() -> new PurchaseException("존재하지 않는 상품입니다."));
+            .orElseThrow(() -> new GeneralException(ErrorStatus.PURCHASE_PRODUCT_NOT_FOUND));
     if (!"ON_SALE".equals(product.status())) {
-      throw new PurchaseException("현재 구매할 수 없는 상품입니다.");
+      throw new GeneralException(ErrorStatus.PURCHASE_PRODUCT_NOT_ON_SALE);
     }
 
     List<PurchaseProductOptionStockDto> options =
@@ -77,7 +78,7 @@ public class PurchaseService {
 
     Long purchaseId = command.getId();
     if (purchaseId == null) {
-      throw new PurchaseException("구매 이력을 생성하지 못했습니다.");
+      throw new GeneralException(ErrorStatus.PURCHASE_CREATION_FAILED);
     }
 
     for (PurchaseOptionAllocationDto allocation : allocations) {
@@ -85,7 +86,7 @@ public class PurchaseService {
           purchaseMapper.decreaseProductOptionStock(
               allocation.productOptionId(), allocation.quantity());
       if (updated != 1) {
-        throw new PurchaseException("상품 재고가 부족합니다.");
+        throw new GeneralException(ErrorStatus.PURCHASE_OUT_OF_STOCK);
       }
 
       purchaseMapper.insertPurchaseProductOption(
@@ -111,7 +112,7 @@ public class PurchaseService {
     }
 
     if (remainingQuantity > 0) {
-      throw new PurchaseException("상품 재고가 부족합니다.");
+      throw new GeneralException(ErrorStatus.PURCHASE_OUT_OF_STOCK);
     }
 
     return allocations;

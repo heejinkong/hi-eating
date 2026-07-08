@@ -12,8 +12,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class HotDeals {
 
-  private int id;
-  private int createdBy;
+  private Long id;
+  private Long createdBy;
   private String title;
   private String description;
   private LocalDateTime startsAt;

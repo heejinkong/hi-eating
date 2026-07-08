@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class HotDealDetailResponseDTO {
-  private int id;
+  private Long id;
   private String title;
   private String description;
   private LocalDateTime startsAt;
