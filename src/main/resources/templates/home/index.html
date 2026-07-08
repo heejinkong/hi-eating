@@ -107,7 +107,10 @@
             <span class="popular-table-card__info">
               <strong th:text="|${post.userName}님의 식탁|">이용자님의 식탁</strong>
               <span>
-                <i aria-hidden="true" class="bi bi-heart-fill"></i>
+                <i
+                  aria-hidden="true"
+                  th:class="${post.liked} ? 'bi bi-heart-fill' : 'bi bi-heart'"
+                ></i>
                 <span data-home-table-decor-like-count th:text="${post.likeCount}">0</span>
               </span>
             </span>
@@ -163,7 +166,7 @@
               data-home-table-decor-modal-like-button
               type="button"
             >
-              <i aria-hidden="true" class="bi bi-heart-fill"></i>
+              <i aria-hidden="true" class="bi bi-heart"></i>
               <span data-home-table-decor-like-count data-home-table-decor-modal-like>0</span>
             </button>
           </div>

@@ -78,12 +78,25 @@ public class ProductService {
   public ProductListPageResponseDto findProductsByCategory(ProductListSearchCondition condition) {
     int totalCount = productMapper.countProductsByCategory(condition);
     int totalPages = Math.max((int) Math.ceil((double) totalCount / condition.getSize()), 1);
-    List<ProductListItemResponseDto> products = productMapper.findProductsByCategory(condition);
+    ProductListSearchCondition queryCondition =
+        condition.getPage() > totalPages
+            ? new ProductListSearchCondition(
+                condition.getCategoryId(),
+                condition.getUserId(),
+                condition.getMinPrice(),
+                condition.getMaxPrice(),
+                condition.getMinDiscountRate(),
+                condition.getSort(),
+                totalPages)
+            : condition;
+
+    List<ProductListItemResponseDto> products =
+        productMapper.findProductsByCategory(queryCondition);
     products.forEach(
         product ->
             product.setPictureLocation(imageUrlResolver.resolve(product.getPictureLocation())));
 
     return new ProductListPageResponseDto(
-        products, condition.getPage(), condition.getSize(), totalCount, totalPages);
+        products, queryCondition.getPage(), queryCondition.getSize(), totalCount, totalPages);
   }
 }

@@ -73,7 +73,10 @@
                 th:classappend="${post.liked} ? ' is-active'"
                 th:attr="data-post-id=${post.postId}, aria-pressed=${post.liked}"
               >
-                <i aria-hidden="true" class="bi bi-heart-fill"></i>
+                <i
+                  aria-hidden="true"
+                  th:class="${post.liked} ? 'bi bi-heart-fill' : 'bi bi-heart'"
+                ></i>
                 <span data-table-decor-like-count th:text="${post.likeCount}">0</span>
               </button>
             </div>
@@ -131,7 +134,7 @@
                 data-table-decor-like
                 aria-pressed="false"
               >
-                <i class="bi bi-heart-fill" aria-hidden="true"></i>
+                <i class="bi bi-heart" aria-hidden="true"></i>
                 <span data-table-decor-like-count data-table-decor-modal-like>0</span>
               </button>
             </div>

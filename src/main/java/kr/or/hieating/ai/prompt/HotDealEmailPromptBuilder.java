@@ -16,7 +16,7 @@ public class HotDealEmailPromptBuilder {
   private static final String INSTRUCTION =
       """
       다음 핫딜 상품을 고객에게 추천하는 이유(추천사)를 한국어로 작성하세요.
-      
+
       작성 조건:
       - 이메일 제목은 80자 이내의 친근하고 흥미를 끄는 한국어로 작성하세요.
       - 본문(content)에는 해당 핫딜 상품을 고객에게 왜 추천하는지, 고객 입장에서 어떤 매력이 있는지 설명하는 추천 사유를 2~3문장 이내로 자연스럽게 작성하세요.
@@ -27,7 +27,7 @@ public class HotDealEmailPromptBuilder {
       - 반드시 {"subject":"제목","content":"추천 사유"} 형태의 순수 JSON 객체만 반환하세요.
         - subject: 메일 제목
         - content: 핫딜 상품의 추천 사유 (2~3문장, 150자 이내)
-      
+
       [핫딜 데이터]
       %s
       """;

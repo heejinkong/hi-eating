@@ -242,6 +242,52 @@
   cursor: pointer;
 }
 
+.admin-email-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.admin-email-pagination[hidden] {
+  display: none;
+}
+
+.admin-email-page-button {
+  display: inline-grid;
+  min-width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 1px solid var(--admin-line);
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--admin-muted);
+  font-size: 0.78rem;
+  font-weight: 900;
+  line-height: 1;
+  padding: 0 0.65rem;
+}
+
+.admin-email-page-button:hover,
+.admin-email-page-button:focus-visible {
+  border-color: #ffd8ca;
+  color: var(--admin-brand-accent);
+  outline: none;
+}
+
+.admin-email-page-button.is-active {
+  border-color: var(--admin-brand-accent);
+  background: var(--admin-brand-accent);
+  color: #ffffff;
+}
+
+.admin-email-page-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 .admin-email-table strong,
 .admin-email-table span {
   display: block;

@@ -4,19 +4,6 @@
     <section th:fragment="content" class="product-list-page">
       <div class="product-list-shell">
         <aside class="product-filter" aria-label="상품 필터">
-          <section class="filter-panel">
-            <h2>카테고리</h2>
-            <nav class="category-filter" aria-label="카테고리 목록">
-              <a
-                th:each="category : ${categories}"
-                th:href="@{/categories/{categoryId}(categoryId=${category.id})}"
-              >
-                <span th:text="${category.name}">카테고리</span>
-                <small th:text="${category.productCount}">0</small>
-              </a>
-            </nav>
-          </section>
-
           <form class="filter-panel" th:action="@{/search}" method="get">
             <h2>필터</h2>
             <input type="hidden" name="keyword" th:value="${condition.keyword}" />
@@ -158,13 +145,19 @@
             aria-label="검색 결과 페이지"
           >
             <a
+              th:classappend="${!productPage.hasPreviousBlock()} ? ' is-disabled'"
+              th:href="@{/search(keyword=${condition.keyword}, page=${productPage.previousBlockPage()}, sort=${condition.sort}, minPrice=${condition.minPrice}, maxPrice=${condition.maxPrice}, minDiscountRate=${condition.minDiscountRate})}"
+            >
+              <i class="bi bi-chevron-double-left" aria-hidden="true"></i>
+            </a>
+            <a
               th:classappend="${!productPage.hasPrevious()} ? ' is-disabled'"
               th:href="@{/search(keyword=${condition.keyword}, page=${productPage.page - 1}, sort=${condition.sort}, minPrice=${condition.minPrice}, maxPrice=${condition.maxPrice}, minDiscountRate=${condition.minDiscountRate})}"
             >
               <i class="bi bi-chevron-left" aria-hidden="true"></i>
             </a>
             <a
-              th:each="pageNumber : ${#numbers.sequence(1, productPage.totalPages)}"
+              th:each="pageNumber : ${#numbers.sequence(productPage.startPage(), productPage.endPage())}"
               th:text="${pageNumber}"
               th:classappend="${pageNumber == productPage.page} ? ' is-active'"
               th:href="@{/search(keyword=${condition.keyword}, page=${pageNumber}, sort=${condition.sort}, minPrice=${condition.minPrice}, maxPrice=${condition.maxPrice}, minDiscountRate=${condition.minDiscountRate})}"
@@ -176,6 +169,12 @@
               th:href="@{/search(keyword=${condition.keyword}, page=${productPage.page + 1}, sort=${condition.sort}, minPrice=${condition.minPrice}, maxPrice=${condition.maxPrice}, minDiscountRate=${condition.minDiscountRate})}"
             >
               <i class="bi bi-chevron-right" aria-hidden="true"></i>
+            </a>
+            <a
+              th:classappend="${!productPage.hasNextBlock()} ? ' is-disabled'"
+              th:href="@{/search(keyword=${condition.keyword}, page=${productPage.nextBlockPage()}, sort=${condition.sort}, minPrice=${condition.minPrice}, maxPrice=${condition.maxPrice}, minDiscountRate=${condition.minDiscountRate})}"
+            >
+              <i class="bi bi-chevron-double-right" aria-hidden="true"></i>
             </a>
           </nav>
         </div>

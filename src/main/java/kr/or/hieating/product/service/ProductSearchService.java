@@ -24,13 +24,24 @@ public class ProductSearchService {
 
     int totalCount = productSearchMapper.countSearchProducts(condition);
     int totalPages = Math.max((int) Math.ceil((double) totalCount / condition.getSize()), 1);
-    List<ProductListItemResponseDto> products = productSearchMapper.searchProducts(condition);
+    ProductSearchCondition queryCondition =
+        condition.getPage() > totalPages
+            ? new ProductSearchCondition(
+                condition.getKeyword(),
+                condition.getUserId(),
+                condition.getMinPrice(),
+                condition.getMaxPrice(),
+                condition.getMinDiscountRate(),
+                condition.getSort(),
+                totalPages)
+            : condition;
+    List<ProductListItemResponseDto> products = productSearchMapper.searchProducts(queryCondition);
 
     products.forEach(
         product ->
             product.setPictureLocation(imageUrlResolver.resolve(product.getPictureLocation())));
 
     return new ProductListPageResponseDto(
-        products, condition.getPage(), condition.getSize(), totalCount, totalPages);
+        products, queryCondition.getPage(), queryCondition.getSize(), totalCount, totalPages);
   }
 }

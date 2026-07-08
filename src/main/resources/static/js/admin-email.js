@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const currentPublishButton = editor?.querySelector('[data-admin-email-publish-current-button]');
   const detailStatus = document.querySelector('[data-admin-email-detail-validation-status]');
   const filterButtons = Array.from(document.querySelectorAll('[data-admin-email-filter]'));
+  const pagination = document.querySelector('[data-admin-email-pagination]');
   const subjectInput = editor?.querySelector('[name="subject"]');
   const recipientInput = editor?.querySelector('input[type="email"]');
   const contentInput = editor?.querySelector('[name="content"]');
@@ -22,6 +23,10 @@ document.addEventListener('DOMContentLoaded', () => {
     ? Number(editor.dataset.emailDraftId)
     : null;
   let currentFilter = 'ALL';
+  let currentPage = 1;
+  const pageSize = 10;
+  const pageBlockSize = 10;
+  const selectedEmailDraftIds = new Set();
 
   const validationMeta = {
     PASS: { label: '검증 통과', className: 'is-success' },
@@ -155,6 +160,25 @@ document.addEventListener('DOMContentLoaded', () => {
     return drafts;
   };
 
+  const getTotalPages = (itemCount) => Math.max(1, Math.ceil(itemCount / pageSize));
+
+  const normalizeCurrentPage = (itemCount) => {
+    currentPage = Math.min(Math.max(currentPage, 1), getTotalPages(itemCount));
+  };
+
+  const moveCurrentPageToDraft = (drafts, emailDraftId) => {
+    if (!emailDraftId) {
+      return;
+    }
+
+    const draftIndex = filterDrafts(drafts).findIndex(
+      (draft) => Number(draft.id) === Number(emailDraftId),
+    );
+    if (draftIndex >= 0) {
+      currentPage = Math.floor(draftIndex / pageSize) + 1;
+    }
+  };
+
   const setSelectedRow = (emailDraftId) => {
     document.querySelectorAll('[data-admin-email-row]').forEach((row) => {
       row.classList.toggle(
@@ -175,6 +199,7 @@ document.addEventListener('DOMContentLoaded', () => {
     checkbox.type = 'checkbox';
     checkbox.value = String(draft.id);
     checkbox.disabled = !draft.publishable && !draft.validationFailed;
+    checkbox.checked = selectedEmailDraftIds.has(Number(draft.id));
     checkbox.dataset.adminEmailSelect = '';
     checkbox.setAttribute('aria-label', `${draft.recipientName || '수신자'} 메일 선택`);
     selectCell.appendChild(checkbox);
@@ -212,17 +237,68 @@ document.addEventListener('DOMContentLoaded', () => {
     return row;
   };
 
+  const createPageButton = (label, targetPage, disabled = false, active = false) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'admin-email-page-button';
+    button.textContent = label;
+    button.disabled = disabled;
+    button.classList.toggle('is-active', active);
+    button.dataset.adminEmailPage = String(targetPage);
+    return button;
+  };
+
+  const renderPagination = (itemCount) => {
+    if (!pagination) {
+      return;
+    }
+
+    const totalPages = getTotalPages(itemCount);
+    pagination.replaceChildren();
+
+    if (itemCount <= pageSize) {
+      pagination.hidden = true;
+      return;
+    }
+
+    pagination.hidden = false;
+
+    const startPage = Math.floor((currentPage - 1) / pageBlockSize) * pageBlockSize + 1;
+    const endPage = Math.min(startPage + pageBlockSize - 1, totalPages);
+
+    pagination.appendChild(createPageButton('Prev', currentPage - 1, currentPage <= 1));
+
+    for (let pageNumber = startPage; pageNumber <= endPage; pageNumber += 1) {
+      pagination.appendChild(
+        createPageButton(String(pageNumber), pageNumber, false, pageNumber === currentPage),
+      );
+    }
+
+    pagination.appendChild(createPageButton('Next', currentPage + 1, currentPage >= totalPages));
+  };
+
   const renderTable = (drafts) => {
     if (!tableBody) {
       return;
     }
 
+    const filteredDrafts = filterDrafts(drafts);
+    normalizeCurrentPage(filteredDrafts.length);
+    const startIndex = (currentPage - 1) * pageSize;
+    const pagedDrafts = filteredDrafts.slice(startIndex, startIndex + pageSize);
+
     tableBody.replaceChildren();
-    filterDrafts(drafts).forEach((draft) => tableBody.appendChild(createEmailRow(draft)));
+    pagedDrafts.forEach((draft) => tableBody.appendChild(createEmailRow(draft)));
+    renderPagination(filteredDrafts.length);
     updateFilterButtons();
 
     if (selectAllCheckbox) {
-      selectAllCheckbox.checked = false;
+      const selectableDrafts = pagedDrafts.filter(
+        (draft) => draft.publishable || draft.validationFailed,
+      );
+      selectAllCheckbox.checked =
+        selectableDrafts.length > 0 &&
+        selectableDrafts.every((draft) => selectedEmailDraftIds.has(Number(draft.id)));
     }
   };
 
@@ -275,7 +351,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  const renderDashboard = (dashboard, preferredEmailDraftId) => {
+  const renderDashboard = (dashboard, preferredEmailDraftId, options = {}) => {
     updateSummary(dashboard.summary);
 
     const drafts = dashboard.emailDrafts || [];
@@ -288,11 +364,15 @@ document.addEventListener('DOMContentLoaded', () => {
       selectedEmailDraftId = Number(preferredDraft.id);
     }
 
+    if (options.focusSelectedPage) {
+      moveCurrentPageToDraft(drafts, selectedEmailDraftId);
+    }
+
     renderTable(drafts);
     renderDetail(preferredDraft, { keepMessage: true });
   };
 
-  const refreshDashboard = async (preferredEmailDraftId) => {
+  const refreshDashboard = async (preferredEmailDraftId, options = {}) => {
     const dashboardUrl = page?.dataset.dashboardUrl;
     if (!dashboardUrl) {
       return null;
@@ -302,7 +382,7 @@ document.addEventListener('DOMContentLoaded', () => {
       ? `${dashboardUrl}?emailId=${encodeURIComponent(preferredEmailDraftId)}`
       : dashboardUrl;
     const dashboard = await fetchApi(url);
-    renderDashboard(dashboard, preferredEmailDraftId);
+    renderDashboard(dashboard, preferredEmailDraftId, options);
     return dashboard;
   };
 
@@ -388,10 +468,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const publishSelectedEmails = async () => {
     const publishUrl = selectedPublishButton?.dataset.publishUrl;
-    const emailDraftIds = Array.from(document.querySelectorAll('[data-admin-email-select]'))
-      .filter((checkbox) => checkbox.checked && !checkbox.disabled)
-      .map((checkbox) => Number(checkbox.value))
-      .filter((value) => Number.isFinite(value));
+    const emailDraftIds = Array.from(selectedEmailDraftIds);
 
     if (!publishUrl || emailDraftIds.length === 0) {
       showMessage('발송할 이메일을 선택해주세요.', 'is-danger');
@@ -405,6 +482,7 @@ document.addEventListener('DOMContentLoaded', () => {
         method: 'POST',
         body: JSON.stringify({ emailDraftIds }),
       });
+      emailDraftIds.forEach((emailDraftId) => selectedEmailDraftIds.delete(emailDraftId));
       await refreshDashboard(selectedEmailDraftId);
       const batchMessage = createBatchPublishMessage(
         result,
@@ -461,6 +539,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const checkbox = event.target.closest('[data-admin-email-select]');
+    if (checkbox) {
+      const emailDraftId = Number(checkbox.value);
+      if (checkbox.checked) {
+        selectedEmailDraftIds.add(emailDraftId);
+      } else {
+        selectedEmailDraftIds.delete(emailDraftId);
+      }
+    }
     if (!checkbox) {
       event.preventDefault();
     }
@@ -476,15 +562,36 @@ document.addEventListener('DOMContentLoaded', () => {
   filterButtons.forEach((button) => {
     button.addEventListener('click', () => {
       currentFilter = button.dataset.adminEmailFilter || 'ALL';
+      currentPage = 1;
       refreshDashboard(selectedEmailDraftId);
     });
+  });
+
+  pagination?.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-admin-email-page]');
+    if (!button || button.disabled) {
+      return;
+    }
+
+    currentPage = Number(button.dataset.adminEmailPage || '1');
+    refreshDashboard(selectedEmailDraftId);
   });
 
   selectAllCheckbox?.addEventListener('change', () => {
     document.querySelectorAll('[data-admin-email-select]').forEach((checkbox) => {
       if (!checkbox.disabled) {
         checkbox.checked = selectAllCheckbox.checked;
+        const emailDraftId = Number(checkbox.value);
+        if (selectAllCheckbox.checked) {
+          selectedEmailDraftIds.add(emailDraftId);
+        } else {
+          selectedEmailDraftIds.delete(emailDraftId);
+        }
       }
     });
   });
+
+  refreshDashboard(selectedEmailDraftId, {
+    focusSelectedPage: Boolean(selectedEmailDraftId),
+  }).catch((error) => showMessage(error.message, 'is-danger'));
 });
