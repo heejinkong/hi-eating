@@ -262,13 +262,26 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   /* ── 폼 제출 검증 ── */
+  const passwordMismatchAlert = document.getElementById('signup-password-mismatch');
+
   signupForm.addEventListener('submit', (event) => {
     if (!passwordInput || !passwordConfirmInput) {
       return;
     }
+
+    if (passwordMismatchAlert) {
+      passwordMismatchAlert.hidden = true;
+    }
+
     if (passwordInput.value !== passwordConfirmInput.value) {
       event.preventDefault();
-      showModal('비밀번호 확인', '비밀번호가 일치하지 않습니다.', 'is-danger');
+
+      if (passwordMismatchAlert) {
+        passwordMismatchAlert.hidden = false;
+      } else {
+        alert('비밀번호가 일치하지 않습니다.');
+      }
+
       passwordConfirmInput.focus();
     }
   });

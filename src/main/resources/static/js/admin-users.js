@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const page = document.querySelector('.admin-users-main');
+  const page = document.querySelector('.main-container');
   const signupForm = document.querySelector('.signup-form');
   const emailLocalInput = document.getElementById('signup-email-local');
   const emailDomainSelect = document.getElementById('signup-email-domain');
@@ -14,6 +14,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const candidatesRefreshButton = document.getElementById('admin-candidates-refresh-button');
   const adminListRefreshButton = document.getElementById('admin-list-refresh-button');
   const roleMessage = document.getElementById('admin-users-role-message');
+  const candidatesSearchInput = document.getElementById('admin-candidates-search-input');
+  const candidatesSearchButton = document.getElementById('admin-candidates-search-button');
+  const candidatesPagination = document.getElementById('admin-candidates-pagination');
+  const candidatesPagePrev = document.getElementById('admin-candidates-page-prev');
+  const candidatesPageNext = document.getElementById('admin-candidates-page-next');
+  const candidatesPageInfo = document.getElementById('admin-candidates-page-info');
 
   const showModal = (title, message, state) => {
     if (!modalElement || !modalMessage) {
@@ -115,9 +121,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const urls = {
     candidates: page.dataset.adminCandidatesUrl,
+    candidatesPage: page.dataset.adminCandidatesPageUrl,
     admins: page.dataset.adminsUrl,
     adminRolePrefix: page.dataset.adminRoleUrlPrefix,
   };
+
+  let candidatesCurrentKeyword = '';
+  let candidatesCurrentPage = 1;
+  let candidatesTotalPages = 1;
+  let candidatesPageGeneration = 0;
 
   const setListState = (container, message, state) => {
     container.replaceChildren();
@@ -230,19 +242,75 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   };
 
-  const loadCandidates = async () => {
+  const loadCandidatesPage = async (keyword, page) => {
     setListState(candidatesList, candidatesList.dataset.loadingMessage, 'is-loading');
+    candidatesPagination?.setAttribute('hidden', '');
+    const generation = ++candidatesPageGeneration;
 
     try {
-      const users = await fetchApi(urls.candidates);
-      renderList(candidatesList, users, {
+      const params = new URLSearchParams({ keyword, page, size: '10' });
+      const result = await fetchApi(`${urls.candidatesPage}?${params}`);
+      if (generation !== candidatesPageGeneration) {
+        return;
+      }
+
+      if (result.users.length === 0 && page > 1) {
+        candidatesCurrentPage = page - 1;
+        candidatesTotalPages = result.totalPages;
+        updatePagination();
+        return loadCandidatesPage(keyword, page - 1);
+      }
+
+      renderList(candidatesList, result.users, {
         type: 'grant',
         label: '권한 부여',
         handler: grantAdminRole,
       });
+      candidatesCurrentKeyword = keyword;
+      candidatesCurrentPage = result.page;
+      candidatesTotalPages = result.totalPages;
+      updatePagination();
+      matchHeights();
     } catch (error) {
-      setListState(candidatesList, error.message, 'is-error');
+      if (generation === candidatesPageGeneration) {
+        setListState(candidatesList, error.message, 'is-error');
+      }
     }
+  };
+
+  const matchHeights = () => {
+    const section = document.querySelector('.admin-users-candidates-card');
+    const stack = document.querySelector('.admin-users-left-stack');
+    if (!section || !stack) {
+      return;
+    }
+    section.style.height = `${stack.offsetHeight}px`;
+  };
+
+  const updatePagination = () => {
+    if (
+      !candidatesPagination ||
+      !candidatesPagePrev ||
+      !candidatesPageNext ||
+      !candidatesPageInfo
+    ) {
+      return;
+    }
+
+    if (candidatesTotalPages <= 1) {
+      candidatesPagination.setAttribute('hidden', '');
+      return;
+    }
+
+    candidatesPagination.removeAttribute('hidden');
+    candidatesPagePrev.disabled = candidatesCurrentPage <= 1;
+    candidatesPageNext.disabled = candidatesCurrentPage >= candidatesTotalPages;
+    candidatesPageInfo.textContent = `${candidatesCurrentPage} / ${candidatesTotalPages}`;
+  };
+
+  const triggerSearch = () => {
+    const keyword = candidatesSearchInput?.value.trim() || '';
+    loadCandidatesPage(keyword, 1);
   };
 
   const loadAdmins = async () => {
@@ -266,7 +334,10 @@ document.addEventListener('DOMContentLoaded', () => {
         method: 'POST',
       });
       showRoleMessage(`${userName}님에게 관리자 권한을 부여했습니다.`, 'is-success');
-      await Promise.all([loadCandidates(), loadAdmins()]);
+      await Promise.all([
+        loadCandidatesPage(candidatesCurrentKeyword, candidatesCurrentPage),
+        loadAdmins(),
+      ]);
     } catch (error) {
       showRoleMessage(error.message, 'is-danger');
     }
@@ -282,17 +353,47 @@ document.addEventListener('DOMContentLoaded', () => {
         method: 'DELETE',
       });
       showRoleMessage(`${userName}님의 관리자 권한을 회수했습니다.`, 'is-success');
-      await Promise.all([loadCandidates(), loadAdmins()]);
+      await Promise.all([
+        loadCandidatesPage(candidatesCurrentKeyword, candidatesCurrentPage),
+        loadAdmins(),
+      ]);
     } catch (error) {
       showRoleMessage(error.message, 'is-danger');
     }
   }
 
-  candidatesRefreshButton?.addEventListener('click', loadCandidates);
+  candidatesRefreshButton?.addEventListener('click', () => {
+    loadCandidatesPage(candidatesCurrentKeyword, candidatesCurrentPage);
+  });
   adminListRefreshButton?.addEventListener('click', loadAdmins);
 
+  candidatesSearchButton?.addEventListener('click', triggerSearch);
+  candidatesSearchInput?.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+      triggerSearch();
+    }
+  });
+
+  candidatesPagePrev?.addEventListener('click', () => {
+    if (candidatesCurrentPage > 1) {
+      loadCandidatesPage(candidatesCurrentKeyword, candidatesCurrentPage - 1);
+    }
+  });
+
+  candidatesPageNext?.addEventListener('click', () => {
+    if (candidatesCurrentPage < candidatesTotalPages) {
+      loadCandidatesPage(candidatesCurrentKeyword, candidatesCurrentPage + 1);
+    }
+  });
+
   showRoleMessage('권한 목록을 불러오는 중입니다.', 'is-muted');
-  Promise.all([loadCandidates(), loadAdmins()])
+  Promise.all([loadCandidatesPage('', 1), loadAdmins()])
     .then(() => showRoleMessage('권한 목록이 최신 상태입니다.', 'is-muted'))
     .catch(() => showRoleMessage('권한 목록을 불러오지 못했습니다.', 'is-danger'));
+
+  const leftStack = document.querySelector('.admin-users-left-stack');
+  if (leftStack && typeof ResizeObserver !== 'undefined') {
+    const ro = new ResizeObserver(() => matchHeights());
+    ro.observe(leftStack);
+  }
 });

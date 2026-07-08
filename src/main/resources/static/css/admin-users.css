@@ -9,8 +9,28 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(340px, 0.72fr);
   gap: 1.5rem;
-  max-width: 1280px;
-  align-items: start;
+  align-items: stretch;
+}
+
+.admin-users-left-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  height: 100%;
+}
+
+.admin-users-candidates-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.admin-users-candidates-card .admin-users-list {
+  flex: 1;
+  overflow-y: auto;
+  max-height: none;
+  min-height: 0;
 }
 
 .admin-users-card {
@@ -41,13 +61,6 @@
   margin: 0;
   color: var(--admin-muted);
   font-size: 0.84rem;
-}
-
-.admin-users-role-stack {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  min-width: 0;
 }
 
 .admin-users-role-card {
@@ -410,11 +423,112 @@
   padding: 0 1.1rem;
 }
 
-@media (max-width: 900px) {
-  .admin-users-main {
-    padding: 2rem 1rem;
-  }
+/* ---- Search bar ---- */
+.admin-users-search-bar {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
 
+.admin-users-search-input {
+  flex: 1;
+  min-height: 40px;
+  padding: 0.55rem 0.85rem;
+  border: 1px solid var(--admin-line);
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--admin-text);
+  font-size: 0.86rem;
+  font-weight: 700;
+  outline: none;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.admin-users-search-input::placeholder {
+  color: #beb6b1;
+  font-weight: 700;
+}
+
+.admin-users-search-input:focus {
+  border-color: var(--admin-brand-accent);
+  box-shadow: 0 0 0 3px rgba(224, 94, 43, 0.1);
+}
+
+.admin-users-search-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 40px;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--admin-line);
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--admin-muted);
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.admin-users-search-button:hover,
+.admin-users-search-button:focus-visible {
+  border-color: var(--admin-brand-accent);
+  color: var(--admin-brand-accent);
+  outline: none;
+}
+
+/* ---- Pagination ---- */
+.admin-users-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--admin-line);
+}
+
+.admin-users-page-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 34px;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--admin-line);
+  border-radius: 7px;
+  background: #ffffff;
+  color: var(--admin-muted);
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    color 0.2s ease,
+    background 0.2s ease;
+}
+
+.admin-users-page-btn:hover:not(:disabled),
+.admin-users-page-btn:focus-visible:not(:disabled) {
+  border-color: var(--admin-brand-accent);
+  color: var(--admin-brand-accent);
+  outline: none;
+}
+
+.admin-users-page-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.admin-users-page-info {
+  color: var(--admin-muted);
+  font-size: 0.82rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+@media (max-width: 900px) {
   .admin-users-header {
     flex-direction: column;
   }

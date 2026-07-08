@@ -22,8 +22,7 @@
 		WHERE user_id = #{userId}
 	</select>
 
-	<select id="findUsersWithoutAdminRole" resultType="kr.or.hieating.auth.admin.dto.AdminUserRoleTargetDto">
-		SELECT u.id, u.email, u.name, u.gender, u.birth
+	<sql id="adminCandidateWhere">
 		FROM users u
 		WHERE u.deleted_at IS NULL
 		  AND NOT EXISTS (
@@ -32,7 +31,27 @@
 			WHERE ua.user_id = u.id
 			  AND ua.auth = 'ROLE_ADMIN'
 		  )
+		<if test="keyword != null and keyword != ''">
+		  AND (u.name LIKE '%' || #{keyword} || '%' OR u.email LIKE '%' || #{keyword} || '%')
+		</if>
+	</sql>
+
+	<select id="findUsersWithoutAdminRole" resultType="kr.or.hieating.auth.admin.dto.AdminUserRoleTargetDto">
+		SELECT u.id, u.email, u.name, u.gender, u.birth
+		<include refid="adminCandidateWhere" />
 		ORDER BY u.created_at DESC, u.id DESC
+	</select>
+
+	<select id="countAdminCandidates" resultType="int">
+		SELECT COUNT(*)
+		<include refid="adminCandidateWhere" />
+	</select>
+
+	<select id="findAdminCandidatesByPage" resultType="kr.or.hieating.auth.admin.dto.AdminUserRoleTargetDto">
+		SELECT u.id, u.email, u.name, u.gender, u.birth
+		<include refid="adminCandidateWhere" />
+		ORDER BY u.created_at DESC, u.id DESC
+		OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
 	</select>
 
 	<select id="findAdminUsersExcluding" resultType="kr.or.hieating.auth.admin.dto.AdminUserRoleTargetDto">

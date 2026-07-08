@@ -14,6 +14,9 @@
             >
               회원가입 정보를 확인해 주세요.
             </p>
+            <p class="auth-alert auth-alert-danger" id="signup-password-mismatch" hidden>
+              비밀번호가 일치하지 않습니다.
+            </p>
 
             <div class="signup-row">
               <label class="signup-label" for="signup-name">이름</label>
@@ -209,7 +212,7 @@
         <aside class="auth-signup-mascot" data-signup-mascot aria-label="하이이팅 가입 도우미">
           <div class="auth-signup-mascot-figure">
             <img
-              alt="HI-Eating 마스코트 나비"
+              alt="HI.eating 마스코트 나비"
               class="auth-signup-mascot-image"
               th:src="@{/images/nabi-mascot.png}"
             />

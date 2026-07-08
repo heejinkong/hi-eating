@@ -123,9 +123,17 @@ document.addEventListener('DOMContentLoaded', () => {
       submitButton.textContent = '등록 중...';
     }
 
+    const xsrfToken = (() => {
+      const match = document.cookie.match(/(?:^|;\s*)XSRF-TOKEN=([^;]*)/);
+      return match ? decodeURIComponent(match[1]) : '';
+    })();
+
     try {
       const response = await fetch(form.action, {
         method: 'POST',
+        headers: {
+          'X-XSRF-TOKEN': xsrfToken,
+        },
         body: formData,
       });
       const apiResponse = await response.json();

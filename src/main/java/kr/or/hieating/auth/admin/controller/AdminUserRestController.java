@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -23,6 +24,19 @@ public class AdminUserRestController {
   @GetMapping("/admin-candidates")
   public ApiResponse<List<AdminUserRoleTargetDto>> adminCandidates() {
     return ApiResponse.onSuccess(adminUserService.findAdminCandidates());
+  }
+
+  @GetMapping("/admin-candidates/page")
+  public ApiResponse<?> adminCandidatesByPage(
+      @RequestParam(defaultValue = "") String keyword,
+      @RequestParam(defaultValue = "1") int page,
+      @RequestParam(defaultValue = "10") int size) {
+    try {
+      return ApiResponse.onSuccess(adminUserService.findAdminCandidatesByPage(keyword, page, size));
+    } catch (IllegalArgumentException exception) {
+      return ApiResponse.onFailure(
+          ErrorStatus._BAD_REQUEST.getCode(), exception.getMessage(), null);
+    }
   }
 
   @GetMapping("/admins")

@@ -7,6 +7,7 @@
       <main
         class="main-container"
         th:data-admin-candidates-url="@{/admin/api/users/admin-candidates}"
+        th:data-admin-candidates-page-url="@{/admin/api/users/admin-candidates/page}"
         th:data-admin-role-url-prefix="@{/admin/api/users}"
         th:data-admins-url="@{/admin/api/users/admins}"
       >
@@ -25,194 +26,170 @@
         </div>
 
         <div class="admin-users-grid">
-          <section class="admin-users-card admin-users-create-card">
-            <div class="admin-users-card-header">
-              <div>
-                <h2>관리자 계정 발급</h2>
-                <p>이메일과 임시 비밀번호를 입력하면 즉시 관리자 권한이 부여됩니다.</p>
-              </div>
-            </div>
-
-            <p
-              class="admin-users-alert is-success"
-              th:if="${adminUserCreateMessage != null}"
-              th:text="${adminUserCreateMessage}"
-            >
-              관리자 계정이 발급되었습니다.
-            </p>
-            <p
-              class="admin-users-alert is-danger"
-              th:if="${adminUserCreateError != null}"
-              th:text="${adminUserCreateError}"
-            >
-              관리자 계정 정보를 확인해 주세요.
-            </p>
-
-            <form class="signup-form admin-users-form" method="post" th:action="@{/admin/users}">
-              <div class="admin-users-form-grid">
-                <div class="admin-users-field">
-                  <label for="signup-name">이름</label>
-                  <input
-                    autocomplete="name"
-                    id="signup-name"
-                    name="name"
-                    placeholder="관리자 이름"
-                    required
-                    th:value="${signupRequest != null ? signupRequest.name : ''}"
-                    type="text"
-                  />
-                </div>
-
-                <div class="admin-users-field is-wide">
-                  <label for="signup-email-local">이메일</label>
-                  <div class="admin-users-email-line">
-                    <input
-                      autocomplete="email"
-                      id="signup-email-local"
-                      name="emailLocal"
-                      placeholder="admin"
-                      required
-                      th:value="${signupRequest != null ? signupRequest.emailLocal : ''}"
-                      type="text"
-                    />
-                    <span>@</span>
-                    <select aria-label="이메일 도메인" id="signup-email-domain" name="emailDomain">
-                      <option value="">직접입력</option>
-                      <option
-                        th:selected="${signupRequest != null && signupRequest.emailDomain == 'gmail.com'}"
-                        value="gmail.com"
-                      >
-                        gmail.com
-                      </option>
-                      <option
-                        th:selected="${signupRequest != null && signupRequest.emailDomain == 'naver.com'}"
-                        value="naver.com"
-                      >
-                        naver.com
-                      </option>
-                      <option
-                        th:selected="${signupRequest != null && signupRequest.emailDomain == 'daum.net'}"
-                        value="daum.net"
-                      >
-                        daum.net
-                      </option>
-                      <option
-                        th:selected="${signupRequest != null && signupRequest.emailDomain == 'kakao.com'}"
-                        value="kakao.com"
-                      >
-                        kakao.com
-                      </option>
-                    </select>
-                    <button
-                      id="signup-email-check-button"
-                      th:data-check-url="@{/signup/email-check}"
-                      type="button"
-                    >
-                      중복확인
-                    </button>
-                  </div>
-                </div>
-
-                <div class="admin-users-field">
-                  <label for="signup-password">임시 비밀번호</label>
-                  <input
-                    autocomplete="new-password"
-                    id="signup-password"
-                    name="password"
-                    placeholder="8자 이상"
-                    required
-                    type="password"
-                  />
-                </div>
-
-                <div class="admin-users-field">
-                  <label for="signup-password-confirm">비밀번호 확인</label>
-                  <input
-                    autocomplete="new-password"
-                    id="signup-password-confirm"
-                    name="passwordConfirm"
-                    placeholder="비밀번호 재입력"
-                    required
-                    type="password"
-                  />
-                </div>
-
-                <div class="admin-users-field">
-                  <label for="signup-birth">생년월일</label>
-                  <input
-                    autocomplete="bday"
-                    id="signup-birth"
-                    inputmode="numeric"
-                    name="birth"
-                    placeholder="20010415"
-                    required
-                    th:value="${signupRequest != null ? signupRequest.birth : ''}"
-                    type="text"
-                  />
-                </div>
-
-                <fieldset class="admin-users-field admin-users-gender">
-                  <legend>성별</legend>
-                  <div class="admin-users-radio-group">
-                    <label>
-                      <input
-                        name="gender"
-                        required
-                        th:checked="${signupRequest != null && signupRequest.gender == 'MALE'}"
-                        type="radio"
-                        value="MALE"
-                      />
-                      <span aria-hidden="true"></span>
-                      남성
-                    </label>
-                    <label>
-                      <input
-                        name="gender"
-                        th:checked="${signupRequest != null && signupRequest.gender == 'FEMALE'}"
-                        type="radio"
-                        value="FEMALE"
-                      />
-                      <span aria-hidden="true"></span>
-                      여성
-                    </label>
-                  </div>
-                </fieldset>
-              </div>
-
-              <div class="admin-users-actions">
-                <button class="admin-users-secondary-button" type="reset">초기화</button>
-                <button class="admin-users-primary-button" type="submit">관리자 계정 발급</button>
-              </div>
-            </form>
-          </section>
-
-          <div class="admin-users-role-stack">
-            <section class="admin-users-card admin-users-role-card">
+          <div class="admin-users-left-stack">
+            <section class="admin-users-card admin-users-create-card">
               <div class="admin-users-card-header">
                 <div>
-                  <h2>기존 사용자 권한 부여</h2>
-                  <p>관리자 권한이 없는 사용자를 선택해 권한을 부여합니다.</p>
+                  <h2>관리자 계정 발급</h2>
+                  <p>이메일과 임시 비밀번호를 입력하면 즉시 관리자 권한이 부여됩니다.</p>
                 </div>
-                <button
-                  aria-label="권한 부여 후보 새로고침"
-                  class="admin-users-icon-button"
-                  id="admin-candidates-refresh-button"
-                  title="새로고침"
-                  type="button"
-                >
-                  <i class="bi bi-arrow-clockwise"></i>
-                </button>
               </div>
 
-              <p aria-live="polite" class="admin-users-role-message" id="admin-users-role-message">
-                권한 관리 결과가 여기에 표시됩니다.
+              <p
+                class="admin-users-alert is-success"
+                th:if="${adminUserCreateMessage != null}"
+                th:text="${adminUserCreateMessage}"
+              >
+                관리자 계정이 발급되었습니다.
               </p>
-              <div
-                class="admin-users-list"
-                data-empty-message="관리자 권한을 부여할 사용자가 없습니다."
-                data-loading-message="사용자 목록을 불러오는 중입니다."
-                id="admin-candidates-list"
-              ></div>
+              <p
+                class="admin-users-alert is-danger"
+                th:if="${adminUserCreateError != null}"
+                th:text="${adminUserCreateError}"
+              >
+                관리자 계정 정보를 확인해 주세요.
+              </p>
+
+              <form class="signup-form admin-users-form" method="post" th:action="@{/admin/users}">
+                <div class="admin-users-form-grid">
+                  <div class="admin-users-field">
+                    <label for="signup-name">이름</label>
+                    <input
+                      autocomplete="name"
+                      id="signup-name"
+                      name="name"
+                      placeholder="관리자 이름"
+                      required
+                      th:value="${signupRequest != null ? signupRequest.name : ''}"
+                      type="text"
+                    />
+                  </div>
+
+                  <div class="admin-users-field is-wide">
+                    <label for="signup-email-local">이메일</label>
+                    <div class="admin-users-email-line">
+                      <input
+                        autocomplete="email"
+                        id="signup-email-local"
+                        name="emailLocal"
+                        placeholder="admin"
+                        required
+                        th:value="${signupRequest != null ? signupRequest.emailLocal : ''}"
+                        type="text"
+                      />
+                      <span>@</span>
+                      <select
+                        aria-label="이메일 도메인"
+                        id="signup-email-domain"
+                        name="emailDomain"
+                      >
+                        <option value="">직접입력</option>
+                        <option
+                          th:selected="${signupRequest != null && signupRequest.emailDomain == 'gmail.com'}"
+                          value="gmail.com"
+                        >
+                          gmail.com
+                        </option>
+                        <option
+                          th:selected="${signupRequest != null && signupRequest.emailDomain == 'naver.com'}"
+                          value="naver.com"
+                        >
+                          naver.com
+                        </option>
+                        <option
+                          th:selected="${signupRequest != null && signupRequest.emailDomain == 'daum.net'}"
+                          value="daum.net"
+                        >
+                          daum.net
+                        </option>
+                        <option
+                          th:selected="${signupRequest != null && signupRequest.emailDomain == 'kakao.com'}"
+                          value="kakao.com"
+                        >
+                          kakao.com
+                        </option>
+                      </select>
+                      <button
+                        id="signup-email-check-button"
+                        th:data-check-url="@{/signup/email-check}"
+                        type="button"
+                      >
+                        중복확인
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="admin-users-field">
+                    <label for="signup-password">임시 비밀번호</label>
+                    <input
+                      autocomplete="new-password"
+                      id="signup-password"
+                      name="password"
+                      placeholder="8자 이상"
+                      required
+                      type="password"
+                    />
+                  </div>
+
+                  <div class="admin-users-field">
+                    <label for="signup-password-confirm">비밀번호 확인</label>
+                    <input
+                      autocomplete="new-password"
+                      id="signup-password-confirm"
+                      name="passwordConfirm"
+                      placeholder="비밀번호 재입력"
+                      required
+                      type="password"
+                    />
+                  </div>
+
+                  <div class="admin-users-field">
+                    <label for="signup-birth">생년월일</label>
+                    <input
+                      autocomplete="bday"
+                      id="signup-birth"
+                      inputmode="numeric"
+                      name="birth"
+                      placeholder="20010415"
+                      required
+                      th:value="${signupRequest != null ? signupRequest.birth : ''}"
+                      type="text"
+                    />
+                  </div>
+
+                  <fieldset class="admin-users-field admin-users-gender">
+                    <legend>성별</legend>
+                    <div class="admin-users-radio-group">
+                      <label>
+                        <input
+                          name="gender"
+                          required
+                          th:checked="${signupRequest != null && signupRequest.gender == 'MALE'}"
+                          type="radio"
+                          value="MALE"
+                        />
+                        <span aria-hidden="true"></span>
+                        남성
+                      </label>
+                      <label>
+                        <input
+                          name="gender"
+                          th:checked="${signupRequest != null && signupRequest.gender == 'FEMALE'}"
+                          type="radio"
+                          value="FEMALE"
+                        />
+                        <span aria-hidden="true"></span>
+                        여성
+                      </label>
+                    </div>
+                  </fieldset>
+                </div>
+
+                <div class="admin-users-actions">
+                  <button class="admin-users-secondary-button" type="reset">초기화</button>
+                  <button class="admin-users-primary-button" type="submit">관리자 계정 발급</button>
+                </div>
+              </form>
             </section>
 
             <section class="admin-users-card admin-users-role-card">
@@ -240,6 +217,77 @@
               ></div>
             </section>
           </div>
+          <!-- /.admin-users-left-stack -->
+
+          <section class="admin-users-card admin-users-role-card admin-users-candidates-card">
+            <div class="admin-users-card-header">
+              <div>
+                <h2>기존 사용자 권한 부여</h2>
+                <p>관리자 권한이 없는 사용자를 선택해 권한을 부여합니다.</p>
+              </div>
+              <button
+                aria-label="권한 부여 후보 새로고침"
+                class="admin-users-icon-button"
+                id="admin-candidates-refresh-button"
+                title="새로고침"
+                type="button"
+              >
+                <i class="bi bi-arrow-clockwise"></i>
+              </button>
+            </div>
+
+            <div class="admin-users-search-bar">
+              <input
+                class="admin-users-search-input"
+                id="admin-candidates-search-input"
+                type="text"
+                placeholder="이름 또는 이메일로 검색"
+                aria-label="사용자 검색"
+              />
+              <button
+                class="admin-users-search-button"
+                id="admin-candidates-search-button"
+                type="button"
+                aria-label="검색"
+              >
+                <i class="bi bi-search"></i>
+              </button>
+            </div>
+
+            <p aria-live="polite" class="admin-users-role-message" id="admin-users-role-message">
+              권한 관리 결과가 여기에 표시됩니다.
+            </p>
+            <div
+              class="admin-users-list"
+              data-empty-message="관리자 권한을 부여할 사용자가 없습니다."
+              data-loading-message="사용자 목록을 불러오는 중입니다."
+              id="admin-candidates-list"
+            ></div>
+            <nav
+              class="admin-users-pagination"
+              id="admin-candidates-pagination"
+              aria-label="사용자 페이지 탐색"
+              hidden
+            >
+              <button
+                class="admin-users-page-btn"
+                id="admin-candidates-page-prev"
+                type="button"
+                aria-label="이전 페이지"
+              >
+                <i class="bi bi-chevron-left"></i>
+              </button>
+              <span class="admin-users-page-info" id="admin-candidates-page-info"></span>
+              <button
+                class="admin-users-page-btn"
+                id="admin-candidates-page-next"
+                type="button"
+                aria-label="다음 페이지"
+              >
+                <i class="bi bi-chevron-right"></i>
+              </button>
+            </nav>
+          </section>
         </div>
 
         <div
