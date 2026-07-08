@@ -159,22 +159,20 @@
 }
 
 .popular-table-section .section-title {
-  font-size: 0;
+  color: var(--color-ink);
+  font-size: 30px;
+  font-weight: 900;
   text-align: center;
 }
 
-.popular-table-section .section-title::before {
-  color: var(--color-ink);
-  content: '자랑해요 ';
-  font-size: 30px;
-  font-weight: 900;
+.popular-table-section .section-title strong {
+  color: var(--color-brand, #ff4d1f);
 }
 
-.popular-table-section .section-title::after {
-  color: var(--color-brand, #ff4d1f);
-  content: '내 식탁 🍽';
-  font-size: 30px;
-  font-weight: 900;
+.popular-table-section .section-title-emoji {
+  margin-left: 4px;
+  color: initial;
+  font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif;
 }
 
 .popular-table-section .section-more-link {
