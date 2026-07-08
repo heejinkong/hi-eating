@@ -3,8 +3,8 @@
   <body>
     <div
       class="home-page"
-      th:fragment="content"
       th:attr="data-home-table-decor-authenticated=${tableDecorAuthenticated}"
+      th:fragment="content"
     >
       <section aria-label="프로모션" class="promotion-section">
         <div
@@ -73,10 +73,10 @@
         class="popular-table-section container-xl reveal-section"
       >
         <div class="section-heading-row">
-          <h2 class="section-title">자랑해요 <strong>내 식탁</strong>🍽</h2>
+          <h2 class="section-title">자랑해요 <strong>내식탁</strong>🍽</h2>
           <a class="section-more-link" th:href="@{/table-decorations}">
             모두 보기
-            <i class="bi bi-chevron-right" aria-hidden="true"></i>
+            <i aria-hidden="true" class="bi bi-chevron-right"></i>
           </a>
         </div>
 
@@ -87,9 +87,8 @@
         <div class="popular-table-grid" th:if="${!#lists.isEmpty(popularTableDecorPosts)}">
           <a
             class="popular-table-card"
-            th:each="post, stat : ${popularTableDecorPosts}"
-            href="#home-table-decor-preview"
             data-home-table-decor-trigger
+            href="#home-table-decor-preview"
             th:attr="data-image-src=${#strings.isEmpty(post.imageSrc) ? '/images/logo-hi-eating.png' : post.imageSrc},
               data-image-alt=|${post.userName}님의 식탁|,
               data-owner=|${post.userName}님의 식탁|,
@@ -97,6 +96,7 @@
               data-like-count=${post.likeCount},
               data-post-id=${post.postId},
               data-liked=${post.liked}"
+            th:each="post, stat : ${popularTableDecorPosts}"
           >
             <span class="popular-table-card__rank" th:text="|Top ${stat.index + 1}|">Top 1</span>
             <img
@@ -107,7 +107,7 @@
             <span class="popular-table-card__info">
               <strong th:text="|${post.userName}님의 식탁|">이용자님의 식탁</strong>
               <span>
-                <i class="bi bi-heart-fill" aria-hidden="true"></i>
+                <i aria-hidden="true" class="bi bi-heart-fill"></i>
                 <span data-home-table-decor-like-count th:text="${post.likeCount}">0</span>
               </span>
             </span>
@@ -116,54 +116,54 @@
       </section>
 
       <div
-        id="home-table-decor-preview"
+        aria-hidden="true"
+        aria-labelledby="home-table-decor-modal-title"
+        aria-modal="true"
         class="table-decor-modal"
         data-home-table-decor-modal
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="home-table-decor-modal-title"
-        aria-hidden="true"
         hidden
+        id="home-table-decor-preview"
+        role="dialog"
       >
         <button
-          class="table-decor-modal__backdrop"
-          type="button"
-          data-home-table-decor-modal-close
           aria-label="식탁 미리보기 닫기"
+          class="table-decor-modal__backdrop"
+          data-home-table-decor-modal-close
+          type="button"
         ></button>
         <div class="table-decor-modal__panel">
           <button
-            class="table-decor-modal__close"
-            type="button"
-            data-home-table-decor-modal-close
             aria-label="식탁 미리보기 닫기"
+            class="table-decor-modal__close"
+            data-home-table-decor-modal-close
+            type="button"
           >
-            <i class="bi bi-x-lg" aria-hidden="true"></i>
+            <i aria-hidden="true" class="bi bi-x-lg"></i>
           </button>
           <div class="table-decor-modal__image">
             <img
-              data-home-table-decor-modal-image
-              src="/images/logo-hi-eating.png"
               alt="식탁 미리보기"
               data-fallback-src="/images/logo-hi-eating.png"
+              data-home-table-decor-modal-image
+              src="/images/logo-hi-eating.png"
             />
           </div>
           <div class="table-decor-modal__body">
-            <h2 id="home-table-decor-modal-title" data-home-table-decor-modal-owner>
+            <h2 data-home-table-decor-modal-owner id="home-table-decor-modal-title">
               이용자님의 식탁
             </h2>
             <p>
               <span data-home-table-decor-modal-date>2026.07.04</span>
             </p>
             <button
-              class="table-decor-modal__like"
-              type="button"
               aria-label="식탁 좋아요"
-              data-home-table-decor-modal-like-button
-              data-home-table-decor-like
               aria-pressed="false"
+              class="table-decor-modal__like"
+              data-home-table-decor-like
+              data-home-table-decor-modal-like-button
+              type="button"
             >
-              <i class="bi bi-heart-fill" aria-hidden="true"></i>
+              <i aria-hidden="true" class="bi bi-heart-fill"></i>
               <span data-home-table-decor-like-count data-home-table-decor-modal-like>0</span>
             </button>
           </div>
@@ -171,34 +171,34 @@
       </div>
 
       <div
+        aria-hidden="true"
+        aria-labelledby="home-table-decor-auth-title"
+        aria-modal="true"
         class="table-decor-auth-modal"
         data-home-table-decor-auth-modal
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="home-table-decor-auth-title"
-        aria-hidden="true"
         hidden
+        role="dialog"
       >
         <button
-          class="table-decor-auth-modal__backdrop"
-          type="button"
-          data-home-table-decor-auth-close
           aria-label="로그인 안내 닫기"
+          class="table-decor-auth-modal__backdrop"
+          data-home-table-decor-auth-close
+          type="button"
         ></button>
         <div class="table-decor-auth-modal__panel">
           <button
-            class="table-decor-auth-modal__close"
-            type="button"
-            data-home-table-decor-auth-close
             aria-label="로그인 안내 닫기"
+            class="table-decor-auth-modal__close"
+            data-home-table-decor-auth-close
+            type="button"
           >
-            <i class="bi bi-x-lg" aria-hidden="true"></i>
+            <i aria-hidden="true" class="bi bi-x-lg"></i>
           </button>
           <strong id="home-table-decor-auth-title">로그인이 필요합니다</strong>
           <p data-home-table-decor-auth-message>좋아요는 로그인한 사용자만 이용할 수 있습니다.</p>
           <div>
             <a th:href="@{/login}">로그인하기</a>
-            <button type="button" data-home-table-decor-auth-close>닫기</button>
+            <button data-home-table-decor-auth-close type="button">닫기</button>
           </div>
         </div>
       </div>

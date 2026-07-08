@@ -171,7 +171,6 @@
 .popular-table-section .section-title::after {
   color: var(--color-brand, #ff4d1f);
   content: '내 식탁 🍽';
-  font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif;
   font-size: 30px;
   font-weight: 900;
 }

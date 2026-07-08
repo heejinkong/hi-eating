@@ -11,19 +11,19 @@
 const MASCOT_STATES = {
   idle: {
     path: '/lotties/nabi-idle.json',
-    message: '가입 정보를 차근차근 알려주세요',
+    message: '가입 정보를<br> 차근차근 알려주세요',
   },
   greeting: {
     path: '/lotties/nabi-greeting.json',
-    message: '반갑습니다! 이름을 알려주세요 😊',
+    message: '반갑습니다!<br>이름을 알려주세요 😊',
   },
   curious: {
     path: '/lotties/nabi-curious.json',
-    message: '이메일 주소를 입력해 주세요 📧',
+    message: '이메일 주소를<br> 입력해 주세요 📧',
   },
   covering: {
     path: '/lotties/nabi-covering.json',
-    message: '비밀번호는 제가 안 볼게요 🙈',
+    message: '비밀번호는<br> 제가 안 볼게요 🙈',
   },
   peeking: {
     path: '/lotties/nabi-peeking.json',
@@ -41,7 +41,11 @@ const MASCOT_STATES = {
 const FIELD_CONFIG = [
   { selector: '#signup-name', state: 'greeting' },
   { selector: '#signup-email-local', state: 'curious' },
-  { selector: '#signup-email-domain', state: 'curious', message: '이메일 도메인을 선택해 주세요' },
+  {
+    selector: '#signup-email-domain',
+    state: 'curious',
+    message: '이메일 도메인을 선택해 주세요',
+  },
   { selector: '#signup-password', state: 'covering' },
   { selector: '#signup-password-confirm', state: 'peeking' },
   { selector: '#signup-birth', state: 'thinking' },
@@ -71,7 +75,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 진단 로그 제거 완료
 
-  if (!signupForm || !modalElement || !modalMessage) return;
+  if (!signupForm || !modalElement || !modalMessage) {
+    return;
+  }
 
   /* ── lottie-web 인스턴스 관리 ── */
   let currentAnim = null;
@@ -87,7 +93,9 @@ document.addEventListener('DOMContentLoaded', () => {
    * @param {string} path - JSON 파일 경로
    */
   const loadAnimation = async (path) => {
-    if (!lottieContainer || typeof lottie === 'undefined') return;
+    if (!lottieContainer || typeof lottie === 'undefined') {
+      return;
+    }
 
     // 이전 애니메이션 파기 + SVG 누적 방지 즉시 초기화
     if (currentAnim) {
@@ -99,12 +107,16 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       if (!jsonCache[path]) {
         const res = await fetch(path);
-        if (!res.ok) throw new Error(`Lottie fetch failed: ${path} (${res.status})`);
+        if (!res.ok) {
+          throw new Error(`Lottie fetch failed: ${path} (${res.status})`);
+        }
         jsonCache[path] = await res.json();
       }
 
       // 다른 호출이 이미 렌더링했으면 중단
-      if (lottieContainer.innerHTML !== '') return;
+      if (lottieContainer.innerHTML !== '') {
+        return;
+      }
 
       currentAnim = lottie.loadAnimation({
         container: lottieContainer,
@@ -134,10 +146,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const message = customMessage ?? config.message;
 
     if (mascotMessageEl) {
-      mascotMessageEl.textContent = message;
+      mascotMessageEl.innerHTML = message;
     }
 
-    if (stateName === currentState) return;
+    if (stateName === currentState) {
+      return;
+    }
     currentState = stateName;
 
     if (signupMascot) {
@@ -176,7 +190,9 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     } else {
       const el = document.querySelector(selector);
-      if (!el) return;
+      if (!el) {
+        return;
+      }
       el.addEventListener('focus', () => {
         clearTimeout(resetTimer);
         setMascotState(state, message);
@@ -187,10 +203,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /* ── 모달 헬퍼 ── */
   const showModal = (title, msg, state) => {
-    if (modalTitle) modalTitle.textContent = title;
+    if (modalTitle) {
+      modalTitle.textContent = title;
+    }
     modalMessage.textContent = msg;
     modalMessage.classList.remove('is-success', 'is-danger');
-    if (state) modalMessage.classList.add(state);
+    if (state) {
+      modalMessage.classList.add(state);
+    }
     if (window.bootstrap?.Modal) {
       window.bootstrap.Modal.getOrCreateInstance(modalElement).show();
     } else {
@@ -202,8 +222,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const buildEmail = () => {
     const local = emailLocalInput.value.trim();
     const domain = emailDomainSelect.value.trim();
-    if (!local) return '';
-    if (local.includes('@') || !domain) return local;
+    if (!local) {
+      return '';
+    }
+    if (local.includes('@') || !domain) {
+      return local;
+    }
     return `${local}@${domain}`;
   };
 
@@ -222,7 +246,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const response = await fetch(`${checkUrl}?email=${encodeURIComponent(email)}`, {
         headers: { Accept: 'application/json' },
       });
-      if (!response.ok) throw new Error('Email check request failed');
+      if (!response.ok) {
+        throw new Error('Email check request failed');
+      }
 
       const result = await response.json();
       showModal('이메일 중복확인', result.message, result.available ? 'is-success' : 'is-danger');
@@ -237,7 +263,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /* ── 폼 제출 검증 ── */
   signupForm.addEventListener('submit', (event) => {
-    if (!passwordInput || !passwordConfirmInput) return;
+    if (!passwordInput || !passwordConfirmInput) {
+      return;
+    }
     if (passwordInput.value !== passwordConfirmInput.value) {
       event.preventDefault();
       showModal('비밀번호 확인', '비밀번호가 일치하지 않습니다.', 'is-danger');

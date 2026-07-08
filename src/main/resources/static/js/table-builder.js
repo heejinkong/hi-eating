@@ -552,10 +552,16 @@ async function captureScene() {
     const formData = new FormData();
     formData.append('captureImage', new File([blob], fileName, { type: 'image/png' }));
 
+    const xsrfToken = (() => {
+      const match = document.cookie.match(/(?:^|;\s*)XSRF-TOKEN=([^;]*)/);
+      return match ? decodeURIComponent(match[1]) : '';
+    })();
+
     const response = await fetch('/api/table-builder/captures', {
       method: 'POST',
       headers: {
         'X-Requested-With': 'XMLHttpRequest',
+        'X-XSRF-TOKEN': xsrfToken,
       },
       body: formData,
     });
