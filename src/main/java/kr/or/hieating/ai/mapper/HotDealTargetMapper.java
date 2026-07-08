@@ -13,7 +13,9 @@ public interface HotDealTargetMapper {
   List<Long> findCategoryIdsByHotDealId(@Param("hotDealId") long hotDealId);
 
   List<Long> findCandidateUserIds(
-      @Param("categoryIds") List<Long> categoryIds, @Param("recentMonths") int recentMonths);
+      @Param("categoryIds") List<Long> categoryIds,
+      @Param("recentMonths") int recentMonths,
+      @Param("maxCandidates") int maxCandidates);
 
   List<UserProfileRow> findUserProfilesByIds(
       @Param("userIds") List<Long> userIds,

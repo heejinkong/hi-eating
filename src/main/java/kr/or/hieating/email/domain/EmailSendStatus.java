@@ -4,6 +4,7 @@ public enum EmailSendStatus {
   PENDING,
   NEEDS_REVIEW,
   APPROVED,
+  PUBLISHING,
   PUBLISHED,
   SENDING,
   SENT,

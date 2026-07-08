@@ -52,6 +52,7 @@
             )
           )
         ORDER BY u.id
+        FETCH FIRST #{maxCandidates} ROWS ONLY
     </select>
 
     <select id="findUserProfilesByIds" resultType="kr.or.hieating.ai.dto.UserProfileRow">

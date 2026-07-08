@@ -86,7 +86,7 @@
                 WHEN retry_count + 1 &lt;= max_retry_count
                 THEN SYSTIMESTAMP
                      + NUMTODSINTERVAL(
-                         LEAST(30 * POWER(2, retry_count), 600),
+                         LEAST(5 * POWER(2, retry_count), 60),
                          'SECOND'
                      )
                 ELSE NULL

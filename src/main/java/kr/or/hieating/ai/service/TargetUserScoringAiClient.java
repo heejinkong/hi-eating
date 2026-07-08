@@ -1,7 +1,10 @@
 package kr.or.hieating.ai.service;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import kr.or.hieating.ai.config.AiProperties;
 import kr.or.hieating.ai.dto.HotDealTargetInfoDto;
@@ -10,6 +13,7 @@ import kr.or.hieating.ai.dto.UserScoreDto;
 import kr.or.hieating.ai.prompt.TargetSelectionPromptBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.ollama.api.OllamaChatOptions;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
@@ -41,6 +45,31 @@ public class TargetUserScoringAiClient {
   }
 
   public List<UserScoreDto> score(HotDealTargetInfoDto hotDeal, List<UserProfileDto> userProfiles) {
+    try {
+      return scoreBatch(hotDeal, userProfiles);
+    } catch (RuntimeException exception) {
+      if (userProfiles.size() <= 1 || !isAiResponseFormatFailure(exception)) {
+        throw exception;
+      }
+
+      int middle = userProfiles.size() / 2;
+      List<UserProfileDto> left = userProfiles.subList(0, middle);
+      List<UserProfileDto> right = userProfiles.subList(middle, userProfiles.size());
+      log.warn(
+          "[대상선정] 배치 평가 실패로 분할 재시도합니다. size={} left={} right={}",
+          userProfiles.size(),
+          left.size(),
+          right.size());
+
+      List<UserScoreDto> scores = new ArrayList<>(userProfiles.size());
+      scores.addAll(score(hotDeal, left));
+      scores.addAll(score(hotDeal, right));
+      return scores;
+    }
+  }
+
+  private List<UserScoreDto> scoreBatch(
+      HotDealTargetInfoDto hotDeal, List<UserProfileDto> userProfiles) {
     String userPrompt = promptBuilder.build(hotDeal, userProfiles);
     RuntimeException lastFailure = null;
 
@@ -52,16 +81,22 @@ public class TargetUserScoringAiClient {
                 .prompt()
                 .system(promptBuilder.systemPrompt())
                 .user(userPrompt)
+                .options(
+                    OllamaChatOptions.builder()
+                        .format(scoreSchema(userProfiles))
+                        .numPredict(512)
+                        .build())
                 .call()
                 .content();
-        List<UserScoreDto> scores = responseParser.parse(response);
-        scores = remapSingleUserResponse(userProfiles, scores);
+        Map<Long, Integer> scoreValues = responseParser.parseScoreMap(response);
+        List<UserScoreDto> scores = toScores(userProfiles, scoreValues);
         validateCompleteResponse(userProfiles, scores);
         return scores;
       } catch (RuntimeException exception) {
         lastFailure = exception;
         log.warn(
-            "[대상선정] AI 호출 또는 파싱 실패 attempt={}/{} userIds={}",
+            "[대상선정] AI 배치 평가 실패 type={} attempt={}/{} userIds={}",
+            failureType(exception),
             attempt + 1,
             retryCount + 1,
             userProfiles.stream().map(UserProfileDto::userId).toList(),
@@ -88,6 +123,39 @@ public class TargetUserScoringAiClient {
     throw new IllegalStateException("AI 대상 선정 재시도 횟수를 초과했습니다. 마지막 오류: " + lastMessage, lastFailure);
   }
 
+  private Map<String, Object> scoreSchema(List<UserProfileDto> userProfiles) {
+    Map<String, Object> properties = new LinkedHashMap<>();
+    List<String> required = new ArrayList<>();
+    for (UserProfileDto profile : userProfiles) {
+      String userId = String.valueOf(profile.userId());
+      properties.put(userId, Map.of("type", "integer", "minimum", 0, "maximum", 100));
+      required.add(userId);
+    }
+    return Map.of(
+        "type",
+        "object",
+        "properties",
+        properties,
+        "required",
+        required,
+        "additionalProperties",
+        false);
+  }
+
+  private List<UserScoreDto> toScores(
+      List<UserProfileDto> profiles, Map<Long, Integer> scoreValues) {
+    List<UserScoreDto> scores = new ArrayList<>(profiles.size());
+    for (UserProfileDto profile : profiles) {
+      Integer score = scoreValues.get(profile.userId());
+      if (score == null) {
+        continue;
+      }
+      scores.add(
+          new UserScoreDto(profile.userId(), score, "활동 정보를 종합한 AI 적합도 %d점".formatted(score)));
+    }
+    return scores;
+  }
+
   private boolean isAiResponseFormatFailure(Throwable failure) {
     Throwable current = failure;
     while (current != null) {
@@ -100,36 +168,18 @@ public class TargetUserScoringAiClient {
     return false;
   }
 
-  private List<UserScoreDto> remapSingleUserResponse(
-      List<UserProfileDto> userProfiles, List<UserScoreDto> scores) {
-    if (userProfiles.size() != 1) {
-      return scores;
+  private String failureType(Throwable failure) {
+    if (isAiResponseFormatFailure(failure)) {
+      return "RESPONSE_FORMAT";
     }
-
-    Long expectedUserId = userProfiles.get(0).userId();
-    UserScoreDto aiScore =
-        scores.stream()
-            .filter(this::hasUsableScore)
-            .filter(score -> expectedUserId.equals(score.userId()))
-            .findFirst()
-            .orElseGet(
-                () ->
-                    scores.stream()
-                        .filter(this::hasUsableScore)
-                        .findFirst()
-                        .orElseThrow(
-                            () ->
-                                new IllegalStateException("AI 대상 선정 응답에 사용할 수 있는 점수와 사유가 없습니다.")));
-    return List.of(new UserScoreDto(expectedUserId, aiScore.score(), aiScore.reason()));
-  }
-
-  private boolean hasUsableScore(UserScoreDto score) {
-    return score != null
-        && score.score() != null
-        && score.score() >= 0
-        && score.score() <= 100
-        && score.reason() != null
-        && !score.reason().isBlank();
+    Throwable current = failure;
+    while (current != null) {
+      if (current instanceof java.net.SocketTimeoutException) {
+        return "TIMEOUT";
+      }
+      current = current.getCause();
+    }
+    return "REMOTE_CALL";
   }
 
   private void validateCompleteResponse(

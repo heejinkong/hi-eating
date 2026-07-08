@@ -11,6 +11,7 @@ import kr.or.hieating.email.domain.EmailSendStatus;
 import kr.or.hieating.email.dto.EmailDraftDto;
 import kr.or.hieating.email.repository.EmailDraftRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.core.ReturnedMessage;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class EmailPublisher {
 
   private static final Duration DEFAULT_CONFIRM_TIMEOUT = Duration.ofSeconds(5);
@@ -43,9 +45,17 @@ public class EmailPublisher {
 
     EmailPublishMessage message = createMessage(emailDraft);
     CorrelationData correlationData = new CorrelationData(String.valueOf(emailDraftId));
+    long creationToPublishMillis =
+        elapsedMillis(emailDraft.getHotDealCreatedAt(), message.requestedAt());
 
     try {
       emailDraftRepository.updatePublishStatus(emailDraftId, EmailPublishStatus.PUBLISHED, null);
+      log.info(
+          "[이메일 처리시간] RabbitMQ 발행 직전 emailDraftId={} hotDealId={} 핫딜생성부터발행까지={}ms({}초)",
+          emailDraftId,
+          emailDraft.getHotDealId(),
+          creationToPublishMillis,
+          seconds(creationToPublishMillis));
       rabbitTemplate.convertAndSend(
           emailEventProperties.exchange(),
           emailEventProperties.routingKey(),
@@ -56,6 +66,10 @@ public class EmailPublisher {
           },
           correlationData);
       verifyBrokerAcceptedMessage(emailDraftId, correlationData);
+      log.info(
+          "[이메일 처리시간] RabbitMQ 발행 확인 완료 emailDraftId={} hotDealId={}",
+          emailDraftId,
+          emailDraft.getHotDealId());
       return message;
     } catch (AmqpException exception) {
       emailDraftRepository.updatePublishStatus(
@@ -102,6 +116,17 @@ public class EmailPublisher {
     return emailEventProperties.publishConfirmTimeout() == null
         ? DEFAULT_CONFIRM_TIMEOUT
         : emailEventProperties.publishConfirmTimeout();
+  }
+
+  private long elapsedMillis(LocalDateTime startedAt, LocalDateTime endedAt) {
+    if (startedAt == null || endedAt == null) {
+      return -1;
+    }
+    return Math.max(0, Duration.between(startedAt, endedAt).toMillis());
+  }
+
+  private String seconds(long millis) {
+    return millis < 0 ? "측정불가" : "%.3f".formatted(millis / 1000.0);
   }
 
   private EmailPublishMessage createMessage(EmailDraftDto emailDraft) {

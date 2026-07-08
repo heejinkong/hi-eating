@@ -19,6 +19,7 @@
     <result property="publishStatus" column="publish_status"/>
     <result property="publishErrorMessage" column="publish_error_message"/>
     <result property="publishedAt" column="published_at"/>
+    <result property="hotDealCreatedAt" column="hot_deal_created_at"/>
     <result property="createdAt" column="created_at"/>
     <result property="updatedAt" column="updated_at"/>
   </resultMap>
@@ -35,7 +36,7 @@
       esl.content,
       CASE
         WHEN esl.status = 'NEEDS_REVIEW' THEN 'FAIL'
-        WHEN esl.status IN ('APPROVED', 'PUBLISHED', 'SENDING', 'SENT', 'RETRYING') THEN 'PASS'
+        WHEN esl.status IN ('APPROVED', 'PUBLISHING', 'PUBLISHED', 'SENDING', 'SENT', 'RETRYING') THEN 'PASS'
         ELSE 'PENDING'
       END AS validation_status,
       CASE
@@ -45,6 +46,7 @@
       esl.status AS send_status,
       CASE
         WHEN esl.status = 'APPROVED' THEN 'READY'
+        WHEN esl.status = 'PUBLISHING' THEN 'PUBLISHED'
         WHEN esl.status = 'PUBLISHED' THEN 'PUBLISHED'
         WHEN esl.status = 'SENDING' THEN 'SENDING'
         WHEN esl.status = 'SENT' THEN 'SENT'
@@ -57,9 +59,10 @@
         ELSE NULL
       END AS publish_error_message,
       CASE
-        WHEN esl.status IN ('PUBLISHED', 'SENDING', 'SENT', 'RETRYING') THEN esl.updated_at
+        WHEN esl.status IN ('PUBLISHING', 'PUBLISHED', 'SENDING', 'SENT', 'RETRYING') THEN esl.updated_at
         ELSE NULL
       END AS published_at,
+      hd.created_at AS hot_deal_created_at,
       esl.created_at,
       esl.updated_at
     FROM email_send_logs esl

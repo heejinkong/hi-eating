@@ -31,6 +31,7 @@ public class EmailDraftDto {
   private EmailPublishStatus publishStatus;
   private String publishErrorMessage;
   private LocalDateTime publishedAt;
+  private LocalDateTime hotDealCreatedAt;
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
 

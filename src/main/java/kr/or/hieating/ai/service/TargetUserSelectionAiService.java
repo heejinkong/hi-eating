@@ -47,11 +47,17 @@ public class TargetUserSelectionAiService {
     }
 
     List<Long> candidateIds =
-        hotDealTargetMapper.findCandidateUserIds(categoryIds, settings.recentMonths());
+        hotDealTargetMapper.findCandidateUserIds(
+            categoryIds, settings.recentMonths(), settings.maxCandidates());
     if (candidateIds.isEmpty()) {
       log.info("[대상선정] 후보 사용자가 없습니다. hotDealId={}", hotDealId);
       return TargetSelectionResult.empty(hotDealId);
     }
+    log.info(
+        "[대상선정] 후보 조회 완료 hotDealId={} 후보={}명 최대={}명",
+        hotDealId,
+        candidateIds.size(),
+        settings.maxCandidates());
 
     HotDealInfoRow hotDealRow = hotDealTargetMapper.findHotDealInfo(hotDealId);
     if (hotDealRow == null) {
@@ -62,10 +68,27 @@ public class TargetUserSelectionAiService {
 
     Map<Long, TargetSelectionEvaluationDto> evaluationsByUserId = new LinkedHashMap<>();
     Map<Long, TargetUserDto> selectedByUserId = new LinkedHashMap<>();
+    int totalBatches = (candidateIds.size() + settings.batchSize() - 1) / settings.batchSize();
+    int batchNumber = 0;
     for (int start = 0; start < candidateIds.size(); start += settings.batchSize()) {
+      batchNumber++;
       int end = Math.min(start + settings.batchSize(), candidateIds.size());
       List<Long> batchIds = candidateIds.subList(start, end);
+      long batchStartedAt = System.nanoTime();
+      log.info(
+          "[대상선정] AI 배치 평가 시작 hotDealId={} batch={}/{} users={}",
+          hotDealId,
+          batchNumber,
+          totalBatches,
+          batchIds.size());
       selectBatch(hotDeal, categoryIds, batchIds, settings, evaluationsByUserId, selectedByUserId);
+      log.info(
+          "[대상선정] AI 배치 평가 완료 hotDealId={} batch={}/{} users={} elapsedMs={}",
+          hotDealId,
+          batchNumber,
+          totalBatches,
+          batchIds.size(),
+          (System.nanoTime() - batchStartedAt) / 1_000_000);
     }
 
     List<TargetSelectionEvaluationDto> evaluations = new ArrayList<>(evaluationsByUserId.values());

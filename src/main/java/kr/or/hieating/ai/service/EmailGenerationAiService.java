@@ -17,6 +17,8 @@ import org.springframework.util.StringUtils;
 public class EmailGenerationAiService {
 
   private final ChatClient chatClient;
+  private final org.springframework.ai.converter.BeanOutputConverter<kr.or.hieating.ai.dto.GeneratedHotDealEmailDto> outputConverter =
+      new org.springframework.ai.converter.BeanOutputConverter<>(kr.or.hieating.ai.dto.GeneratedHotDealEmailDto.class);
 
   // @Qualifier로 여러 ChatClient Bean 중 "생성용" Bean을 명시적으로 주입받음
   public EmailGenerationAiService(@Qualifier("emailGenerationChatClient") ChatClient chatClient) {
@@ -31,7 +33,17 @@ public class EmailGenerationAiService {
    */
   public String generate(String prompt) {
     Assert.hasText(prompt, "prompt must not be blank"); // 빈 프롬프트 방어
-    String response = chatClient.prompt().user(prompt).call().content();
+    String response =
+        chatClient
+            .prompt()
+            .user(prompt)
+            .options(
+                org.springframework.ai.ollama.api.OllamaChatOptions.builder()
+                    .format(outputConverter.getJsonSchemaMap())
+                    .numPredict(2048) // 이메일 생성 글자 수 제한 넉넉히 설정
+                    .build())
+            .call()
+            .content();
     Assert.state(StringUtils.hasText(response), "AI generation response must not be blank");
     return response;
   }

@@ -30,7 +30,7 @@ public class HotDealEmailValidationPromptBuilder {
       화면에 표시되는 한국어 문구와 상품명·가격·할인율의 정확성을 검증하세요.
 
       하나라도 충족하지 못하면 해당 값은 false입니다.
-      issues에는 실패한 항목의 구체적인 이유만 작성하세요. 모두 통과하면 빈 배열을 작성하세요.
+      issues에는 실패한 항목의 구체적인 이유만 항목당 80자 이내로 작성하세요. 모두 통과하면 빈 배열을 작성하세요.
       반드시 아래 형태의 순수 JSON 객체만 반환하세요.
       {"spellingValid":true,"contextValid":true,"productInfoValid":true,"discountRateValid":true,"exaggerationFree":true,"lengthValid":true,"issues":[]}
 

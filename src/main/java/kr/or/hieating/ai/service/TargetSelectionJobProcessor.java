@@ -32,20 +32,41 @@ public class TargetSelectionJobProcessor {
     }
 
     try {
+      log.info(
+          "[대상선정 Job] 시작 jobId={} hotDealId={} retryCount={}/{}",
+          job.id(),
+          job.hotDealId(),
+          job.retryCount(),
+          job.maxRetryCount());
+      long jobStartedAt = System.nanoTime();
+      long stageStartedAt = jobStartedAt;
       TargetSelectionResult result = selectionService.selectAndSaveTargets(job.hotDealId());
+      long selectionMillis = elapsedMillis(stageStartedAt);
+      long generationMillis = 0;
+      long validationMillis = 0;
       if (result.selectedCount() > 0) {
+        stageStartedAt = System.nanoTime();
+        log.info("[대상선정 Job] 이메일 생성 시작 jobId={} hotDealId={}", job.id(), job.hotDealId());
         var email = emailGenerationService.generateAndSave(job.hotDealId());
+        generationMillis = elapsedMillis(stageStartedAt);
+        stageStartedAt = System.nanoTime();
+        log.info("[대상선정 Job] 이메일 검증 시작 jobId={} hotDealId={}", job.id(), job.hotDealId());
         emailQualityValidationService.validateAndApply(job.hotDealId(), email);
+        validationMillis = elapsedMillis(stageStartedAt);
       }
       jobMapper.markCompleted(
           job.id(), result.candidateCount(), result.selectedCount(), result.insertedCount());
       log.info(
-          "[대상선정 Job] 완료 jobId={} hotDealId={} 후보={} 선정={} 저장={}",
+          "[대상선정 Job] 완료 jobId={} hotDealId={} 후보={} 선정={} 저장={} 소요시간(ms): 대상선정={}, 이메일생성={}, 이메일검증={}, 전체={}",
           job.id(),
           job.hotDealId(),
           result.candidateCount(),
           result.selectedCount(),
-          result.insertedCount());
+          result.insertedCount(),
+          selectionMillis,
+          generationMillis,
+          validationMillis,
+          elapsedMillis(jobStartedAt));
     } catch (RuntimeException exception) {
       String failureReason = abbreviate(buildFailureReason(exception));
       jobMapper.markFailed(job.id(), failureReason);
@@ -61,6 +82,10 @@ public class TargetSelectionJobProcessor {
 
   public int recoverInterruptedJobs() {
     return jobMapper.recoverInterruptedJobs();
+  }
+
+  private long elapsedMillis(long startedAt) {
+    return (System.nanoTime() - startedAt) / 1_000_000;
   }
 
   private String abbreviate(String message) {
