@@ -135,6 +135,10 @@ public class EmailPublisher {
   }
 
   private EmailPublishMessage createMessage(EmailDraftDto emailDraft) {
+    String content = emailDraft.getContent();
+    if (content != null) {
+      content = content.replace("{{고객명}}", emailDraft.getRecipientName());
+    }
     return new EmailPublishMessage(
         emailDraft.getId(),
         emailDraft.getHotDealId(),
@@ -143,7 +147,7 @@ public class EmailPublisher {
         emailDraft.getRecipientEmail(),
         emailDraft.getHotDealTitle(),
         emailDraft.getSubject(),
-        emailDraft.getContent(),
+        content,
         LocalDateTime.now());
   }
 }

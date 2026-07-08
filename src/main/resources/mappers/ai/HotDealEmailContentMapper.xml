@@ -68,10 +68,16 @@
     </insert>
 
     <update id="applyContentToSendLogs">
-        UPDATE email_send_logs
-        SET title = #{subject}, content = #{content}, updated_at = SYSTIMESTAMP
-        WHERE hot_deal_id = #{hotDealId}
-          AND status = 'PENDING'
+        UPDATE email_send_logs esl
+        SET esl.title = #{subject},
+            esl.content = REPLACE(
+                #{content},
+                '{{고객명}}',
+                NVL((SELECT u.name FROM users u WHERE u.id = esl.user_id), esl.recipient_email)
+            ),
+            esl.updated_at = SYSTIMESTAMP
+        WHERE esl.hot_deal_id = #{hotDealId}
+          AND esl.status = 'PENDING'
     </update>
 
     <update id="updateValidationResult">

@@ -104,14 +104,18 @@
   </select>
 
   <update id="updateContentAndApprove">
-    UPDATE email_send_logs
-    SET title = #{subject},
-        content = #{content},
-        status = 'APPROVED',
-        failure_reason = NULL,
-        updated_at = SYSTIMESTAMP
-    WHERE id = #{id}
-      AND status = 'NEEDS_REVIEW'
+    UPDATE email_send_logs esl
+    SET esl.title = #{subject},
+        esl.content = REPLACE(
+            #{content},
+            '{{고객명}}',
+            NVL((SELECT u.name FROM users u WHERE u.id = esl.user_id), esl.recipient_email)
+        ),
+        esl.status = 'APPROVED',
+        esl.failure_reason = NULL,
+        esl.updated_at = SYSTIMESTAMP
+    WHERE esl.id = #{id}
+      AND esl.status = 'NEEDS_REVIEW'
   </update>
 
   <update id="updateStatus">

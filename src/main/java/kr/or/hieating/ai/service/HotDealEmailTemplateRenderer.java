@@ -20,6 +20,8 @@ public class HotDealEmailTemplateRenderer {
   private static final Pattern LATIN_WORD = Pattern.compile("(?i)[a-z]+(?:[-'][a-z]+)*");
   private static final Pattern BRACES = Pattern.compile("[{}]");
 
+  private static final Pattern BOLD_PATTERN = Pattern.compile("\\*\\*(.*?)\\*\\*");
+
   @Value("${greenfood.email.hot-deal-base-url:http://localhost:8080}")
   private String hotDealBaseUrl;
 
@@ -36,12 +38,38 @@ public class HotDealEmailTemplateRenderer {
       List<HotDealEmailProductRow> products,
       GeneratedHotDealEmailDto aiCopy) {
     String productName = koreanCopy(products.get(0).productName());
+    int discountRate = products.get(0).discountRate();
+    String hotDealPrice = price(products.get(0).hotDealPrice());
+    String endDate = hotDeal.endsAt().format(DATE_FORMAT);
+    
+    // Clean up only the AI-generated content (recommendation reason)
+    String cleanAiContent = koreanCopy(aiCopy.content());
+
+    // Fixed template content structure requested by user
+      String templateContent = """
+        안녕하세요, {{고객명}}님 😊
+        
+        놓치기 아쉬운 특별 핫딜이 도착했어요!
+        
+        🔥 **%s** 🔥
+        지금 **%d%%** 할인된 **%s**원에 만나보실 수 있습니다.
+        
+        %s
+        
+        ⏰ 혜택 기간은 %s까지입니다.
+        👉인기 상품은 조기 소진될 수 있으니 서둘러 확인해보세요.
+        
+        
+        감사합니다:)
+        HI.eating 드림
+        """.formatted(productName, discountRate, hotDealPrice, cleanAiContent, endDate);
+
     String subject = "(광고) [하이이팅] 관심 상품 [%s] 핫딜 알림".formatted(abbreviate(productName, 42));
     String content =
         renderHtml(
             hotDeal,
             products,
-            aiCopy.content(),
+            templateContent,
             hotDealUrl(hotDeal.hotDealId()),
             imageUrl(hotDeal.heroImageLocation()));
     return new GeneratedHotDealEmailDto(subject, content);
@@ -89,7 +117,7 @@ public class HotDealEmailTemplateRenderer {
         .formatted(
             escape(koreanCopy(hotDeal.title())),
             image,
-            paragraphs(aiContent),
+            paragraphs(aiContent, hotDealUrl),
             productRows(products),
             escape(hotDealUrl),
             hotDeal.startsAt().format(DATE_FORMAT),
@@ -116,17 +144,27 @@ public class HotDealEmailTemplateRenderer {
     return rows.toString();
   }
 
-  private String paragraphs(String value) {
-    String[] blocks = koreanCopy(value).split("(?:\\r?\\n){2,}");
+  private String paragraphs(String value, String hotDealUrl) {
+    String[] blocks = value.split("(?:\\r?\\n){2,}");
     StringBuilder html = new StringBuilder();
     for (String block : blocks) {
       if (StringUtils.hasText(block)) {
+        String escapedBlock = escape(block.trim()).replace("\n", "<br>");
+        String processedBlock = replaceMarkdownBold(escapedBlock);
+        if (processedBlock.contains("{{핫딜상세링크}}")) {
+          String linkHtml = "<a href=\"%s\" style=\"color:#ff4b2b;text-decoration:underline;\">%s</a>".formatted(hotDealUrl, hotDealUrl);
+          processedBlock = processedBlock.replace("{{핫딜상세링크}}", linkHtml);
+        }
         html.append("<p style=\"margin:0 0 16px;\">")
-            .append(escape(block.trim()).replace("\n", "<br>"))
+            .append(processedBlock)
             .append("</p>");
       }
     }
     return html.toString();
+  }
+
+  private String replaceMarkdownBold(String value) {
+    return BOLD_PATTERN.matcher(value).replaceAll("<strong>$1</strong>");
   }
 
   String koreanCopy(String value) {
