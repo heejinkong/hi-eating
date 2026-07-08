@@ -15,6 +15,8 @@ public interface AdminEmailSendLogMapper {
 
   List<EmailDraftDto> findPublishReadyDrafts();
 
+  List<Long> findPublishReadyDraftIds(@Param("limit") int limit);
+
   Optional<EmailDraftDto> findById(@Param("id") Long id);
 
   int updateContentAndApprove(
@@ -24,4 +26,6 @@ public interface AdminEmailSendLogMapper {
       @Param("id") Long id,
       @Param("status") String status,
       @Param("failureReason") String failureReason);
+
+  int claimForPublishing(@Param("id") Long id);
 }

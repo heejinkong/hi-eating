@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 import kr.or.hieating.email.domain.EmailPublishStatus;
+import kr.or.hieating.email.domain.EmailSendStatus;
 import kr.or.hieating.email.domain.EmailValidationStatus;
 import kr.or.hieating.email.dto.EmailDraftDto;
 
@@ -96,6 +97,11 @@ public class InMemoryEmailDraftRepository implements EmailDraftRepository {
   }
 
   @Override
+  public List<Long> findPublishReadyDraftIds(int limit) {
+    return findPublishReadyDrafts().stream().limit(limit).map(EmailDraftDto::getId).toList();
+  }
+
+  @Override
   public Optional<EmailDraftDto> findById(Long id) {
     return Optional.ofNullable(storage.get(id)).map(this::copyOf);
   }
@@ -113,6 +119,9 @@ public class InMemoryEmailDraftRepository implements EmailDraftRepository {
     }
     if (saved.getPublishStatus() == null) {
       saved.setPublishStatus(EmailPublishStatus.READY);
+    }
+    if (saved.getSendStatus() == null) {
+      saved.setSendStatus(toSendStatus(saved.getPublishStatus()));
     }
     if (saved.getCreatedAt() == null) {
       saved.setCreatedAt(now);
@@ -150,10 +159,35 @@ public class InMemoryEmailDraftRepository implements EmailDraftRepository {
         id,
         emailDraft -> {
           emailDraft.setPublishStatus(publishStatus);
+          emailDraft.setSendStatus(toSendStatus(publishStatus));
           emailDraft.setPublishErrorMessage(publishErrorMessage);
           emailDraft.setPublishedAt(
               publishStatus == EmailPublishStatus.PUBLISHED ? LocalDateTime.now() : null);
         });
+  }
+
+  @Override
+  public boolean claimForPublishing(Long id) {
+    EmailDraftDto emailDraft = storage.get(id);
+    if (emailDraft == null || emailDraft.getPublishStatus() != EmailPublishStatus.READY) {
+      return false;
+    }
+
+    updatePublishStatus(id, EmailPublishStatus.PUBLISHING, null);
+    return true;
+  }
+
+  private EmailSendStatus toSendStatus(EmailPublishStatus publishStatus) {
+    return switch (publishStatus) {
+      case READY -> EmailSendStatus.APPROVED;
+      case PUBLISHING -> EmailSendStatus.PUBLISHING;
+      case PUBLISHED -> EmailSendStatus.PUBLISHED;
+      case SENDING -> EmailSendStatus.SENDING;
+      case SENT -> EmailSendStatus.SENT;
+      case RETRYING -> EmailSendStatus.RETRYING;
+      case FAILED -> EmailSendStatus.FAILED;
+      case PENDING -> EmailSendStatus.PENDING;
+    };
   }
 
   private EmailDraftDto updateRequired(Long id, EmailDraftUpdater updater) {

@@ -41,6 +41,11 @@ public class MyBatisEmailDraftRepository implements EmailDraftRepository {
   }
 
   @Override
+  public List<Long> findPublishReadyDraftIds(int limit) {
+    return adminEmailSendLogMapper.findPublishReadyDraftIds(limit);
+  }
+
+  @Override
   public Optional<EmailDraftDto> findById(Long id) {
     return adminEmailSendLogMapper.findById(id);
   }
@@ -75,6 +80,7 @@ public class MyBatisEmailDraftRepository implements EmailDraftRepository {
     EmailSendStatus status =
         switch (publishStatus) {
           case READY -> EmailSendStatus.APPROVED;
+          case PUBLISHING -> EmailSendStatus.PUBLISHING;
           case PUBLISHED -> EmailSendStatus.PUBLISHED;
           case SENDING -> EmailSendStatus.SENDING;
           case SENT -> EmailSendStatus.SENT;
@@ -83,6 +89,11 @@ public class MyBatisEmailDraftRepository implements EmailDraftRepository {
           case PENDING -> EmailSendStatus.PENDING;
         };
     return updateSendStatus(id, status, publishErrorMessage);
+  }
+
+  @Override
+  public boolean claimForPublishing(Long id) {
+    return adminEmailSendLogMapper.claimForPublishing(id) == 1;
   }
 
   public EmailDraftDto updateSendStatus(Long id, EmailSendStatus sendStatus, String failureReason) {

@@ -27,27 +27,25 @@ public class HotDealEmailQualityValidationService {
   private final EmailValidationAiService validationAiService;
   private final EmailQualityValidationResponseParser responseParser;
   private final HotDealEmailPersistenceService persistenceService;
-  private final HotDealEmailAutoPublishService autoPublishService;
 
   public EmailQualityValidationResult validateAndApply(
       long hotDealId, GeneratedHotDealEmailDto email) {
     HotDealEmailInfoRow hotDeal = contentMapper.findHotDealInfo(hotDealId);
     List<HotDealEmailProductRow> products = contentMapper.findHotDealProducts(hotDealId);
     if (hotDeal == null || products.isEmpty()) {
-      throw new IllegalStateException("이메일 검증용 핫딜 정보를 찾을 수 없습니다. hotDealId=" + hotDealId);
+      throw new IllegalStateException(
+          "Cannot find hot deal email validation data. hotDealId=" + hotDealId);
     }
 
     String prompt = promptBuilder.build(hotDeal, products, email);
     EmailQualityValidationResult result =
         responseParser.parse(validationAiService.validate(prompt));
     int updated = persistenceService.applyValidation(hotDealId, result);
-    int published = result.isPass() ? autoPublishService.publishApprovedEmails(hotDealId) : 0;
     log.info(
-        "[이메일 검증] 완료 hotDealId={} result={} 발송로그={}건 published={}건",
+        "[HotDeal Email Validation] completed hotDealId={} result={} applied={}",
         hotDealId,
         result.isPass() ? "PASS" : "FAIL",
-        updated,
-        published);
+        updated);
     return result;
   }
 }

@@ -16,6 +16,8 @@ public interface EmailDraftRepository {
 
   List<EmailDraftDto> findPublishReadyDrafts();
 
+  List<Long> findPublishReadyDraftIds(int limit);
+
   Optional<EmailDraftDto> findById(Long id);
 
   EmailDraftDto save(EmailDraftDto emailDraft);
@@ -27,4 +29,6 @@ public interface EmailDraftRepository {
 
   EmailDraftDto updatePublishStatus(
       Long id, EmailPublishStatus publishStatus, String publishErrorMessage);
+
+  boolean claimForPublishing(Long id);
 }

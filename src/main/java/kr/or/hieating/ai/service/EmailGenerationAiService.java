@@ -17,8 +17,11 @@ import org.springframework.util.StringUtils;
 public class EmailGenerationAiService {
 
   private final ChatClient chatClient;
-  private final org.springframework.ai.converter.BeanOutputConverter<kr.or.hieating.ai.dto.GeneratedHotDealEmailDto> outputConverter =
-      new org.springframework.ai.converter.BeanOutputConverter<>(kr.or.hieating.ai.dto.GeneratedHotDealEmailDto.class);
+  private final org.springframework.ai.converter.BeanOutputConverter<
+          kr.or.hieating.ai.dto.GeneratedHotDealEmailDto>
+      outputConverter =
+          new org.springframework.ai.converter.BeanOutputConverter<>(
+              kr.or.hieating.ai.dto.GeneratedHotDealEmailDto.class);
 
   // @Qualifier로 여러 ChatClient Bean 중 "생성용" Bean을 명시적으로 주입받음
   public EmailGenerationAiService(@Qualifier("emailGenerationChatClient") ChatClient chatClient) {

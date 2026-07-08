@@ -92,14 +92,6 @@
           AND status = 'PENDING'
     </update>
 
-    <select id="findApprovedEmailSendLogIds" resultType="long">
-        SELECT id
-        FROM email_send_logs
-        WHERE hot_deal_id = #{hotDealId}
-          AND status = 'APPROVED'
-        ORDER BY id ASC
-    </select>
-
     <select id="countSendLogs" resultType="int">
         SELECT COUNT(*)
         FROM email_send_logs
@@ -113,7 +105,7 @@
           AND (
               (
                   #{validationStatus} = 'PASS'
-                  AND status IN ('APPROVED', 'PUBLISHED', 'SENDING', 'SENT', 'RETRYING', 'FAILED')
+                  AND status IN ('APPROVED', 'PUBLISHING', 'PUBLISHED', 'SENDING', 'SENT', 'RETRYING', 'FAILED')
               )
               OR (
                   #{validationStatus} = 'FAIL'

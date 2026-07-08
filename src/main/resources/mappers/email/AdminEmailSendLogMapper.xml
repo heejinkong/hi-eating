@@ -46,7 +46,7 @@
       esl.status AS send_status,
       CASE
         WHEN esl.status = 'APPROVED' THEN 'READY'
-        WHEN esl.status = 'PUBLISHING' THEN 'PUBLISHED'
+        WHEN esl.status = 'PUBLISHING' THEN 'PUBLISHING'
         WHEN esl.status = 'PUBLISHED' THEN 'PUBLISHED'
         WHEN esl.status = 'SENDING' THEN 'SENDING'
         WHEN esl.status = 'SENT' THEN 'SENT'
@@ -87,6 +87,17 @@
     ORDER BY esl.created_at ASC, esl.id ASC
   </select>
 
+  <select id="findPublishReadyDraftIds" resultType="long">
+    SELECT id
+    FROM (
+      SELECT id
+      FROM email_send_logs
+      WHERE status = 'APPROVED'
+      ORDER BY created_at ASC, id ASC
+    )
+    WHERE ROWNUM &lt;= #{limit}
+  </select>
+
   <select id="findById" resultMap="EmailDraftResultMap">
     <include refid="EmailDraftColumns"/>
     WHERE esl.id = #{id}
@@ -109,5 +120,14 @@
         failure_reason = #{failureReason},
         updated_at = SYSTIMESTAMP
     WHERE id = #{id}
+  </update>
+
+  <update id="claimForPublishing">
+    UPDATE email_send_logs
+    SET status = 'PUBLISHING',
+        failure_reason = NULL,
+        updated_at = SYSTIMESTAMP
+    WHERE id = #{id}
+      AND status = 'APPROVED'
   </update>
 </mapper>

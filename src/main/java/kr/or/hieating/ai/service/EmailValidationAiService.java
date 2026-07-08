@@ -17,8 +17,11 @@ import org.springframework.util.StringUtils;
 public class EmailValidationAiService {
 
   private final ChatClient chatClient;
-  private final org.springframework.ai.converter.BeanOutputConverter<kr.or.hieating.ai.dto.EmailQualityValidationResult> outputConverter =
-      new org.springframework.ai.converter.BeanOutputConverter<>(kr.or.hieating.ai.dto.EmailQualityValidationResult.class);
+  private final org.springframework.ai.converter.BeanOutputConverter<
+          kr.or.hieating.ai.dto.EmailQualityValidationResult>
+      outputConverter =
+          new org.springframework.ai.converter.BeanOutputConverter<>(
+              kr.or.hieating.ai.dto.EmailQualityValidationResult.class);
 
   // @Qualifier로 여러 ChatClient Bean 중 "검증용" Bean을 명시적으로 주입받음
   public EmailValidationAiService(@Qualifier("emailValidationChatClient") ChatClient chatClient) {

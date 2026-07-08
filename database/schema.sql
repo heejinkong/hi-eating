@@ -393,6 +393,7 @@ CREATE TABLE EMAIL_SEND_LOGS
                                                 'NEEDS_REVIEW',
                                                 'APPROVED',
                                                 'PUBLISHED',
+                                                'PUBLISHING',
                                                 'SENDING',
                                                 'SENT',
                                                 'RETRYING',

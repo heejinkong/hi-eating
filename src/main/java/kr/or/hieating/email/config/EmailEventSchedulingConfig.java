@@ -1,0 +1,14 @@
+package kr.or.hieating.email.config;
+
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableScheduling;
+
+@EnableScheduling
+@Configuration
+@ConditionalOnProperty(
+    prefix = "greenfood.email-event",
+    name = "enabled",
+    havingValue = "true",
+    matchIfMissing = true)
+public class EmailEventSchedulingConfig {}
