@@ -23,9 +23,13 @@
   --admin-header-mb: 2rem;
 }
 
+html {
+  font-size: 18px !important; /* +2px font size increase */
+}
+
 /* ---- Body ---- */
-body {
-  font-family: var(--admin-font-family);
+body, input, select, textarea, button {
+  font-family: var(--admin-font-family) !important;
   background: var(--admin-bg);
   color: var(--admin-text);
 }
@@ -247,4 +251,47 @@ body {
   .header-panel {
     flex-direction: column;
   }
+}
+
+/* ---- Reusable Common Alert Modal Styling (matches admin-users.css modal) ---- */
+.admin-common-modal .modal-content {
+  border: 0 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08) !important;
+}
+
+.admin-common-modal .modal-title {
+  color: var(--admin-text) !important;
+  font-size: 1rem !important;
+  font-weight: 800 !important;
+}
+
+.admin-common-modal-message {
+  margin: 0 !important;
+  color: var(--admin-muted) !important;
+  font-size: 0.9rem !important;
+  font-weight: 700 !important;
+  line-height: 1.6 !important;
+}
+
+.admin-common-modal-button {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 43px !important;
+  border-radius: 8px !important;
+  font-size: 0.88rem !important;
+  font-weight: 800 !important;
+  white-space: nowrap !important;
+  cursor: pointer !important;
+  border: 0 !important;
+  background: var(--admin-brand-accent) !important;
+  color: #ffffff !important;
+  padding: 0 1.1rem !important;
+  width: 100% !important;
+  transition: background 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.admin-common-modal-button:hover {
+  background: var(--admin-brand-action) !important;
 }

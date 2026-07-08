@@ -368,6 +368,11 @@ function validateFormValues(values, controls) {
     controls.titleInput?.focus();
     return false;
   }
+  if (values.title.length > 20) {
+    alert('배너 제목은 20자 이하로 입력해 주세요.');
+    controls.titleInput?.focus();
+    return false;
+  }
   if (!values.start) {
     alert('시작일자를 선택해 주세요.');
     controls.startsAtInput?.focus();

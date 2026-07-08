@@ -107,11 +107,10 @@
     </div>
 
     <!-- 프로필 섹션 (하단 고정) -->
-    <a
+    <div
       class="user-profile"
       th:if="${currentUser != null}"
-      th:href="@{/mypage/edit}"
-      aria-label="회원정보 수정"
+      style="cursor: default;"
     >
       <div class="user-info">
         <div
@@ -125,6 +124,6 @@
           <span class="user-email" th:text="${currentUser.email}">eddy@alphaca.kr</span>
         </div>
       </div>
-    </a>
+    </div>
   </aside>
 </html>

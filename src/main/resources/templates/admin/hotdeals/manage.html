@@ -17,7 +17,7 @@
             <div class="stat-badge-icon"><i class="bi bi-lightning-fill"></i></div>
             <div class="stat-badge-info">
               <h3 th:text="${hotDeals != null ? hotDeals.size() : 0}">2</h3>
-              <p>전체 기획전</p>
+              <p>진행중인 핫딜</p>
             </div>
           </div>
         </div>
@@ -226,9 +226,8 @@
                 </div>
 
                 <div class="mb-3">
-                  <div class="d-flex justify-content-between align-items-center mb-1">
+                  <div class="mb-1">
                     <label class="control-label m-0" for="dealDescription">핫딜 설명</label>
-                    <button type="button" class="ai-btn-badge">AI 문장 추천</button>
                   </div>
                   <textarea
                     class="form-control form-control-custom w-100"
