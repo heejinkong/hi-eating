@@ -6,6 +6,11 @@ let editingHotDealId = null; // 수정중인 핫딜 ID를 저장하는 전역변
 
 let currentPage = 1;
 
+function getCsrfToken() {
+  const match = document.cookie.match(/(?:^|;\s*)XSRF-TOKEN=([^;]*)/);
+  return match ? decodeURIComponent(match[1]) : '';
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   searchProducts();
 
@@ -59,6 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
         method: method,
         headers: {
           'Content-Type': 'application/json',
+          'X-XSRF-TOKEN': getCsrfToken(),
         },
         body: JSON.stringify(requestData),
       })
@@ -101,6 +107,9 @@ document.addEventListener('DOMContentLoaded', () => {
       ) {
         fetch(`/admin/hotdeals/${editingHotDealId}`, {
           method: 'DELETE',
+          headers: {
+            'X-XSRF-TOKEN': getCsrfToken(),
+          },
         })
           .then((res) => res.json())
           .then((response) => {
