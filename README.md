@@ -3,6 +3,8 @@
 > **"AI가 고르고, AI가 쓰고, AI가 검증하는 스마트 핫딜 마케팅 & 실시간 상담 커머스 플랫폼"**  
 > **hi-eating**은 사용자의 행동 데이터를 다차원 벡터로 분석하여 초개인화된 상품을 추천하고, Spring AI와 Ollama 원격 LLM을 연동한 지능형 핫딜 타겟팅 파이프라인 및 RabbitMQ 기반의 고신뢰성 비동기 메시징 아키텍처를 구현한 혁신적인 이커머스 웹 애플리케이션입니다.
 
+<img width="619" height="301" alt="스크린샷 2026-07-12 오전 12 55 16" src="https://github.com/user-attachments/assets/8a497362-0d14-48e7-943b-b743c4cb0a35" />
+
 ---
 
 ## 📑 목차
@@ -13,10 +15,12 @@
 - [5. 트러블슈팅 및 최적화 경험](#5-트러블슈팅-및-최적화-경험)
 - [6. 프로젝트 시작 가이드](#6-프로젝트-시작-가이드)
 
----
+---<img width="616" height="299" alt="스크린샷 2026-07-12 오전 12 57 58" src="https://github.com/user-attachments/assets/0c0ddec2-bde8-49c5-8cfd-ec9b28e1c47d" />
+
+
 
 ## 1. 프로젝트 개요
-
+<img width="618" height="295" alt="스크린샷 2026-07-12 오전 12 56 28" src="https://github.com/user-attachments/assets/455653a3-1a2c-45d3-8b07-65db4827bccc" />
 * **개발 기간**: 2026.07
 * **기획 배경**: 현대 이커머스에서 불특정 다수를 타겟으로 하는 마케팅 이메일은 낮은 전환율과 높은 피로도를 유발합니다. 또한 실시간 문의 대응의 부재는 고객 이탈의 주원인입니다.
 * **데이터 출처**: **현대백화점 그룹 현대그린푸드의 케어푸드 전문 브랜드 '그리팅(Greating)'**의 실제 상품 데이터를 **크롤링(Crawling)**하여 풍부하고 사실적인 건강식/케어푸드 제품 데이터셋을 구축했습니다.
@@ -68,6 +72,9 @@ graph TD
 ## 3. 핵심 기능 설명
 
 ### 🤖 1. AI 기반 핫딜 마케팅 자동화 파이프라인
+
+<img width="614" height="297" alt="스크린샷 2026-07-12 오전 12 54 42" src="https://github.com/user-attachments/assets/9ccc84c9-576c-4e78-a1fc-b76d5923c83f" />
+
 * **비동기 작업 스케줄러 (`TargetSelectionJobProcessor`)**: 핫딜이 생성되면 비동기 백그라운드 작업이 큐잉됩니다.
 * **정밀 타겟 스코어링 (`TargetUserScoringAiClient`)**: 
   - 후보 고객의 카테고리별 활동 로그를 수집하여 AI 검증용 모델(Ollama 포트 11435, `temperature 0.2`로 일관성 확보)에 전달합니다.
@@ -78,6 +85,9 @@ graph TD
   - 작성된 본문에 대해 맞춤법, 할인율 오류, 허위 정보, 비속어, 본문 길이 등을 자가 평가(`PASS`/`FAIL`)하고 사유(`issues`)를 JSON으로 매핑하여 관리자의 검수 편의성을 증대합니다.
 
 ### 🎯 2. 개인화 텍스트 임베딩 추천 엔진
+
+<img width="614" height="295" alt="스크린샷 2026-07-12 오전 12 58 40" src="https://github.com/user-attachments/assets/21c5c5bc-a48d-4877-bc6e-1601c3570505" />
+
 * **사용자 행동 분석 프로필 (`UserProfileService`)**: 
   - 사용자의 행동 이력에 따라 가중치(구매 3.0, 찜 2.0, 방문 1.0, 4점 이상 평점 1.5)를 다르게 수집합니다.
   - 각 활동의 텍스트 요약을 임베딩하여 가중 평균을 구해 사용자의 취향을 대표하는 단일 **프로필 벡터**를 완성합니다.
@@ -86,11 +96,15 @@ graph TD
   - 실시간으로 코사인 유사도를 계산하여 유저 취향과 가장 밀착된 상위 7개(`TOP_N`) 상품 리스트를 렌더링합니다.
 
 ### 🐇 3. 고신뢰성 비동기 메시지 발행 (RabbitMQ)
+
+<img width="615" height="297" alt="스크린샷 2026-07-12 오전 12 59 12" src="https://github.com/user-attachments/assets/11b4887e-5a71-46c2-8c1e-0d81cfca0f7a" />
 * **Publisher Confirms & Returns**: 
   - 메시지가 유실되는 것을 방지하기 위해 `CorrelationData` 객체 및 `confirmCallback`을 적용했습니다.
   - RabbitMQ 브로커가 메시지를 안전하게 수신했는지 (`Ack`) 비동기 확인을 거치며, 라우팅 오류(`ReturnedMessage`) 감지 시 발송 로그 테이블에 실패 사유와 상태 코드를 기입합니다.
 
 ### 💬 4. 실시간 1:1 고객 관리 채팅 (WebSockets)
+
+<img width="617" height="303" alt="스크린샷 2026-07-12 오전 1 00 09" src="https://github.com/user-attachments/assets/5d89548a-2f94-4c04-a05a-7d5f1d11da20" />
 * 일반 사용자용 플로팅 채팅 위젯과 관리자 전용 어드민 대화 패널 간의 양방향 WebSocket 통신 채널을 운영합니다.
 * 다중 동시 쓰기 환경에서 웹소켓 충돌을 예방하는 스레드 세이프 구조를 완성했습니다.
 
@@ -141,23 +155,19 @@ graph TD
 * **원인**: IME 입력 상태에서는 브라우저의 키다운 이벤트가 문자 조립 완료 신호와 입력 신호 두 개를 모두 발생시키기 때문임.
 * **해결**: `chat-widget.js` 이벤트 리스너 내부에 `event.isComposing` 프로퍼티 검사를 도입하여 문자 입력 조합 중에는 폼 전송 이벤트 호출을 차단하도록 수정했습니다.
 
+### 🧠 Spring AI & Ollama 연동 트러블슈팅
+
+#### 1. 다중 ChatClient 빈(Bean) 주입 모호성 예외 (`NoUniqueBeanDefinitionException`)
+* **문제**: 이메일 콘텐츠 생성용(`emailGenerationChatClient`)과 품질 검증용(`emailValidationChatClient`)으로 용도가 다른 두 개의 `ChatClient` 빈을 등록하여 의존성 주입 시 어떤 빈을 매핑해야 할지 몰라 컴파일 에러 발생.
+* **해결**: 각 서비스 클래스(`EmailValidationAiService`, `TargetUserScoringAiClient`)의 생성자 파라미터 레벨에 `@Qualifier("emailValidationChatClient")` 어노테이션을 명시해 각각에 맞는 전용 클라이언트를 정교하게 바인딩하여 의존성 주입 모호성을 완전히 극복했습니다.
+
+#### 2. 로컬 LLM 응답 포맷 불안정 및 Jackson JSON 파싱 예외
+* **문제**: 원격/로컬 Ollama LLM 특성상 프롬프트 지시를 위반하고 답변에 마크다운 펜스(```json ... ```)를 씌우거나 원하지 않는 자연어 꼬리표를 붙여 Jackson `ObjectMapper` 파싱 중에 `JsonProcessingException`이 빈번하게 터지는 버그 발생.
+* **해결**:
+  * **전처리 파싱 가드 (`extractJson`)**: 응답 문자열에서 최초의 중괄호(`{`)와 마지막 중괄호(`}`) 위치를 계산하여 순수 JSON 데이터 블록만 깔끔하게 도려내는 정밀 전처리 정규 가공 메소드를 구현했습니다.
+  * **배치 2분할 재시도 (Divide & Conquer)**: 특정 배치 단위(예: 30명) 평가 중에 일부 사용자의 정보로 인해 LLM 포맷 에러가 발생한 경우, 전체를 실패로 처리하지 않고 후보군 리스트를 절반으로 분할하여 개별 재시도를 큐잉하는 전략적 예외 분할 메커니즘을 설계했습니다.
+  * **룰 기반 폴백 (Rule-based Fallback)**: 최종 임계값 내 재시도 실패 시 서비스 중단을 막기 위해, 사용자 활동 등급 기반으로 스코어를 자동 보정하는 규칙 기반 자체 알고리즘(50점 고정 및 장애 대응 로깅) 정책을 결합한 다중 안전장치를 구축했습니다.
+
+
 ---
-
-## 6. 프로젝트 시작 가이드
-
-### 📋 요구 사항 (Prerequisites)
-* Java 17 SDK 이상
-* RabbitMQ 브로커 실행 상태 (Port 5672)
-* Oracle DB 실행 상태 (Port 1521)
-* Ollama 실행 상태 (Port 11434, 11435, 11436에 별도 서버 설정 혹은 포트포워딩)
-
-### 🛠️ Ollama 로컬 모델 준비
-```bash
-# 생성용 및 검증용 모델 다운로드
-ollama pull kosa-ollama3:latest
-
-# 임베딩용 추천 모델 다운로드
-ollama pull nomic-embed-text:latest
-```
-
 *본 프로젝트는 현대퓨처넷 교육과정의 팀 프로젝트 결과물로, 초개인화된 AI 추천 및 고성능 비동기 아키텍처 구현을 목표로 제작되었습니다.*
